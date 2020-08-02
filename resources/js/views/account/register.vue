@@ -11,7 +11,9 @@ export default {
       password: "",
       phone: "",
       isRegisterError: false,
-      registerSuccess: false
+      registerSuccess: false,
+      phoneFocus: false,
+      passwordFocus: false
     };
   },
   props: {
@@ -41,32 +43,17 @@ export default {
 
 <template>
   <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6 col-xl-5">
+    <div class="col-12 text-center mb-5">
+      <div>
+        <img src="/images/logo.svg" alt="Zenvision" class="img-fluid" />
+      </div>
+    </div>
+    <div class="col-md-8 col-lg-6 col-xl-5 mt-2">
       <div class="card overflow-hidden">
-        <div class="bg-soft-primary">
-          <div class="row">
-            <div class="col-7">
-              <div class="text-primary p-4">
-                <h5 class="text-primary">Free Register</h5>
-                <p>Get your free Skote account now.</p>
-              </div>
-            </div>
-            <div class="col-5 align-self-end">
-              <img src="/images/profile-img.png" alt class="img-fluid" />
-            </div>
-          </div>
+        <div class="text-center">
+          <h4 class="text-white text-uppercase mb-4 mt-4">Sign Up</h4>
         </div>
         <div class="card-body pt-0">
-          <div>
-            <a href="/">
-              <div class="avatar-md profile-user-wid mb-4">
-                <span class="avatar-title rounded-circle bg-light">
-                  <img src="/images/logo.svg" alt class="rounded-circle" height="34" />
-                </span>
-              </div>
-            </a>
-          </div>
-
           <b-alert
             v-model="registerSuccess"
             class="mt-3"
@@ -142,7 +129,7 @@ export default {
             </b-form-group>
 
             <div class="mt-4">
-              <b-button type="submit" variant="primary" class="btn-block">Register</b-button>
+              <b-button type="submit" variant="primary" class="btn-block btn-success">Register</b-button>
             </div>
 
             <div class="mt-4 text-center">
