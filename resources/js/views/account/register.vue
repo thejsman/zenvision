@@ -5,10 +5,11 @@
 export default {
   data() {
     return {
-      name: "",
+      firstname: "",
+      lastname: "",
       email: "",
       password: "",
-      password_confirmation: "",
+      phone: "",
       isRegisterError: false,
       registerSuccess: false
     };
@@ -26,6 +27,14 @@ export default {
   },
   mounted() {
     this.isRegisterError = !!this.regError;
+  },
+  computed: {
+    phoneState() {
+      return this.phone.length > 9 ? true : false;
+    },
+    passwordState() {
+      return this.password.length > 5 ? true : false;
+    }
   }
 };
 </script>
@@ -69,43 +78,67 @@ export default {
 
           <b-form class="p-2" :action="submitUrl" method="POST">
             <slot />
-            <b-form-group id="email-group" label="Name" label-for="name">
+            <b-form-group id="firstname-group">
               <b-form-input
-                id="name"
-                v-model="name"
-                name="name"
+                id="firstname"
+                v-model="firstname"
+                name="firstname"
                 type="text"
-                placeholder="Enter name"
+                placeholder="First name"
+                required
               ></b-form-input>
             </b-form-group>
-
-            <b-form-group id="fullname-group" label="Email" label-for="email">
+            <b-form-group id="lastname-group">
+              <b-form-input
+                id="lastname"
+                v-model="lastname"
+                name="lastname"
+                type="text"
+                placeholder="Last name"
+                required
+              ></b-form-input>
+            </b-form-group>
+            <b-form-group id="fullname-group">
               <b-form-input
                 id="email"
                 name="email"
                 v-model="email"
                 type="email"
                 placeholder="Enter email"
+                required
               ></b-form-input>
             </b-form-group>
-
-            <b-form-group id="password-group" label="Password" label-for="password">
+            <b-form-group id="phone-group">
+              <b-form-input
+                id="phone"
+                v-model="phone"
+                @focus="phoneFocus=true"
+                aria-describedby="phone-feedback"
+                name="phone"
+                type="tel"
+                placeholder="Phone number"
+                required
+              ></b-form-input>
+              <b-form-invalid-feedback
+                :state="phoneFocus? phoneState : true"
+                id="phone-feedback"
+              >Phone number should be a 10 digit number</b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group id="password-group">
               <b-form-input
                 id="password"
                 v-model="password"
+                @focus="passwordFocus=true"
+                aria-descrivedby="password-feedback"
                 name="password"
                 type="password"
                 placeholder="Enter password"
+                required
               ></b-form-input>
-            </b-form-group>
-            <b-form-group label="Confirm Password" label-for="password-confirm">
-              <b-form-input
-                id="password-confirm"
-                v-model="password_confirmation"
-                name="password_confirmation"
-                type="password"
-                placeholder="Confirm password"
-              ></b-form-input>
+              <b-form-invalid-feedback
+                id="password-feeback"
+                :state="passwordFocus? passwordState : true"
+              >Password must be at least 6 character long</b-form-invalid-feedback>
             </b-form-group>
 
             <div class="mt-4">
