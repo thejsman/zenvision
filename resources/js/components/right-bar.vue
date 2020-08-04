@@ -45,7 +45,7 @@ export default {
             <hr class="mt-0" />
             <h6 class="text-center mb-0">Choose Mode</h6>
 
-            <div class="p-4">
+            <!-- <div class="p-4">
                 <div class="mb-2">
                     <a href="javascript: void(0);" @click="$root.changeMode('default')">
                         <img src="/images/layouts/layout-1.jpg" class="img-fluid img-thumbnail" alt />
@@ -63,7 +63,7 @@ export default {
                         <img src="/images/layouts/layout-3.jpg" class="img-fluid img-thumbnail" alt />
                     </a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 

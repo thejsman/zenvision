@@ -142,29 +142,33 @@ export default {
           id: 1,
           title: "Email Marketing",
           value: "-",
-          data: [{
-            title: "Email sent",
-            value: "-"
-          },
-          {
-            title: "Revenue",
-            value: "-"
-          }]
+          data: [
+            {
+              title: "Email sent",
+              value: "-",
+            },
+            {
+              title: "Revenue",
+              value: "-",
+            },
+          ],
         },
         {
-          id: 1,
+          id: 2,
           title: "Organic Search",
           value: "-",
-          data: [{
-            title: "Traffic",
-            value: "-"
-          },
-          {
-            title: "Revenue",
-            value: "-"
-          }]
+          data: [
+            {
+              title: "Traffic",
+              value: "-",
+            },
+            {
+              title: "Revenue",
+              value: "-",
+            },
+          ],
         },
-      ]
+      ],
     };
   },
 };
@@ -173,14 +177,14 @@ export default {
   <Layout>
     <div class="row">
       <div class="col-12">
-        <div class="page-title-box d-flex align-items-center justify-content-between">
+        <div class="page-title-box d-flex justify-content-between">
           <b-button variant="primary">
             Add Channels
             <i class="fas fa-plus pl-1"></i>
           </b-button>
           <div class="page-title-right">
-            <ol class="breadcrumb m-0">
-              <li class="breadcrumb-item active">
+            <ol class="text-center m-0">
+              <li class="list-unstyled">
                 Date Range:
                 <b-button variant="outline-light">01/01/2018 - 12/31/2018</b-button>
               </li>
@@ -223,12 +227,12 @@ export default {
           </div>
           <div class="col-xl-12 pa-chart card-body"></div>
         </div>
-          <div class="row">
+        <div class="row">
           <div class="col-xl-12 mt-4">
             <h3>Acquisition Channels</h3>
           </div>
           <div v-for="channel of channelsData" :key="channel.id" class="col-md-4 p-2">
-            <Stat :title="channel.title" :value="channel.value" :data="channel.data" />
+            <Stat :title="channel.title" :value="channel.value" :channelData="channel.data" />
           </div>
         </div>
       </div>

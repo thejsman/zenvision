@@ -15,9 +15,9 @@ export default {
     id: {
       type: Number,
     },
-    data: {
+    channelData: {
       type: Array,
-      default: [],
+      default: () =>([]),
     },
   },
 };
@@ -32,9 +32,9 @@ export default {
           <h4 class="mb-0">{{value}}</h4>
         </div>
       </div>
-      <div v-for="d of data" :key="d.titled" class="block">
-        <span class="text-muted font-weight-medium pt-1 pb-1">{{d.title}}</span>
-        <span class="float-right">{{d.value}}</span>
+      <div v-for="data of channelData" :key="data.title" class="block">
+        <span class="text-muted font-weight-medium pt-1 pb-1">{{data.title}}</span>
+        <span class="float-right">{{data.value}}</span>
       </div>
     </div>
   </div>
