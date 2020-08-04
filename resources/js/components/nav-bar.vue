@@ -40,8 +40,8 @@ export default {
           document.webkitCancelFullScreen();
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -79,43 +79,19 @@ export default {
           <i class="fa fa-fw fa-bars"></i>
         </button>
       </div>
-
       <div class="d-flex">
-        <b-dropdown
-          class="d-inline-block d-lg-none ml-2"
-          variant="black"
-          menu-class="dropdown-menu-lg p-0"
-          toggle-class="header-item noti-icon"
-          right
-        >
+        <b-dropdown right variant="black" toggle-class="header-item">
           <template v-slot:button-content>
-            <i class="mdi mdi-magnify"></i>
-          </template>
-
-          <form class="p-3">
-            <div class="form-group m-0">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search ..."
-                  aria-label="Recipient's username"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit">
-                    <i class="mdi mdi-magnify"></i>
-                  </button>
-                </div>
-              </div>
+            <div class="dropdown d-inline-block">
+              <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right">
+                <i class="bx bx-cog toggle-right"></i>
+              </button>
             </div>
-          </form>
+          </template>
+          <a class="dropdown-item text-danger" href="/logout">
+            <i class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"></i> Logout
+          </a>
         </b-dropdown>
-
-        <div class="dropdown d-inline-block">
-          <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right">
-            <i class="bx bx-cog bx-spin toggle-right"></i>
-          </button>
-        </div>
       </div>
     </div>
   </header>
