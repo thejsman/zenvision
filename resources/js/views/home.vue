@@ -100,6 +100,43 @@ export default {
           value: "-",
         },
       ],
+      performanceData: [
+        {
+          id: 1,
+          title: "Conversion Rate",
+          value: "-",
+        },
+        {
+          id: 2,
+          title: "Abandoned Cart",
+          value: "-",
+        },
+        {
+          id: 3,
+          title: "LTV",
+          value: "-",
+        },
+        {
+          id: 4,
+          title: "Avg Order Value",
+          value: "-",
+        },
+        {
+          id: 5,
+          title: "Avg Units Per Order",
+          value: "-",
+        },
+        {
+          id: 6,
+          title: "Avg Profit Per Orders",
+          value: "-",
+        },
+        {
+          id: 7,
+          title: "% US Orders",
+          value: "-",
+        },
+      ],
     };
   },
 };
@@ -137,6 +174,14 @@ export default {
           </div>
           <div v-for="cost of costData" :key="cost.id" class="col-md-4 p-2">
             <Stat :title="cost.title" :value="cost.value" />
+          </div>
+        </div>
+         <div class="row">
+          <div class="col-xl-12 mt-4">
+            <h3>Key Performance Metrics</h3>
+          </div>
+          <div v-for="performance of performanceData" :key="performance.id" class="col-md-4 p-2">
+            <Stat :title="performance.title" :value="performance.value" />
           </div>
         </div>
       </div>
