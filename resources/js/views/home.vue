@@ -53,6 +53,53 @@ export default {
           value: "-",
         },
       ],
+       costData: [
+        {
+          id: 1,
+          title: "Ad Spend",
+          value: "-",
+        },
+        {
+          id: 2,
+          title: "COGS",
+          value: "-",
+        },
+        {
+          id: 3,
+          title: "Merchant Fees",
+          value: "-",
+        },
+        {
+          id: 4,
+          title: "Refunds",
+          value: "-",
+        },
+        {
+          id: 5,
+          title: "Chargebacks",
+          value: "-",
+        },
+        {
+          id: 6,
+          title: "Discounts",
+          value: "-",
+        },
+        {
+          id: 7,
+          title: "Subscription Costs",
+          value: "-",
+        },
+        {
+          id: 8,
+          title: "Taxes",
+          value: "-",
+        },
+        {
+          id: 9,
+          title: "Operating Costs",
+          value: "-",
+        },
+      ],
     };
   },
 };
@@ -82,6 +129,14 @@ export default {
           </div>
           <div v-for="stat of statData" :key="stat.id" class="col-md-4 p-2">
             <Stat :title="stat.title" :value="stat.value" />
+          </div>
+        </div>
+         <div class="row">
+          <div class="col-xl-12 mt-4">
+            <h3>Cost</h3>
+          </div>
+          <div v-for="cost of costData" :key="cost.id" class="col-md-4 p-2">
+            <Stat :title="cost.title" :value="cost.value" />
           </div>
         </div>
       </div>
