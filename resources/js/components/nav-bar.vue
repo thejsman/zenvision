@@ -49,35 +49,22 @@ export default {
   <header id="page-topbar">
     <div class="navbar-header">
       <div class="d-flex">
-        <!-- LOGO -->
-        <div class="navbar-brand-box">
-          <a href="/" class="logo logo-dark">
-            <span class="logo-sm">
-              <img src="/images/logo.svg" alt height="22" />
-            </span>
-            <span class="logo-lg">
-              <img src="/images/logo-dark.png" alt height="17" />
-            </span>
-          </a>
-
-          <a href="/" class="logo logo-light">
-            <span class="logo-sm">
-              <img src="/images/logo-light.svg" alt height="22" />
-            </span>
-            <span class="logo-lg">
-              <img src="/images/logo-light.png" alt height="19" />
-            </span>
-          </a>
-        </div>
-
         <button
           id="vertical-menu-btn"
           type="button"
-          class="btn btn-sm px-3 font-size-16 header-item"
+          class="btn btn-sm px-4 font-size-16 header-item"
           @click="toggleMenu"
         >
           <i class="fa fa-fw fa-bars"></i>
         </button>
+        <!-- LOGO -->
+        <div class="px-4">
+          <a href="/" class="logo">
+            <span>
+              <img src="/images/logo.svg" alt height="22" />
+            </span>
+          </a>
+        </div>
       </div>
       <div class="d-flex">
         <b-dropdown right variant="black" toggle-class="header-item">
