@@ -6,17 +6,20 @@ export default {
   props: {
     title: {
       type: String,
-      default: ""
+      default: "",
     },
     value: {
       type: String,
-      default: ""
+      default: "",
     },
     id: {
       type: Number,
-      
-    }
-  }
+    },
+    data: {
+      type: Array,
+      default: [],
+    },
+  },
 };
 </script>
 
@@ -28,15 +31,11 @@ export default {
           <p class="text-muted font-weight-medium">{{title}}</p>
           <h4 class="mb-0">{{value}}</h4>
         </div>
-
-        <!-- <div class="mini-stat-icon avatar-sm align-self-center">
-          <span class="">
-            <i :class="`${icon} font-size-24`"></i>
-          </span>
-        </div> -->
+      </div>
+      <div v-for="d of data" :key="d.titled" class="block">
+        <span class="text-muted font-weight-medium pt-1 pb-1">{{d.title}}</span>
+        <span class="float-right">{{d.value}}</span>
       </div>
     </div>
-    <!-- end card-body -->
   </div>
-  <!-- end card -->
 </template>

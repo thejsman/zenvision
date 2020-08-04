@@ -53,7 +53,7 @@ export default {
           value: "-",
         },
       ],
-       costData: [
+      costData: [
         {
           id: 1,
           title: "Ad Spend",
@@ -137,6 +137,34 @@ export default {
           value: "-",
         },
       ],
+      channelsData: [
+        {
+          id: 1,
+          title: "Email Marketing",
+          value: "-",
+          data: [{
+            title: "Email sent",
+            value: "-"
+          },
+          {
+            title: "Revenue",
+            value: "-"
+          }]
+        },
+        {
+          id: 1,
+          title: "Organic Search",
+          value: "-",
+          data: [{
+            title: "Traffic",
+            value: "-"
+          },
+          {
+            title: "Revenue",
+            value: "-"
+          }]
+        },
+      ]
     };
   },
 };
@@ -152,14 +180,17 @@ export default {
           </b-button>
           <div class="page-title-right">
             <ol class="breadcrumb m-0">
-              <li class="breadcrumb-item active">Date Range:</li>
+              <li class="breadcrumb-item active">
+                Date Range:
+                <b-button variant="outline-light">01/01/2018 - 12/31/2018</b-button>
+              </li>
             </ol>
           </div>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="col-xl-6">
+      <div class="col-xl-5">
         <div class="row">
           <div class="col-xl-12 mt-4">
             <h3>Revenues</h3>
@@ -168,7 +199,7 @@ export default {
             <Stat :title="stat.title" :value="stat.value" />
           </div>
         </div>
-         <div class="row">
+        <div class="row">
           <div class="col-xl-12 mt-4">
             <h3>Cost</h3>
           </div>
@@ -176,7 +207,7 @@ export default {
             <Stat :title="cost.title" :value="cost.value" />
           </div>
         </div>
-         <div class="row">
+        <div class="row">
           <div class="col-xl-12 mt-4">
             <h3>Key Performance Metrics</h3>
           </div>
@@ -185,7 +216,29 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-xl-6">Char here</div>
+      <div class="col-xl-7">
+        <div class="row ml-2">
+          <div class="col-xl-12 mt-4">
+            <h3>Profit Analysis</h3>
+          </div>
+          <div class="col-xl-12 pa-chart card-body"></div>
+        </div>
+          <div class="row">
+          <div class="col-xl-12 mt-4">
+            <h3>Acquisition Channels</h3>
+          </div>
+          <div v-for="channel of channelsData" :key="channel.id" class="col-md-4 p-2">
+            <Stat :title="channel.title" :value="channel.value" :data="channel.data" />
+          </div>
+        </div>
+      </div>
     </div>
   </Layout>
 </template>
+<style scoped>
+.pa-chart {
+  width: 100%;
+  height: 300px;
+  background-color: #2a3042;
+}
+</style>
