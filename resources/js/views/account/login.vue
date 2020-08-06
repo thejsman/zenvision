@@ -39,7 +39,7 @@ export default {
       <div class="card overflow-hidden">
         <div class="card-body pt-0">
           <div class="text-center">
-            <h4 class="text-white text-uppercase mb-4 mt-4">Login</h4>
+            <h4 class="text-white text-uppercase mb-4 mt-4">Log in</h4>
           </div>
           <b-alert v-model="isAuthError" variant="danger" class="mt-3" dismissible>{{authError}}</b-alert>
 

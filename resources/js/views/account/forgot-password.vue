@@ -77,7 +77,7 @@ export default {
       <div class="mt-5 text-center">
         <p>
           Remember It ?
-          <a href="/login" class="font-weight-medium text-primary">Login here</a>
+          <a href="/login" class="font-weight-medium text-primary">Log in here</a>
         </p>
       </div>
     </div>

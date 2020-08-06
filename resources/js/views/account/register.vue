@@ -150,7 +150,7 @@ export default {
       <div class="mt-5 text-center">
         <p>
           Already have an account ?
-          <a href="/login" class="font-weight-medium text-primary">Login</a>
+          <a href="/login" class="font-weight-medium text-primary">Log in</a>
         </p>
       </div>
     </div>
