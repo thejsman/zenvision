@@ -183,8 +183,8 @@ export default {
               Add Channels
               <i class="fas fa-plus pl-1"></i>
             </template>
-            <b-dropdown-item href="#">Shopify</b-dropdown-item>
-            <b-dropdown-item href="#">Facebook Ads</b-dropdown-item>
+            <b-dropdown-item href="#"><img src="/images/icons/shopify-icon.svg" alt="" height="21" class="mr-2"/>  Shopify</b-dropdown-item>
+            <b-dropdown-item href="#"><img src="/images/icons/facebook-icon.svg" alt="" height="19" class="mr-2" /> Facebook Ads</b-dropdown-item>
           </b-dropdown>
           <div class="page-title-right">
             <ol class="text-center m-0">
