@@ -178,10 +178,14 @@ export default {
     <div class="row">
       <div class="col-12">
         <div class="page-title-box d-flex justify-content-between">
-          <b-button variant="primary">
-            Add Channels
-            <i class="fas fa-plus pl-1"></i>
-          </b-button>
+           <b-dropdown variant="primary" class="m-2">
+            <template v-slot:button-content>
+              Add Channels
+              <i class="fas fa-plus pl-1"></i>
+            </template>
+            <b-dropdown-item href="#">Shopify</b-dropdown-item>
+            <b-dropdown-item href="#">Facebook Ads</b-dropdown-item>
+          </b-dropdown>
           <div class="page-title-right">
             <ol class="text-center m-0">
               <li class="list-unstyled">
