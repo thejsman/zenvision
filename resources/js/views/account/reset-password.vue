@@ -32,37 +32,23 @@ export default {
 
 <template>
   <div class="row justify-content-center">
+     <div class="col-12 text-center mb-5">
+      <div>
+        <img src="/images/logo.svg" alt="Zenvision" class="img-fluid" />
+      </div>
+    </div>
     <div class="col-md-8 col-lg-6 col-xl-5">
       <div class="card overflow-hidden">
-        <div class="bg-soft-primary">
-          <div class="row">
-            <div class="col-7">
-              <div class="text-primary p-4">
-                <h5 class="text-primary">Reset Password</h5>
-                <p>Re-Password with Skote.</p>
-              </div>
-            </div>
-            <div class="col-5 align-self-end">
-              <img src="/images/profile-img.png" alt class="img-fluid" />
-            </div>
-          </div>
-        </div>
-        <div class="card-body pt-0">
-          <div>
-            <a href="/">
-              <div class="avatar-md profile-user-wid mb-4">
-                <span class="avatar-title rounded-circle bg-light">
-                  <img src="/images/logo.svg" alt height="34" />
-                </span>
-              </div>
-            </a>
+        <div class="card-body pt-2">
+            <div class="text-center">
+            <h4 class="text-white text-uppercase mb-4 mt-4">reset password</h4>
           </div>
           <div class="p-2">
             <b-alert v-model="isResetError" class="mb-4" variant="danger" dismissible>{{error}}</b-alert>
             <form :action="submitUrl" method="POST">
               <slot />
               <div class="form-group">
-                <label for="useremail">Email</label>
+               
                 <input
                   type="email"
                   name="email"
@@ -72,25 +58,27 @@ export default {
                   placeholder="Enter email"
                 />
               </div>
-              <b-form-group id="password-group" label="Password" label-for="password">
+              <b-form-group id="password-group" >
                 <b-form-input
                   id="password"
                   name="password"
                   type="password"
                   placeholder="Enter password"
+                  required
                 ></b-form-input>
               </b-form-group>
-              <b-form-group label="Confirm Password" label-for="password-confirm">
+              <b-form-group>
                 <b-form-input
                   id="password-confirm"
                   name="password_confirmation"
                   type="password"
                   placeholder="Confirm password"
+                  required
                 ></b-form-input>
               </b-form-group>
               <div class="form-group row mb-0">
                 <div class="col-12 text-right">
-                  <button class="btn btn-primary w-md" type="submit">Reset</button>
+                  <button class="btn btn-primary btn-success btn-block" type="submit">Reset</button>
                 </div>
               </div>
             </form>
