@@ -8,16 +8,16 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
+
+    /* Rule to make password min length to 6 */
+    public function rules()
+    {
+        return [
+          'password' => ['required', 'min:6', 'confirmed']
+    
+        ];
+    }
+
 
     use ResetsPasswords;
 
