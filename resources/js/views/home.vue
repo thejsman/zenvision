@@ -2,12 +2,13 @@
 import Layout from "../layouts/main";
 import PageHeader from "../components/page-header";
 import Stat from "../components/widgets/stat";
+import ShopifyConnect from "../components/ShopifyConnect-modal";
 
 /**
  * Starter component
  */
 export default {
-  components: { Layout, PageHeader, Stat },
+  components: { Layout, PageHeader, Stat, ShopifyConnect },
   data() {
     return {
       title: "Zenvision Dashboard",
@@ -171,6 +172,11 @@ export default {
       ],
     };
   },
+  methods: {
+    openModal() {
+      this.$refs.modal.ShopifyConnect();
+    },
+  },
 };
 </script>
 <template>
@@ -178,13 +184,18 @@ export default {
     <div class="row">
       <div class="col-12">
         <div class="page-title-box d-flex justify-content-between">
-           <b-dropdown variant="primary" class="m-2">
+          <b-dropdown variant="primary" class="m-2">
             <template v-slot:button-content>
               Add Channels
               <i class="fas fa-plus pl-1"></i>
             </template>
-            <b-dropdown-item href="#"><img src="/images/icons/shopify-icon.svg" alt="" height="21" class="mr-2"/>  Shopify</b-dropdown-item>
-            <b-dropdown-item href="#"><img src="/images/icons/facebook-icon.svg" alt="" height="19" class="mr-2" /> Facebook Ads</b-dropdown-item>
+            <b-dropdown-item href="#" v-b-modal.shopify-connect>
+              <img src="/images/icons/shopify-icon.svg" alt height="21" class="mr-2" />
+              Shopify
+            </b-dropdown-item>
+            <b-dropdown-item href="#">
+              <img src="/images/icons/facebook-icon.svg" alt height="19" class="mr-2" /> Facebook Ads
+            </b-dropdown-item>
           </b-dropdown>
           <div class="page-title-right">
             <ol class="text-center m-0">
@@ -241,6 +252,9 @@ export default {
         </div>
       </div>
     </div>
+    <b-modal id="shopify-connect" centered hide-footer hide-header>
+      <ShopifyConnect />
+    </b-modal>
   </Layout>
 </template>
 <style scoped>
