@@ -20,7 +20,7 @@
           >Contact our support</a>
         </div>
         <div>
-          <b-button variant="primary" class="btn btn-cancel">Cancel</b-button>
+          <b-button variant="primary" class="btn btn-cancel" @click="$emit('handle-close')">Cancel</b-button>
         </div>
       </div>
     </div>

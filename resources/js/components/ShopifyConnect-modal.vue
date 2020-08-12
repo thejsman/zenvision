@@ -33,14 +33,18 @@
             >How to connect my Shopify store?</a>
           </div>
           <div>
-            <b-button variant="primary" class="btn btn-cancel mr-2">Cancel</b-button>
+            <b-button
+              variant="primary"
+              class="btn btn-cancel mr-2"
+              @click="$emit('handle-close')"
+            >Cancel</b-button>
             <b-button type="submit" variant="primary" class="btn btn-success">Connect</b-button>
           </div>
         </div>
       </b-form>
     </div>
     <b-modal id="how-to-connect-store" size="lg" centered hide-footer hide-header>
-      <HowToConnectStore />
+      <HowToConnectStore @handle-close="$bvModal.hide('how-to-connect-store')" />
     </b-modal>
   </div>
 </template>
@@ -98,6 +102,9 @@ export default {
         this.store_url = clipboard_text;
         $("#store_url").blur();
       }
+    },
+    handleClose() {
+      this.$emit("closemodal");
     },
   },
 };

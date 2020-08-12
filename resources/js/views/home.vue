@@ -172,11 +172,6 @@ export default {
       ],
     };
   },
-  methods: {
-    openModal() {
-      this.$refs.modal.ShopifyConnect();
-    },
-  },
 };
 </script>
 <template>
@@ -253,7 +248,7 @@ export default {
       </div>
     </div>
     <b-modal id="shopify-connect" centered hide-footer hide-header>
-      <ShopifyConnect />
+      <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
     </b-modal>
   </Layout>
 </template>
