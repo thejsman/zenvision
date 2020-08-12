@@ -233,7 +233,7 @@ export default {
           <div class="col-xl-12 mt-4">
             <h3>Profit Analysis</h3>
           </div>
-          <div class="col-xl-12 pa-chart card-body ml-2"></div>
+          <div class="col-xl-12 pa-chart card-body ml-2 mt-2"></div>
         </div>
         <div class="row">
           <div class="col-xl-12 mt-4">
