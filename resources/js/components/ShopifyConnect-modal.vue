@@ -10,7 +10,7 @@
       </p>
       <b-alert v-model="isAuthError" variant="danger" class="mt-3" dismissible>{{authError}}</b-alert>
 
-      <b-form class="p-2" :action="submitUrl" method="POST">
+      <b-form class="p-2" @submit.prevent="validateShopify" method="POST">
         <slot />
         <b-form-group id="input-group-1">
           <b-form-input
@@ -50,6 +50,7 @@
 </template>
 <script>
 import HowToConnectStore from "./HowToConnectStore-model";
+import axios from "axios";
 
 export default {
   name: "ShopifyConnect",
@@ -100,11 +101,14 @@ export default {
 
       if (clipboard_text !== "") {
         this.store_url = clipboard_text;
-        $("#store_url").blur();
+        element.target.blur();
       }
     },
-    handleClose() {
-      this.$emit("closemodal");
+    validateShopify() {
+      console.log(this.store_url);
+      if (this.store_url !== "") {
+        window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders&redirect_uri=https://83ca6597df20.ngrok.io/shopify/auth`;
+      }
     },
   },
 };
