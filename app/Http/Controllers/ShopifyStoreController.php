@@ -9,9 +9,7 @@ use App\ShopifyStore;
 class ShopifyStoreController extends Controller
 {
     public function getStores () {
-        $stores = ShopifyStore::where('user_id', 1);
-
-        dd($stores);
+       return Auth::user()->stores;
     }
 
     public function getPermission()

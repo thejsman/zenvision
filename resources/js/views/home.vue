@@ -3,12 +3,12 @@ import Layout from "../layouts/main";
 import PageHeader from "../components/page-header";
 import Stat from "../components/widgets/stat";
 import ShopifyConnect from "../components/ShopifyConnect-modal";
-
+import StoreIcon from "../components/Store-icon";
 /**
  * Starter component
  */
 export default {
-  components: { Layout, PageHeader, Stat, ShopifyConnect },
+  components: { Layout, PageHeader, Stat, ShopifyConnect, StoreIcon },
   data() {
     return {
       title: "Zenvision Dashboard",
@@ -178,7 +178,7 @@ export default {
   <Layout>
     <div class="row">
       <div class="col-12">
-        <div class="page-title-box d-flex justify-content-between">
+        <div class="page-title-box d-flex align-items-center">
           <b-dropdown variant="primary" class="m-2">
             <template v-slot:button-content>
               Add Channels
@@ -192,7 +192,10 @@ export default {
               <img src="/images/icons/facebook-icon.svg" alt height="19" class="mr-2" /> Facebook Ads
             </b-dropdown-item>
           </b-dropdown>
-          <div class="page-title-right">
+          <div class="flex-start pl-2">
+            <StoreIcon />
+          </div>
+          <div class="ml-auto">
             <ol class="text-center m-0">
               <li class="list-unstyled">
                 Date Range:
@@ -203,6 +206,7 @@ export default {
         </div>
       </div>
     </div>
+
     <div class="row">
       <div class="col-xl-5">
         <div class="row">
