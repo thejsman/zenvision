@@ -17,7 +17,7 @@ class CreateShopifyOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('store_id');
-            $table->bigInteger('order_id');
+            $table->bigInteger('order_id')->unique();
             $table->integer('order_number');
             $table->timestamp('created_on_shopify');
             $table->boolean('test');
