@@ -1,8 +1,9 @@
 <template>
   <div class="row">
     <div class="m-4 d-flex flex-column">
-      <div class="font-weight-bold font-size-14 text-white">
-        <img src="/images/icons/shopify-icon.svg" alt height="21" class="mr-2" /> Connect to Shopify store
+      <div class="font-weight-bold font-size-14 text-white d-flex align-items-center">
+        <img src="/images/icons/shopify-icon.svg" alt height="21" class="mr-2" />
+        <div>Connect to Shopify store</div>
       </div>
       <p class="mt-4 mb-4">
         Enter your existing
