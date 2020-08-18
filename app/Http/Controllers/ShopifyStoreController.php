@@ -20,7 +20,6 @@ class ShopifyStoreController extends Controller
 
     public function getResponse(Request $request)
     {
-
 			// $this->getPermission();
 			// response code from shopify
 			$response_code = $request->input('code');
