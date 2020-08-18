@@ -15,7 +15,6 @@ class ShopifyStoreController extends Controller
     public function getPermission()
 	{
 		$this->foo = Shopify::make($this->shop, $this->scopes);
-
 		return $this->foo->redirect();
 	}
 
