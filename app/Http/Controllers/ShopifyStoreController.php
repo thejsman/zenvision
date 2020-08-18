@@ -19,7 +19,6 @@ class ShopifyStoreController extends Controller
 	}
 
     public function getResponse(Request $request)
-
     {
 
 			// $this->getPermission();
