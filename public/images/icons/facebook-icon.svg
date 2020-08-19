@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+	<defs>
+		<image width="384" height="384" id="img1" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KCTxzdHlsZT4KCQl0c3BhbiB7IHdoaXRlLXNwYWNlOnByZSB9CgkJLnNocDAgeyBmaWxsOiAjM2Q1YTk4IH0gCgkJLnNocDEgeyBmaWxsOiAjZmZmZmZmIH0gCgk8L3N0eWxlPgoJPHBhdGggaWQ9IkxheWVyIiBjbGFzcz0ic2hwMCIgZD0iTTEyIDI0QzUuMzYgMjQgMCAxOC42NCAwIDEyQzAgNS4zNiA1LjM2IDAgMTIgMEMxOC42NCAwIDI0IDUuMzYgMjQgMTJDMjQgMTguNjQgMTguNjQgMjQgMTIgMjRaIiAvPgoJPHBhdGggaWQ9ImYiIGNsYXNzPSJzaHAxIiBkPSJNMTMuMzEgMjAuNDRMMTMuMzEgMTIuNzVMMTUuOSAxMi43NUwxNi4yNyA5Ljc1TDEzLjMxIDkuNzVMMTMuMzEgNy44NEMxMy4zMSA2Ljk3IDEzLjU0IDYuMzggMTQuODEgNi4zOEwxNi4zOSA2LjM4TDE2LjM5IDMuNjhDMTYuMTMgMy42NCAxNS4xOSAzLjU2IDE0LjA2IDMuNTZDMTEuNzcgMy41NiAxMC4yIDQuOTUgMTAuMiA3LjU0TDEwLjIgOS43NUw3LjYxIDkuNzVMNy42MSAxMi43NUwxMC4yIDEyLjc1TDEwLjIgMjAuNDRMMTMuMzEgMjAuNDRaIiAvPgo8L3N2Zz4="/>
+	</defs>
 	<style>
 		tspan { white-space:pre }
-		.shp0 { fill: #3d5a98 } 
-		.shp1 { fill: #ffffff } 
 	</style>
-	<path id="Layer" class="shp0" d="M12 24C5.36 24 0 18.64 0 12C0 5.36 5.36 0 12 0C18.64 0 24 5.36 24 12C24 18.64 18.64 24 12 24Z" />
-	<path id="f" class="shp1" d="M13.31 20.44L13.31 12.75L15.9 12.75L16.27 9.75L13.31 9.75L13.31 7.84C13.31 6.97 13.54 6.38 14.81 6.38L16.39 6.38L16.39 3.68C16.13 3.64 15.19 3.56 14.06 3.56C11.77 3.56 10.2 4.95 10.2 7.54L10.2 9.75L7.61 9.75L7.61 12.75L10.2 12.75L10.2 20.44L13.31 20.44Z" />
+	<use id="facebook-icon" href="#img1" transform="matrix(0.94,0,0,0.94,19.396,19.396)"/>
 </svg>
