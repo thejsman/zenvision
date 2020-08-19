@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Auth::routes();
+Route::get('user/stores', 'ShopifyStoreController@getStores');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
+
 Route::get('/{group}/{component}', 'HomeController@show');
+
 
