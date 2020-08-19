@@ -1,8 +1,8 @@
 <template>
   <div class="d-flex flex-row">
     <div v-for="store in stores" :key="store.id">
-      <div class="rectangle mr-2">
-        <img src="/images/icons/shopify-icon.svg" alt height="20" />
+      <div class="border border-primary rounded mr-2 p-2">
+        <img src="/images/icons/shopify-icon.svg" alt height="18" />
       </div>
     </div>
   </div>
@@ -28,11 +28,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.rectangle {
-  border-radius: 5px;
-  border: solid 1px #556ee7;
-  padding: 5px;
-  text-align: center;
-}
-</style>
