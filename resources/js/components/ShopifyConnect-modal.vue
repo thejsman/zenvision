@@ -36,7 +36,7 @@
           <div>
             <b-button
               variant="primary"
-              class="btn btn-cancel mr-2"
+              class="btn btn-dark border-0 mr-2"
               @click="$emit('handle-close')"
             >Cancel</b-button>
             <b-button type="submit" variant="primary" class="btn btn-success">Connect</b-button>
@@ -115,9 +115,3 @@ export default {
 };
 </script>
 
-<style>
-.btn-cancel {
-  background-color: #32394f;
-  border: none;
-}
-</style>
