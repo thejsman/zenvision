@@ -2,8 +2,8 @@
 import Layout from "../layouts/main";
 import PageHeader from "../components/page-header";
 import Stat from "../components/widgets/stat";
-import ShopifyConnect from "../components/ShopifyConnect-modal";
-import StoreIcon from "../components/Store-icon";
+import ShopifyConnect from "../components/custom-components/modals/ShopifyConnect-modal";
+import StoreIcon from "../components/custom-components/Store-icon";
 /**
  * Starter component
  */
@@ -185,11 +185,22 @@ export default {
               <i class="fas fa-plus pl-1"></i>
             </template>
             <b-dropdown-item href="#" v-b-modal.shopify-connect>
-              <img src="/images/icons/shopify-icon.svg" alt height="21" class="mr-2" />
+              <img
+                src="/images/icons/shopify-icon.svg"
+                alt
+                height="21"
+                class="mr-2"
+              />
               Shopify
             </b-dropdown-item>
             <b-dropdown-item href="#">
-              <img src="/images/icons/facebook-icon.svg" alt height="19" class="mr-2" /> Facebook Ads
+              <img
+                src="/images/icons/facebook-icon.svg"
+                alt
+                height="19"
+                class="mr-2"
+              />
+              Facebook Ads
             </b-dropdown-item>
           </b-dropdown>
           <div class="flex-start pl-2">
@@ -199,7 +210,9 @@ export default {
             <ol class="text-center m-0">
               <li class="list-unstyled">
                 Date Range:
-                <b-button variant="outline-light">01/01/2018 - 12/31/2018</b-button>
+                <b-button variant="outline-light"
+                  >01/01/2018 - 12/31/2018</b-button
+                >
               </li>
             </ol>
           </div>
@@ -229,7 +242,11 @@ export default {
           <div class="col-xl-12 mt-4">
             <h3>Key Performance Metrics</h3>
           </div>
-          <div v-for="performance of performanceData" :key="performance.id" class="col-md-4 p-2">
+          <div
+            v-for="performance of performanceData"
+            :key="performance.id"
+            class="col-md-4 p-2"
+          >
             <Stat :title="performance.title" :value="performance.value" />
           </div>
         </div>
@@ -245,8 +262,16 @@ export default {
           <div class="col-xl-12 mt-4">
             <h3>Acquisition Channels</h3>
           </div>
-          <div v-for="channel of channelsData" :key="channel.id" class="col-md-4 p-2">
-            <Stat :title="channel.title" :value="channel.value" :channelData="channel.data" />
+          <div
+            v-for="channel of channelsData"
+            :key="channel.id"
+            class="col-md-4 p-2"
+          >
+            <Stat
+              :title="channel.title"
+              :value="channel.value"
+              :channelData="channel.data"
+            />
           </div>
         </div>
       </div>
@@ -256,7 +281,7 @@ export default {
     </b-modal>
   </Layout>
 </template>
-<style scoped>
+<style>
 .pa-chart {
   width: 100%;
   height: 300px;
