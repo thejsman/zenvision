@@ -17,15 +17,19 @@
         <strong>Shopify store URL</strong> below and you'll be redirected to
         Shopify to connect your account to Zenvision
       </p>
+
       <b-alert
-        v-model="isAuthError"
+        :show="dismissCountDown"
         variant="danger"
         class="mt-3"
+        fade
         dismissible
-        >{{ authError }}</b-alert
+        @dismissed="dismissCountDown = 0"
+        @dismiss-count-down="countDownChanged"
+        >{{ formError }}</b-alert
       >
 
-      <b-form class="p-2" @submit.prevent="validateShopify" method="POST">
+      <b-form class="p-2" @submit.prevent="connectToShopifyStore" method="POST">
         <slot />
         <b-form-group id="input-group-1">
           <b-form-input
@@ -64,7 +68,7 @@
     </div>
     <b-modal
       id="how-to-connect-store"
-      size="lg"
+      size="xl"
       centered
       hide-footer
       hide-header
@@ -86,23 +90,20 @@ export default {
     return {
       store_url: "",
       tryingToLogIn: false,
-      isAuthError: false,
+      formError: "",
+      dismissSecs: 5,
+      dismissCountDown: 0,
     };
   },
   props: {
     submitUrl: {
       type: String,
     },
-    authError: {
-      type: String,
-      required: false,
-      default: () => null,
-    },
-  },
-  mounted() {
-    this.isAuthError = !!this.authError;
   },
   methods: {
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
     onBlur: function (element) {
       let store_url = this.store_url.trim();
 
@@ -131,10 +132,55 @@ export default {
         element.target.blur();
       }
     },
-    validateShopify() {
-      console.log(this.store_url);
-      if (this.store_url !== "") {
-        window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders&redirect_uri=https://d7df9bf702fa.ngrok.io/shopify/auth`;
+    showAlert(message) {
+      this.formError = message;
+      this.dismissCountDown = this.dismissSecs;
+    },
+
+    //Check valid URL
+    CheckURL(str) {
+      const pattern = new RegExp(
+        "^(https?:\\/\\/)?" + // protocol
+          "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+          "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+          "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+          "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+          "(\\#[-a-z\\d_]*)?$",
+        "i"
+      ); // fragment locator
+
+      //check if its a shopify store url and a valid url
+      return str.includes(".myshopify.com") && pattern.test(str);
+    },
+
+    async connectToShopifyStore() {
+      let store_url = this.store_url.trim();
+
+      //check empty string, is a valid URL and is of Shopify store
+      if (store_url !== "" && !this.CheckURL(store_url)) {
+        this.showAlert("Please enter a valid Shopify URL.");
+      } else {
+        try {
+          console.log("Valid url");
+          //Check if the store is already connected
+          const {
+            data: { count },
+          } = await axios.get("/api/validateShopifyStoreUrl", {
+            params: {
+              store_url,
+            },
+          });
+
+          // if store exists
+          if (count) {
+            this.showAlert("Shopify store already connected.");
+          } else {
+            window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders&redirect_uri=https://d7df9bf702fa.ngrok.io/shopify/auth`;
+          }
+        } catch (error) {
+          console.log(error);
+          this.showAlert("Something went wrong. Please try again later.");
+        }
       }
     },
   },
