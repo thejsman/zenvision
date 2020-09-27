@@ -12,7 +12,12 @@ class ShopifyOrder extends Model
     protected $casts = [
         'discount_applications' => 'array',
         'tax_lines' => 'array',
-        'refunds' => 'array'
+        'refunds' => 'array',
+        'shipping_lines' => 'array'
     ];
+
+    public function getCogs() {
+        return $this->hasMany(ShopifyOrderProduct::class, 'order_id', 'order_id')->get()->sum('cogs');
+    }
 
 }
