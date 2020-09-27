@@ -40,4 +40,7 @@ class User extends Authenticatable
     public function stores() {
         return $this->hasMany(ShopifyStore::class);
     }
+    public function getEnabledShopifyStores() {
+        return $this->stores()->where('enabled_on_dashboard', true)->get()->pluck('id');
+    }
 }

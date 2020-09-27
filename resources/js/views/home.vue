@@ -1,6 +1,7 @@
 <script>
 import Layout from "../layouts/main";
 import PageHeader from "../components/page-header";
+import axios from "axios";
 
 //Top Nav imports
 import ChannelDropdown from "../components/custom-components/channel-dropdown";
@@ -32,39 +33,11 @@ export default {
   data() {
     return {
       title: "Zenvision Dashboard",
+      enabled_on_dashboard: [],
+      refund_total: 0,
+      number_of_products: 0,
+      orders: [],
 
-      statData: [
-        {
-          id: 1,
-          title: "Number of Orders",
-          value: "-",
-        },
-        {
-          id: 2,
-          title: "Order Revenue",
-          value: "-",
-        },
-        {
-          id: 3,
-          title: "Shipping Revenue",
-          value: "-",
-        },
-        {
-          id: 4,
-          title: "Gross Profit",
-          value: "-",
-        },
-        {
-          id: 5,
-          title: "Net Profit",
-          value: "-",
-        },
-        {
-          id: 6,
-          title: "Subscription",
-          value: "-",
-        },
-      ],
       costData: [
         {
           id: 1,
@@ -183,6 +156,31 @@ export default {
       ],
     };
   },
+  created() {
+    this.getShopifyStoreData();
+  },
+  methods: {
+    async getShopifyStoreData() {
+      try {
+        const {
+          data: {
+            enabled_on_dashboard,
+            refund_total,
+            orders,
+            number_of_products,
+          },
+        } = await axios.get("shopifystoredata");
+
+        //assign values
+        this.enabled_on_dashboard = enabled_on_dashboard;
+        this.number_of_products = number_of_products;
+        this.refund_total = refund_total;
+        this.orders = orders;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
 };
 </script>
 <template>
@@ -199,8 +197,8 @@ export default {
 
     <div class="row">
       <div class="col-xl-5">
-        <Revenue :revenueData="statData" />
-        <Costs :costData="costData" />
+        <Revenue :revenueData="orders" />
+        <Costs :costData="orders" />
       </div>
       <div class="col-xl-7">
         <Chart />

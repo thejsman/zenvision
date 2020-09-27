@@ -22,3 +22,12 @@ Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 Route::get('/{group}/{component}', 'HomeController@show');
 
 
+
+Route::group(['middleware' => ['auth']], function () {
+    //Shopify Connect APIs
+    Route::get('validateShopifyStoreUrl', 'ShopifyStoreController@validateUrl');
+    //Dashboard - Shopify Data
+    Route::get('shopifystoredata', 'DashboardController@index');
+
+});
+

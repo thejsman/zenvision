@@ -165,7 +165,7 @@ export default {
           //Check if the store is already connected
           const {
             data: { count },
-          } = await axios.get("/api/validateShopifyStoreUrl", {
+          } = await axios.get("validateShopifyStoreUrl", {
             params: {
               store_url,
             },

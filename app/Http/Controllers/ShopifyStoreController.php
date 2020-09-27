@@ -13,6 +13,12 @@ class ShopifyStoreController extends Controller
        return Auth::user()->stores;
     }
 
+    // validate Store url method
+    public function validateUrl(Request $request) {
+        $store_url = $request->store_url;
+        $count = ShopifyStore::where('store_url', $store_url)->where('user_id',Auth::user()->id)->count();
+        return ['count' => $count];
+    }
 
     public function getResponse(Request $request)
     {
