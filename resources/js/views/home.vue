@@ -9,6 +9,7 @@ import DateRange from "../components/custom-components/date-range";
 import StoreIcon from "../components/custom-components/Store-icon";
 
 //Dashboard Data sections import
+import Profit from "../components/custom-components/dashboard-data/profit-section";
 import Revenue from "../components/custom-components/dashboard-data/revenue-section";
 import Costs from "../components/custom-components/dashboard-data/cost-section";
 import KeyPerformance from "../components/custom-components/dashboard-data/key-performance-section";
@@ -25,6 +26,7 @@ export default {
     StoreIcon,
     DateRange,
     ChannelDropdown,
+    Profit,
     Revenue,
     Costs,
     KeyPerformance,
@@ -80,6 +82,7 @@ export default {
 
     <div class="row">
       <div class="col-xl-5">
+        <Profit :profitData="orders" />
         <Revenue :revenueData="orders" />
         <Costs :costData="orders" :refundTotal="refund_total" />
       </div>
