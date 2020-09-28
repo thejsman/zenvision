@@ -37,123 +37,6 @@ export default {
       refund_total: 0,
       number_of_products: 0,
       orders: [],
-
-      costData: [
-        {
-          id: 1,
-          title: "Ad Spend",
-          value: "-",
-        },
-        {
-          id: 2,
-          title: "COGS",
-          value: "-",
-        },
-        {
-          id: 3,
-          title: "Merchant Fees",
-          value: "-",
-        },
-        {
-          id: 4,
-          title: "Refunds",
-          value: "-",
-        },
-        {
-          id: 5,
-          title: "Chargebacks",
-          value: "-",
-        },
-        {
-          id: 6,
-          title: "Discounts",
-          value: "-",
-        },
-        {
-          id: 7,
-          title: "Subscription Costs",
-          value: "-",
-        },
-        {
-          id: 8,
-          title: "Taxes",
-          value: "-",
-        },
-        {
-          id: 9,
-          title: "Operating Costs",
-          value: "-",
-        },
-      ],
-      performanceData: [
-        {
-          id: 1,
-          title: "Conversion Rate",
-          value: "-",
-        },
-        {
-          id: 2,
-          title: "Abandoned Cart",
-          value: "-",
-        },
-        {
-          id: 3,
-          title: "LTV",
-          value: "-",
-        },
-        {
-          id: 4,
-          title: "Avg Order Value",
-          value: "-",
-        },
-        {
-          id: 5,
-          title: "Avg Units Per Order",
-          value: "-",
-        },
-        {
-          id: 6,
-          title: "Avg Profit Per Orders",
-          value: "-",
-        },
-        {
-          id: 7,
-          title: "% US Orders",
-          value: "-",
-        },
-      ],
-      channelsData: [
-        {
-          id: 1,
-          title: "Email Marketing",
-          value: "-",
-          data: [
-            {
-              title: "Email sent",
-              value: "-",
-            },
-            {
-              title: "Revenue",
-              value: "-",
-            },
-          ],
-        },
-        {
-          id: 2,
-          title: "Organic Search",
-          value: "-",
-          data: [
-            {
-              title: "Traffic",
-              value: "-",
-            },
-            {
-              title: "Revenue",
-              value: "-",
-            },
-          ],
-        },
-      ],
     };
   },
   created() {
@@ -198,11 +81,15 @@ export default {
     <div class="row">
       <div class="col-xl-5">
         <Revenue :revenueData="orders" />
-        <Costs :costData="orders" />
+        <Costs :costData="orders" :refundTotal="refund_total" />
       </div>
       <div class="col-xl-7">
         <Chart />
-        <KeyPerformance :performanceData="performanceData" />
+        <KeyPerformance
+          :performanceData="orders"
+          :shopifyStores="enabled_on_dashboard"
+          :totalProducts="number_of_products"
+        />
       </div>
     </div>
     <b-modal id="shopify-connect" centered hide-footer hide-header>

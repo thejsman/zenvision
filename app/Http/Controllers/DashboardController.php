@@ -6,11 +6,12 @@ use Illuminate\Http\Request;
 use Auth;
 use App\ShopifyStore;
 use App\ShopifyOrder;
+use App\Http\CustomRequests;
 
 class DashboardController extends Controller
 {
-    //Store Data
-    public function index(Request $request) {
+    //Function to get store sata
+    public function index() {
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
         $orders = [];
@@ -31,5 +32,29 @@ class DashboardController extends Controller
             'orders' => $orders,
             'refund_total' => $refundTotal
         ];
+    }
+
+    // Funciton to get abandoned cart count
+    public function getAbandonedCartCount(Request $request) {
+
+            if($request->filled('store_ids')) {
+                $store_ids =  $request->store_ids;
+
+                $abandoned_cart_count = 0;
+                if(count($store_ids) > 0){
+                    foreach($store_ids as $store_id) {
+                        $store = ShopifyStore::find($store_id)->getStoreDetails();
+                        $url = "https://". $store['store_url']."/admin/api/2020-07/checkouts/count.json";
+                        $access_token = $store['api_token'];
+                        $response = CustomRequests::getRequest($url,[], $access_token );
+
+                        $abandoned_cart_count +=  $response['count'];
+                    }
+                }
+                return $abandoned_cart_count;
+            } else {
+                return 0;
+            }
+
     }
 }

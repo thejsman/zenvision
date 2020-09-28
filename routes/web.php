@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('validateShopifyStoreUrl', 'ShopifyStoreController@validateUrl');
     //Dashboard - Shopify Data
     Route::get('shopifystoredata', 'DashboardController@index');
+    Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
 
 });
 

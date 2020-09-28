@@ -28,6 +28,15 @@ class ShopifyStore extends Model
         }
         return $orders;
     }
+    public function getStoreDetails() {
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'store_name' => $this->store_name,
+            'store_url' => $this->store_url,
+            'api_token' => $this->api_token
+        ];
+    }
 
     public function getRefundTotal() {
        return  $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status',['refunded','voided'])->get()->sum('total_price');

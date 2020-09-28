@@ -10,19 +10,28 @@ class CustomRequests
    *
    * @return object
    */
-  public static function getRequest($url, $payload = '')
+  public static function getRequest($url, $payload = '', $access_token)
   {
+    if ($access_token === '') {
+        $headers = array('Content-Type:application/json');
+    } else {
+        $headers = array(
+            'X-Shopify-Access-Token:'.$access_token,
+            'Content-Type:application/json'
+        );
+    }
       // init variable
       $retry_script = false;
+
 
       // add the payload to the url if there is any
       if ($payload) {
         $url = $url.'&'.http_build_query($payload);
       }
-
       // init curl
       $curl = curl_init();
       curl_setopt($curl, CURLOPT_URL, $url);
+      curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($curl, CURLOPT_CONNECTTIMEOUT , 7);
       curl_setopt($curl, CURLOPT_USERAGENT , "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)");
@@ -38,8 +47,10 @@ class CustomRequests
           // execute curl request
           $result = curl_exec($curl);
           // json decode the response
+
           $response = json_decode($result, true);
           // check if error found in request
+
           if (!isset($response['errors'])) {
               // close curl connection
               curl_close($curl);
