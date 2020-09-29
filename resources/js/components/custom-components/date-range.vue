@@ -37,10 +37,7 @@ export default {
     },
     selectDate() {
       const { startDate, endDate } = this.dateRange;
-      console.log(
-        moment(startDate).format("DD/MM/YYYY"),
-        moment(endDate).format("DD/MM/YYYY")
-      );
+      this.$emit("changeDateRange", this.dateRange);
     },
   },
 };
@@ -48,5 +45,11 @@ export default {
 <style>
 .daterangepicker {
   top: 40px;
+  background-color: #262b3c;
+}
+.reportrange-text[data-v-267f4ee2] {
+  background: #262b3c;
+  padding: 0.47rem 0.75rem;
 }
 </style>
+

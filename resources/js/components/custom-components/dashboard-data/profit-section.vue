@@ -96,8 +96,6 @@ export default {
       const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
       const profit = parseFloat(revenue - cogs).toFixed(2);
 
-      this.profit = profit;
-
       // Create an array of last 11 days
       const dates = [...Array(11)].map((_, i) => {
         const d = new Date();
@@ -120,6 +118,10 @@ export default {
         });
         apexData.push(sum_profit);
       });
+
+      const profit_of_elevendays = _.sum(apexData);
+
+      this.profit = profit_of_elevendays;
       // parse the array
       const sumArray = apexData.map((item) =>
         item == 0 ? 0 : parseFloat(item).toFixed(2)

@@ -161,7 +161,6 @@ export default {
         this.showAlert("Please enter a valid Shopify URL.");
       } else {
         try {
-          console.log("Valid url");
           //Check if the store is already connected
           const {
             data: { count },

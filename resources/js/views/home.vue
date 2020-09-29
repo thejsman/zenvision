@@ -18,6 +18,8 @@ import Chart from "../components/custom-components/dashboard-data/chart-section"
 //Modal import
 import ShopifyConnect from "../components/custom-components/modals/ShopifyConnect-modal";
 
+import moment from "moment";
+
 export default {
   components: {
     Layout,
@@ -39,6 +41,8 @@ export default {
       refund_total: 0,
       number_of_products: 0,
       orders: [],
+      backupOrders: [],
+      dateRangeSelected: [],
     };
   },
   created() {
@@ -61,9 +65,25 @@ export default {
         this.number_of_products = number_of_products;
         this.refund_total = refund_total;
         this.orders = orders;
+        this.backupOrders = orders;
       } catch (error) {
         console.log(error);
       }
+    },
+    handleDateChange(dateRange) {
+      const { startDate, endDate } = dateRange;
+      const s_date = moment(startDate).format("MM-DD-YYYY");
+      const e_date = moment(endDate).format("MM-DD-YYYY");
+
+      const filteredOrders = this.backupOrders.filter((order) => {
+        const orderDate = moment(order.created_on_shopify).format("MM-DD-YYYY");
+        return (
+          new Date(orderDate) >= new Date(s_date) &&
+          new Date(orderDate) <= new Date(e_date)
+        );
+      });
+      this.dateRangeSelected = [moment(s_date), moment(e_date)];
+      this.orders = filteredOrders;
     },
   },
 };
@@ -75,19 +95,19 @@ export default {
         <div class="page-title-box d-flex align-items-center">
           <ChannelDropdown />
           <StoreIcon />
-          <DateRange />
+          <DateRange @changeDateRange="handleDateChange" />
         </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col-xl-5">
-        <Profit :profitData="orders" />
+        <Profit :profitData="backupOrders" />
         <Revenue :revenueData="orders" />
         <Costs :costData="orders" :refundTotal="refund_total" />
       </div>
       <div class="col-xl-7">
-        <Chart />
+        <Chart :chartData="orders" :ChartdateRange="dateRangeSelected" />
         <KeyPerformance
           :performanceData="orders"
           :shopifyStores="enabled_on_dashboard"

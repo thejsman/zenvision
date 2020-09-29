@@ -46,8 +46,9 @@ export default {
       const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
       const total_tax = _.sumBy(orders, (order) => parseFloat(order.total_tax));
 
-      const average_order = (revenue - shipping_revenue) / number_of_orders;
-      const average_unit = number_of_products / number_of_orders;
+      const average_order =
+        (revenue - shipping_revenue) / number_of_orders || 0;
+      const average_unit = number_of_products / number_of_orders || 0;
       const average_profit = parseFloat(
         (revenue - cogs) / number_of_orders
       ).toFixed(2);
@@ -57,7 +58,7 @@ export default {
       );
       const average_us_percentage =
         (shipping_country.true / number_of_orders) * 100;
-      console.log({ average_us_percentage });
+
       this.data = [
         {
           id: 1,
@@ -65,19 +66,33 @@ export default {
           value: "-",
         },
         {
+          id: 2,
+          title: "Abandoned Cart",
+          value: `0`,
+        },
+        {
           id: 3,
           title: "Avg Order Value",
-          value: `$` + average_order,
+          value:
+            `$` + isNaN(average_order)
+              ? parseFloat(average_order).toFixed(2)
+              : "0",
         },
         {
           id: 4,
           title: "Avg Units Per Order",
-          value: `${average_unit}`,
+          value:
+            `$` + isNaN(average_unit)
+              ? parseFloat(average_unit).toFixed(2)
+              : "0",
         },
         {
           id: 5,
           title: "Avg Profit Per Orders",
-          value: `$` + average_profit,
+          value:
+            `$` + isNaN(average_profit)
+              ? parseFloat(average_profit).toFixed(2)
+              : "0",
         },
         {
           id: 6,
@@ -85,28 +100,23 @@ export default {
           value: `${average_us_percentage}`,
         },
       ];
-      this.getAbandonedCartCount();
+      // Development saving network requst
+      //   this.getAbandonedCartCount();
     },
     async getAbandonedCartCount() {
-      let count = 0;
+      let count = "0";
       try {
         const result = await axios.get("abandonedcart", {
           params: {
             store_ids: this.shopifyStores,
           },
         });
+
         count = await result.data;
-        console.log({ count });
       } catch (error) {
         console.log(error);
       }
-
-      // Development saving network requst
-      this.data.splice(2, 0, {
-        id: 2,
-        title: "Abandoned Cart",
-        value: `${count}`,
-      });
+      this.data[1].value = `${count}`;
     },
   },
 };
