@@ -23,25 +23,23 @@ class CreateShopifyOrdersTable extends Migration
             $table->boolean('test');
             $table->decimal('total_price', 8, 2);
             $table->decimal('total_tax', 6, 2);
-            $table->boolean('taxes_included')->nullable()->default(false); // Yellow
             $table->string('currency');
             $table->string('financial_status');
-            $table->boolean('confirmed')->nullable()->default(true); // Yellow
             $table->decimal('total_discounts', 6,2);
             $table->string('referring_site')->nullable();
             $table->string('landing_site')->nullable();
             $table->string('cancelled_at')->nullable();
             $table->decimal('total_price_usd',8,2);
-            $table->string('source_identifier')->nullable(); //yellow
-            $table->string('source_url')->nullable(); //yellow
             $table->json('discount_applications')->nullable();
             $table->string('fulfillment_status')->nullable();
-            $table->json('tax_lines');
+            $table->json('tax_lines')->nullable();
             $table->json('refunds')->nullable();
-            $table->decimal('total_tip_received', 4, 2);
+            $table->decimal('total_tip_received', 4, 2)->nullable();
             $table->string('original_total_duties_set')->nullable();
             $table->string('current_total_duties_set')->nullable();
+            $table->string('shipping_country')->nullable();
             $table->json('shipping_lines')->nullable();
+            $table->boolean('is_deleted')->nullable()->default(0);
             $table->timestamps();
 
             // Foreign keys

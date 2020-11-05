@@ -19,7 +19,8 @@ class CreateShopifyStoresTable extends Migration
             $table->string('store_name');
             $table->string('store_url');
             $table->string('api_token');
-            $table->boolean('status')->default(true);
+            $table->boolean('enabled_on_dashboard')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
