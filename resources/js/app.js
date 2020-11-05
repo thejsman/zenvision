@@ -10,11 +10,21 @@ window.Vue = Vue;
 
 import { BootstrapVue } from "bootstrap-vue";
 import vClickOutside from "v-click-outside";
+import VueApexCharts from "vue-apexcharts";
+import chartist_tooltip from "chartist-plugin-tooltip";
 
 Vue.prototype.$isDev = process.env.MIX_APP_ENV !== "production";
 Vue.config.devtools = Vue.prototype.$isDev;
 Vue.config.debug = Vue.prototype.$isDev;
 Vue.config.silent = !Vue.prototype.$isDev;
+
+// Vue.use(require("vue-chartist"), {
+//     messageNoData: "You have not enough data",
+//     classNoData: "empty"
+// });
+Vue.use(require("vue-chartist"), {
+    plugins: [chartist_tooltip]
+});
 
 Vue.use(BootstrapVue);
 Vue.use(vClickOutside);
@@ -22,6 +32,8 @@ Vue.component(
     "dynamic-component",
     require("./components/dynamic-component").default
 );
+
+Vue.component("apexchart", VueApexCharts);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -70,7 +82,7 @@ const app = new Vue({
         },
         changeLayout(layout) {
             this.layoutType = layout;
-            localStorage.setItem("layout-type",  layout);
+            localStorage.setItem("layout-type", layout);
         }
     }
 });
