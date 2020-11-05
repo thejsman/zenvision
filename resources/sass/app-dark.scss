@@ -15,9 +15,9 @@ File: Main dark Css File
 @import "~bootstrap/scss/variables";
 @import "variables-dark";
 @import "~bootstrap/scss/mixins";
-@import '~bootstrap/scss/bootstrap';
-@import 'bootstrap';
-@import '~bootstrap-vue/src/index.scss';
+@import "~bootstrap/scss/bootstrap";
+@import "bootstrap";
+@import "~bootstrap-vue/src/index.scss";
 
 // Structure
 @import "custom/structure/general";
@@ -32,8 +32,8 @@ File: Main dark Css File
 // Components
 @import "custom/components/avatar";
 @import "custom/components/helper";
+@import "custom/components/shopify_model";
 @import "custom/components/demos";
-
 
 // Plugins
 @import "custom/plugins/custom-scrollbar";
