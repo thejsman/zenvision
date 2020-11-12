@@ -49,7 +49,7 @@ export default {
       </div>
     </div>
     <div class="col-md-8 col-lg-6 col-xl-5 mt-2">
-      <div class="card overflow-hidden">
+      <div class="card card-login overflow-hidden">
         <div class="text-center">
           <h4 class="text-white text-uppercase mb-4 mt-4">Sign Up</h4>
         </div>
@@ -134,11 +134,11 @@ export default {
 
             <div class="mt-4 text-center">
               <p class="mb-0">
-                By registering you agree to the Skote
+                By registering you agree to the
                 <a
                   href="javascript: void(0);"
                   class="text-primary"
-                >Terms of Use</a>
+                >Terms & Conditions</a>
               </p>
             </div>
           </b-form>

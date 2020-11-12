@@ -1,0 +1,219 @@
+.card-login {
+  padding: 25px;
+  border-radius: 10px!important;
+  margin-top: 40px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: 45px!important;
+    padding: 0.47rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #bfc8e2;
+    background-color: #2e3548;
+    background-clip: padding-box;
+    border: 1px solid #32394e;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #34c38f;
+    border-color: #34c38f;
+    height: 45px;
+    transition: 0.3s;
+}
+
+.custom-control {
+    position: relative;
+    display: block;
+    min-height: 1.21875rem;
+    padding-left: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.forgot-password {
+  transition: 0.3s;
+}
+
+.forgot-password:hover {
+  opacity: 0.5;
+}
+
+.text-primary {
+    color: #F77062 !important;
+    transition: 0.3s;
+}
+
+a.text-primary:hover, a.text-primary:focus {
+    color: #BE5348 !important;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+    border-radius: 10px !important;
+}
+
+.mini-stats-wid {
+    border-radius: 10px;
+}
+
+.profit-card {
+  background: #2f3863;
+  border-radius: 10px;
+}
+
+.pa-chart {
+    width: 100%;
+    height: 377px!important;
+    background-color: #2a3042;
+}
+
+.logo {
+    line-height: 70px;
+    transition: 0.3s;
+}
+
+.logo:hover {
+    opacity: 0.5;
+}
+
+.bx-cog {
+  transition: 0.3s;
+}
+
+.bx-cog:hover {
+  opacity: 0.5;
+}
+
+.dropdown-menu.show {
+    top: 110% !important;
+    transition: 0.3s;
+}
+
+.navbar-header .dropdown.show .header-item {
+    background-color: transparent;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.35rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #bfc8e2;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    transition: 0.3s;
+}
+
+.reportrange-text[data-v-267f4ee2] {
+    background: #fff;
+    cursor: pointer;
+    padding: 5px 5px;
+    border: 0px !important;
+    width: 100%;
+    background: #2a3142 !important;
+    padding: 12px 20px 12px 20px !important;
+    transition: 0.3s;
+    border-radius: 7px;
+}
+
+.reportrange-text[data-v-267f4ee2]:hover {
+    opacity: 0.7;
+}
+
+.mr-2, .mx-2 {
+    margin-top: 13px !important;
+    margin-right: 15px !important;
+}
+
+td[data-v-aab6e828], th[data-v-aab6e828] {
+    padding: 5px !important;
+    background-color: #2a3142 !important;
+}
+
+.daterangepicker .calendar-table {
+    border: 1px solid #2a3142!important;
+    border-radius: 4px;
+    background-color: #2a3142!important;
+}
+
+.daterangepicker td.in-range {
+    background-color: #fa836f !important;
+    border-color: transparent;
+    color: #ffffff !important;
+    border-radius: 0;
+}
+
+.daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #d8634f !important;
+    border-color: transparent;
+    color: #fff;
+}
+
+.vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
+    padding: 15px!important;
+    background: #2a3142!important;
+    padding: 0;
+    border: 0px;
+    box-shadow: 0 12px 70px 0 rgba(0,0,0,0.50);
+}
+
+.fa-calendar:before {
+    content: "\F133";
+    margin-right: 7px;
+}
+
+.daterangepicker .drp-buttons {
+    clear: both;
+    text-align: right;
+    padding: 10px;
+    border-top: 0px!important;
+    line-height: 12px;
+    vertical-align: middle;
+}
+
+.daterangepicker .drp-selected {
+    display: inline-block;
+    font-size: 12px;
+    padding-right: 15px;
+}
+
+.daterangepicker .drp-buttons .btn {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 25px!important;
+}
+
+.vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
+    padding: 0;
+    border-radius: 10px;
+}
+
+.daterangepicker.opensleft:before {
+    right: 9px;
+    visibility: hidden;
+}
+
+.daterangepicker.opensleft:after {
+    right: 10px;
+    visibility: hidden;
+}
+
+.daterangepicker.opensleft[data-v-267f4ee2] {
+    right: 0px!important;
+    left: auto;
+    margin-top: 20px;
+}
+
+  //transform: scale(1.02);

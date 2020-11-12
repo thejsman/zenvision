@@ -3,9 +3,7 @@
     <div class="col-xl-8 mt-4">
       <h3>Profit</h3>
       <div
-        class="d-flex flex-row card"
-        :style="{ background: '#2f3863', borderRadius: '5px' }"
-      >
+        class="d-flex flex-row card profit-card">
         <div class="card-body">
           <div class="d-flex flex-row justify-content-between">
             <div class="media">
@@ -140,5 +138,3 @@ export default {
   },
 };
 </script>
-
-

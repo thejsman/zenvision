@@ -41,7 +41,7 @@ export default {
       </div>
     </div>
     <div class="col-md-8 col-lg-6 col-xl-5">
-      <div class="card overflow-hidden">
+      <div class="card card-login overflow-hidden">
         <div class="card-body pt-2">
           <div class="text-center">
             <h4 class="text-white text-uppercase mb-4 mt-4">reset password</h4>
