@@ -7,14 +7,14 @@
         <img
           src="/images/icons/shopify-icon.svg"
           alt
-          height="21"
-          class="mr-2"
+          height="40"
+          class="shopify-icon"
         />
-        <div>Connect to Shopify store</div>
+        <h3>Connect to Shopify store</h3>
       </div>
-      <p class="mt-4 mb-4">
+      <p class="text100">
         Enter your existing
-        <strong>Shopify store URL</strong> below and you'll be redirected to
+        <b>Shopify store URL</b> below and you'll be redirected to
         Shopify to connect your account to Zenvision
       </p>
 
@@ -29,7 +29,7 @@
         >{{ formError }}</b-alert
       >
 
-      <b-form class="p-2" @submit.prevent="connectToShopifyStore" method="POST">
+      <b-form class="p-0" @submit.prevent="connectToShopifyStore" method="POST">
         <slot />
         <b-form-group id="input-group-1">
           <b-form-input
@@ -46,7 +46,7 @@
         <div class="d-flex mt-4 justify-content-between align-items-center p-0">
           <div>
             <a
-              class="text-muted font-size-10"
+              class="font-size-10"
               href="#"
               v-b-modal.how-to-connect-store
               >How to connect my Shopify store?</a
@@ -54,12 +54,12 @@
           </div>
           <div>
             <b-button
-              variant="primary"
-              class="btn btn-dark border-0 mr-2"
+              variant="cancel"
+              class="btn btn-cancel"
               @click="$emit('handle-close')"
-              >Cancel</b-button
-            >
-            <b-button type="submit" variant="primary" class="btn btn-success"
+              >Cancel</b-button>
+
+            <b-button type="submit" variant="success" class="btn btn-success ml-2"
               >Connect</b-button
             >
           </div>
@@ -185,4 +185,3 @@ export default {
   },
 };
 </script>
-
