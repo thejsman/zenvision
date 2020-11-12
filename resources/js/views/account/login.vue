@@ -36,7 +36,7 @@ export default {
       </div>
     </div>
     <div class="col-md-8 col-lg-6 col-xl-5">
-      <div class="card overflow-hidden">
+      <div class="card card-login overflow-hidden">
         <div class="card-body pt-0">
           <div class="text-center">
             <h4 class="text-white text-uppercase mb-4 mt-4">Log in</h4>
@@ -74,7 +74,7 @@ export default {
               <b-button type="submit" variant="primary" class="btn-block btn-success">Log In</b-button>
             </div>
             <div class="mt-4 text-center">
-              <a href="/password/reset" class="text-muted">
+              <a href="/password/reset" class="text-muted forgot-password">
                 <i class="mdi mdi-lock mr-1"></i> Forgot your password?
               </a>
             </div>
@@ -99,4 +99,3 @@ export default {
   </div>
   <!-- end row -->
 </template>
-
