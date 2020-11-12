@@ -2,7 +2,7 @@
   <div class="row">
     <div class="m-4 d-flex flex-column">
       <div class="font-weight-bold font-size-14 text-white">
-        How to connect my Shopify store?
+        <h3>How to connect my Shopify store?</h3>
       </div>
       <p class="mt-4 mb-4 text-white">
         In order to connect your store, go to your
@@ -20,20 +20,19 @@
       >
         <div>
           Still unable to connect?
-          <a href="mailto:support@zenvision.com" class="text-white"
+          <a href="mailto:support@zenvision.com" class="text-white underlined"
             >Contact our support</a
           >
         </div>
         <div>
           <b-button
-            variant="primary"
+            variant="cancel"
             class="btn btn-cancel"
             @click="$emit('handle-close')"
-            >Cancel</b-button
+            >Ok</b-button
           >
         </div>
       </div>
     </div>
   </div>
 </template>
-

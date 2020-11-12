@@ -206,13 +206,6 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
     padding-right: 15px;
 }
 
-.daterangepicker .drp-buttons .btn {
-    margin-left: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 25px!important;
-}
-
 .vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
     padding: 0;
     border-radius: 10px;
@@ -238,8 +231,8 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
     margin-left: 8px;
     font-size: 12px;
     font-weight: 500!important;
-    padding: 4px 8px;
     transition: 0.3s;
+    padding: 14px 25px!important;
 }
 
 .daterangepicker .drp-buttons .btn:hover {
@@ -330,5 +323,14 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 }
 
 .btn-cancel:hover {
+  opacity: 0.5;
+}
+
+.underlined {
+  text-decoration: underline!important;
+  transition: 0.3s;
+}
+
+.underlined:hover {
   opacity: 0.5;
 }
