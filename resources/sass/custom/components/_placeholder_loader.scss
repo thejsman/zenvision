@@ -1,0 +1,44 @@
+.placeholder {
+    padding: 3.5px;
+
+    &.wave div {
+        animation: wave 1s infinite linear forwards;
+        -webkit-animation: wave 1s infinite linear forwards;
+        background: #215a92;
+        background: linear-gradient(
+            to right,
+            #222736 8%,
+            #2a3042 18%,
+            #222736 33%
+        );
+        background-size: 800px 104px;
+        border-radius: 10px;
+    }
+
+    div {
+        background: #222736;
+    }
+
+    .line {
+        height: 12px;
+        margin: 0 0 10px 50px;
+    }
+}
+
+@keyframes wave {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+@-webkit-keyframes wave {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
