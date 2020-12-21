@@ -14,8 +14,8 @@
       </div>
       <p class="text100">
         Enter your existing
-        <b>Shopify store URL</b> below and you'll be redirected to
-        Shopify to connect your account to Zenvision
+        <b>Shopify store URL</b> below and you'll be redirected to Shopify to
+        connect your account to Zenvision
       </p>
 
       <b-alert
@@ -45,10 +45,7 @@
         </b-form-group>
         <div class="d-flex mt-4 justify-content-between align-items-center p-0">
           <div>
-            <a
-              class="font-size-10"
-              href="#"
-              v-b-modal.how-to-connect-store
+            <a class="font-size-10" href="#" v-b-modal.how-to-connect-store
               >How to connect my Shopify store?</a
             >
           </div>
@@ -57,9 +54,13 @@
               variant="cancel"
               class="btn btn-cancel"
               @click="$emit('handle-close')"
-              >Cancel</b-button>
+              >Cancel</b-button
+            >
 
-            <b-button type="submit" variant="success" class="btn btn-success ml-2"
+            <b-button
+              type="submit"
+              variant="success"
+              class="btn btn-success ml-2"
               >Connect</b-button
             >
           </div>
@@ -174,7 +175,7 @@ export default {
           if (count) {
             this.showAlert("Shopify store already connected.");
           } else {
-            window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders&redirect_uri=https://d7df9bf702fa.ngrok.io/shopify/auth`;
+            window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders&redirect_uri=http://zenvision-staging.herokuapp.com/shopify/auth`;
           }
         } catch (error) {
           console.log(error);
