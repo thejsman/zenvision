@@ -26,9 +26,9 @@ Route::get('/{group}/{component}', 'HomeController@show');
 Route::group(['middleware' => ['auth']], function () {
     //Shopify Connect APIs
     Route::get('validateShopifyStoreUrl', 'ShopifyStoreController@validateUrl');
+
     //Dashboard - Shopify Data
     Route::get('shopifystoredata', 'DashboardController@index');
+    Route::get('shopifydata', 'DashboardController@getShopifyData');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
-
 });
-

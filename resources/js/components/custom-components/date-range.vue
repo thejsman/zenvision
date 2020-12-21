@@ -14,6 +14,7 @@
 <script>
 import DateRangePicker from "vue2-daterange-picker";
 import moment from "moment";
+import { eventBus } from "../../app";
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 
 export default {
@@ -22,12 +23,13 @@ export default {
   data() {
     return {
       dateRange: {
-        startDate: moment().add("month", -3),
+        startDate: moment().add(-3, "month"),
         endDate: moment(),
       },
       opens: "left",
     };
   },
+  created() {},
   methods: {
     dateFormat(classes, date) {
       if (!classes.disabled) {
@@ -37,7 +39,8 @@ export default {
     },
     selectDate() {
       const { startDate, endDate } = this.dateRange;
-      this.$emit("changeDateRange", this.dateRange);
+      //   this.$emit("changeDateRange", this.dateRange);
+      eventBus.$emit("changeDateRange", this.dateRange);
     },
   },
 };
@@ -50,6 +53,14 @@ export default {
 .reportrange-text[data-v-267f4ee2] {
   background: #262b3c;
   padding: 0.47rem 0.75rem;
+}
+.daterangepicker .calendar-table,
+.daterangepicker .drp-buttons {
+  border: none;
+  background-color: none;
+}
+.daterangepicker td.in-range {
+  background-color: #ebf4f82b;
 }
 </style>
 

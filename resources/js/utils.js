@@ -38,7 +38,6 @@ export const getSumBy = (values, filter) => {
 };
 
 export const updateData = (data, title, value) => {
-    console.log(title, value);
     data.forEach(d => {
         if (d.title === title) {
             d.value = `${value}`;

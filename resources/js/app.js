@@ -11,23 +11,28 @@ window.Vue = Vue;
 import { BootstrapVue } from "bootstrap-vue";
 import vClickOutside from "v-click-outside";
 import VueApexCharts from "vue-apexcharts";
-import chartist_tooltip from "chartist-plugin-tooltip";
+import "chartist/dist/chartist.min.css";
+import VTooltip from "v-tooltip";
+import chartistPluginTooltip, * as ChartistTooltips from "chartist-plugin-tooltips";
 
 Vue.prototype.$isDev = process.env.MIX_APP_ENV !== "production";
 Vue.config.devtools = Vue.prototype.$isDev;
 Vue.config.debug = Vue.prototype.$isDev;
 Vue.config.silent = !Vue.prototype.$isDev;
 
+export const eventBus = new Vue();
+
 // Vue.use(require("vue-chartist"), {
 //     messageNoData: "You have not enough data",
 //     classNoData: "empty"
 // });
 Vue.use(require("vue-chartist"), {
-    plugins: [chartist_tooltip]
+    plugins: [chartistPluginTooltip]
 });
 
 Vue.use(BootstrapVue);
 Vue.use(vClickOutside);
+Vue.use(VTooltip);
 Vue.component(
     "dynamic-component",
     require("./components/dynamic-component").default
@@ -48,8 +53,10 @@ Vue.component("apexchart", VueApexCharts);
  */
 
 import "./views";
+import store from "./store";
 const app = new Vue({
     el: "#app",
+    store,
     data() {
         return {
             layoutType: "vertical"
