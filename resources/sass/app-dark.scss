@@ -32,7 +32,6 @@ File: Main dark Css File
 // Components
 @import "custom/components/avatar";
 @import "custom/components/helper";
-@import "custom/components/shopify_model";
 @import "custom/components/demos";
 
 // Plugins
@@ -44,3 +43,7 @@ File: Main dark Css File
 @import "custom/pages/authentication";
 @import "icons";
 @import "main";
+
+//Custom files import
+@import "custom/components/shopify_model";
+@import "custom/components/placeholder_loader";
