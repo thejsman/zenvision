@@ -66,17 +66,27 @@ export default {
           </a>
         </div>
       </div>
+      <div class="">
+        <a class="btn btn-link text-white" href="/">Profit Analysis</a>
+        <a class="btn btn-link text-white" href="/mastersheet">Mastersheet</a>
+      </div>
       <div class="d-flex">
         <b-dropdown right variant="black" toggle-class="header-item">
           <template v-slot:button-content>
             <div class="dropdown d-inline-block">
-              <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right">
+              <button
+                type="button"
+                class="btn header-item noti-icon right-bar-toggle toggle-right"
+              >
                 <i class="bx bx-cog toggle-right"></i>
               </button>
             </div>
           </template>
           <a class="dropdown-item" href="/logout">
-            <i class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"></i> Logout
+            <i
+              class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"
+            ></i>
+            Logout
           </a>
         </b-dropdown>
       </div>

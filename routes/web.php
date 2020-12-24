@@ -17,6 +17,7 @@ Auth::routes();
 Route::get('user/stores', 'ShopifyStoreController@getStores');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('/mastersheet', 'MastersheetController@index');
 Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 
 Route::get('/{group}/{component}', 'HomeController@show');
@@ -29,6 +30,4 @@ Route::group(['middleware' => ['auth']], function () {
     //Dashboard - Shopify Data
     Route::get('shopifystoredata', 'DashboardController@index');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
-
 });
-
