@@ -1,13 +1,13 @@
 <script>
 import Layout from "../../layouts/main";
-import ChannelDropdown from "../../components/custom-components/channel-dropdown";
+import AddChannel from "./add-channel";
 import Sidepanel from "./sidepanel";
 import Mainpanel from "./mainpanel";
 
 export default {
   components: {
     Layout,
-    ChannelDropdown,
+    AddChannel,
     Sidepanel,
     Mainpanel,
   },
@@ -17,8 +17,11 @@ export default {
   <Layout>
     <div class="row">
       <!-- Right Sidebar -->
-      <div class="col-12 my-2">
-        <ChannelDropdown />
+      <div class="col-12 my-2 d-flex justify-content-between">
+        <AddChannel />
+        <b-button class="border-0 mr-4 btn-export" variant="dark"
+          >Export</b-button
+        >
       </div>
       <div class="col-3 mt-4">
         <Sidepanel />
@@ -38,5 +41,9 @@ export default {
   width: 200px;
   height: 200px;
   background-color: #2f3863;
+}
+.btn-export {
+  height: 40px;
+  width: 80px;
 }
 </style>

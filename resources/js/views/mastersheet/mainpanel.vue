@@ -1,13 +1,22 @@
 <script>
 import Stat from "../../components/widgets/stat-mastersheet";
+import Transactions from "./transaction-section";
+import { eventBus } from "../../app";
+import {
+  YESTERDAYS_NET_EQUITY_FLUCTUATION,
+  YESTERDAYS_PROFIT_LOSS,
+  OTHER_EXPENSES,
+} from "../../constants";
+import { updateData, displayCurrency } from "../../utils";
+
 export default {
-  components: { Stat },
+  components: { Stat, Transactions },
   data() {
     return {
       statData: [
         {
           icon: "bx bx-copy-alt",
-          title: "Yesterday Net Equity Fluctuation",
+          title: YESTERDAYS_NET_EQUITY_FLUCTUATION,
           value: "$0",
           tooltip:
             "This balance represents the total fluctuation in Net Equity between Yesterday and the day before.",
@@ -15,15 +24,16 @@ export default {
         },
         {
           icon: "bx bx-archive-in",
-          title: "Yesterday's Profit/Loss",
+          title: YESTERDAYS_PROFIT_LOSS,
           tooltip:
             "This represents yesterday's total Profit or Loss for the store(s) that you have connected to Zenvision.",
           value: "$0",
           loading: false,
+          showGraph: true,
         },
         {
           icon: "bx bx-purchase-tag-alt",
-          title: "Other expenses",
+          title: OTHER_EXPENSES,
           tooltip:
             "This balance represents difference between yesterday’s profit/loss and yesterday's fluctuation in net equity. The purpose of this balance is to understand the cash flow differences between your profits/losses and the business's net worth.  PLEASE NOTE that the other expenses section below represents our suggestions for what transactions make up this total difference.",
           value: "$0",
@@ -63,32 +73,15 @@ export default {
           :value="stat.value"
           :tooltip="stat.tooltip"
           :loading="stat.loading"
+          :showGraph="stat.showGraph"
         />
       </div>
       <!-- end col-->
     </div>
-    <div class="mt-4">
-      <h4>
-        Transactions
-        <i
-          class="fas fas fa-info-circle"
-          v-b-tooltip.hover="
-            'This section represents all transactions that have occurred in the accounts that are linked to Zenvision.'
-          "
-        ></i>
-      </h4>
-
-      <div class="col-md-12 p-0">
-        <div class="transaction_section w-100"></div>
-      </div>
-    </div>
+    <Transactions />
   </div>
 </template>
 <style lang="scss">
-/* ==============
-  Email
-===================*/
-
 .transaction_section {
   background: #2a3043;
   height: 400px;

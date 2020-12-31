@@ -6,12 +6,14 @@
 
 require("./bootstrap");
 import Vue from "vue";
+import store from "./store";
 window.Vue = Vue;
 
 import { BootstrapVue } from "bootstrap-vue";
 import vClickOutside from "v-click-outside";
 import VueApexCharts from "vue-apexcharts";
 import chartist_tooltip from "chartist-plugin-tooltip";
+import "chartist/dist/chartist.min.css";
 
 Vue.prototype.$isDev = process.env.MIX_APP_ENV !== "production";
 Vue.config.devtools = Vue.prototype.$isDev;
@@ -34,6 +36,8 @@ Vue.component(
 );
 
 Vue.component("apexchart", VueApexCharts);
+
+export const eventBus = new Vue();
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -50,6 +54,7 @@ Vue.component("apexchart", VueApexCharts);
 import "./views";
 const app = new Vue({
     el: "#app",
+    store,
     data() {
         return {
             layoutType: "vertical"
