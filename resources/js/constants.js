@@ -28,6 +28,18 @@ MasterSheet Section
 //Main Section
 
 export const YESTERDAYS_NET_EQUITY_FLUCTUATION =
-    "Yesterday Net Equity Fluctuation";
+    "Yesterday's Net Equity Fluctuation";
 export const YESTERDAYS_PROFIT_LOSS = "Yesterday's Profit/Loss";
-export const OTHER_EXPENSES = "Other expenses";
+export const OTHER_EXPENSES = "Other Expenses";
+
+//Sidepanel
+
+//Assets
+export const NET_EQUITY = "Net Equity";
+export const TOTAL_CASH = "Cash";
+export const TOTAL_INVENTORY = "Inventory";
+export const TOTAL_RESERVES = "Reserves";
+
+//Debts
+export const TOTAL_CREDIT_CARD = "Credit Card";
+export const TOTAL_SUPPLIER_PAYABLE = "Supplier Payable";

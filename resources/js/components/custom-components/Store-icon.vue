@@ -1,9 +1,20 @@
 <template>
   <div class="flex-start pl-2">
-    <div class="d-flex flex-row">
+    <div class="d-flex flex-row dropdown">
       <div v-for="store in stores" :key="store.id">
-        <div class="border border-primary rounded mr-2 p-2">
+        <div
+          class="border rounded p-2 dropbtn"
+          :class="{ 'border-primary': store.enabled_on_dashboard }"
+          @click="handleClick(store)"
+          v-b-tooltip.hover="store.store_name"
+        >
           <img src="/images/icons/shopify-icon.svg" alt height="18" />
+        </div>
+        <div class="dropdown-content">
+          <a href="#" @click="handleClick(store)">
+            {{ store.enabled_on_dashboard ? "Disable" : "Enable" }}</a
+          >
+          <a href="#" @click="showMsgBoxOne(store, $event)">Remove</a>
         </div>
       </div>
     </div>
@@ -11,6 +22,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "../../app";
 export default {
   name: "StoreIcon",
   data() {
@@ -26,6 +38,41 @@ export default {
       const stores = await axios.get("/user/stores");
       this.stores = stores.data;
     },
+    async handleClick(store) {
+      try {
+        await axios.patch("shopifystore", store);
+        eventBus.$emit("toggleShopifyStore");
+        this.getStores();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async removeChannel(store, event) {
+      try {
+        // eventBus.$emit("removeShopifyStore", store.id);
+        await axios.patch("shopifystoredelete", store);
+        eventBus.$emit("toggleShopifyStore");
+        this.getStores();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    showMsgBoxOne(store) {
+      this.boxOne = "";
+      this.$bvModal
+        .msgBoxConfirm("Are you sure you want to remove the Shopify store?")
+        .then((value) => {
+          this.boxOne = value;
+          console.log("Yes", value);
+          if (value) {
+            this.removeChannel(store);
+          }
+        })
+        .catch((err) => {
+          // An error occurred
+        });
+    },
   },
 };
 </script>
+

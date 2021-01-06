@@ -3,13 +3,37 @@ import Layout from "../../layouts/main";
 import AddChannel from "./add-channel";
 import Sidepanel from "./sidepanel";
 import Mainpanel from "./mainpanel";
+import ShopifyConnect from "../../components/custom-components/modals/ShopifyConnect-modal";
+import StoreIcon from "../../components/custom-components/Store-icon";
 
+import { eventBus } from "../../app";
 export default {
+  data() {
+    return {
+      allOrders: [],
+    };
+  },
   components: {
     Layout,
     AddChannel,
     Sidepanel,
     Mainpanel,
+    ShopifyConnect,
+    StoreIcon,
+  },
+  created() {
+    eventBus.$on("toggleShopifyStore", () => {
+      this.getShopifyData();
+    });
+    this.getShopifyData();
+  },
+  methods: {
+    async getShopifyData() {
+      const {
+        data: { enabled_on_dashboard, orders },
+      } = await axios.get("shopifystoredata");
+      this.allOrders = orders;
+    },
   },
 };
 </script>
@@ -18,18 +42,24 @@ export default {
     <div class="row">
       <!-- Right Sidebar -->
       <div class="col-12 my-2 d-flex justify-content-between">
-        <AddChannel />
+        <div class="d-flex justify-content-start align-items-center">
+          <AddChannel />
+          <StoreIcon />
+        </div>
         <b-button class="border-0 mr-4 btn-export" variant="dark"
           >Export</b-button
         >
       </div>
       <div class="col-3 mt-4">
-        <Sidepanel />
+        <Sidepanel :orders="allOrders" />
       </div>
       <div class="col-9 mt-4">
-        <Mainpanel />
+        <Mainpanel :orders="allOrders" />
       </div>
     </div>
+    <b-modal id="shopify-connect" centered hide-footer hide-header>
+      <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
+    </b-modal>
   </Layout>
 </template>
 <style>

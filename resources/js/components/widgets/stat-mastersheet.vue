@@ -30,6 +30,65 @@ export default {
       type: String,
       default: "",
     },
+    chartOptions: {
+      type: Object,
+      default: () => {
+        return {
+          chart: {
+            type: "area",
+            height: 40,
+            sparkline: {
+              enabled: true,
+            },
+          },
+          stroke: {
+            curve: "smooth",
+            width: 2,
+          },
+          colors: ["#f1b44c"],
+          fill: {
+            type: "gradient",
+            gradient: {
+              shadeIntensity: 1,
+              inverseColors: false,
+              opacityFrom: 0.45,
+              opacityTo: 0.05,
+              stops: [25, 100, 100, 100],
+            },
+          },
+          tooltip: {
+            fixed: {
+              enabled: false,
+              color: "#000000",
+            },
+            x: {
+              show: false,
+            },
+            y: {
+              formatter: (value) => {
+                return "$" + value;
+              },
+            },
+            marker: {
+              show: false,
+            },
+          },
+        };
+      },
+    },
+    series: {
+      type: Array,
+      default: () => [
+        {
+          name: "Profit",
+          data: [0, 0, 0, 0, 0, 0, 0],
+        },
+      ],
+    },
+    showGraph: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
@@ -49,9 +108,22 @@ export default {
             ></i>
             <i v-else class="fas fa-angle-down"></i>
           </div>
-          <div>-</div>
-          <div class="rectangle mt-3">
-            <h4 class="mb-0">{{ value }}</h4>
+          <div>
+            <h4 class="mb-0 mx-auto">{{ value }}</h4>
+          </div>
+          <div class="d-flex justify-content-between">
+            <div class="rectangle mt-3">
+              <h4 class="mb-0 mx-auto">0%</h4>
+            </div>
+
+            <apexchart
+              v-if="showGraph"
+              class="apex-charts"
+              :height="50"
+              :width="120"
+              :options="chartOptions"
+              :series="series"
+            />
           </div>
         </div>
       </div>
@@ -66,16 +138,19 @@ export default {
 </template>
 <style>
 .rectangle {
-  padding: 1.5px 8px 1px;
+  padding: 6px 8px 6px;
 
   border-radius: 2px;
   background-color: #34c48f66;
-  width: 40px;
+  width: 60px;
 }
 .rectangle h4 {
   color: #b0fbb0;
   font-size: 16px;
   font-weight: 100;
   text-align: center;
+}
+.apexcharts-tooltip {
+  color: #191e2c;
 }
 </style>

@@ -45,3 +45,18 @@ export const updateData = (data, title, value) => {
         }
     });
 };
+
+export const updateGraphData = (data, title, value, graphData) => {
+    data.forEach(d => {
+        if (d.title === title) {
+            d.value = `${value}`;
+
+            d.series = [{ name: "Profit", data: graphData }];
+            d.loading = false;
+        }
+    });
+};
+
+export const setLoading = data => {
+    data.forEach(d => (d.loading = true));
+};

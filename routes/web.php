@@ -29,5 +29,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('validateShopifyStoreUrl', 'ShopifyStoreController@validateUrl');
     //Dashboard - Shopify Data
     Route::get('shopifystoredata', 'DashboardController@index');
+    Route::get('mastersheetdata', 'DashboardController@mastersheet');
+    Route::get('msdebts', 'DashboardController@msdebts');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
+    Route::get('shopifybalance', 'DashboardController@getShopifyStoreBalance');
+
+
+    Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
+    Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
 });
