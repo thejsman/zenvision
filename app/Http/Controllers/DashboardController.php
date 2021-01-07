@@ -82,7 +82,7 @@ class DashboardController extends Controller
         };
 
         //return values
-        $total_cash = 200;
+        $total_cash = 0;
         $total_inventory = 0;
         $total_reserves = 0;
         $total_credit_card = 0;
@@ -125,10 +125,10 @@ class DashboardController extends Controller
 
 
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        $store_balance = 110;
+        $store_balance = 0;
         foreach ($enabled_on_dashboard as $store_id) {
 
-            // For Development: to save network requests
+            // Commented for Development: to save network requests
 
             // $store = ShopifyStore::find($store_id)->getStoreDetails();
             // $url = "https://" . $store['store_url'] . "/admin/api/2021-01/shopify_payments/balance.json";

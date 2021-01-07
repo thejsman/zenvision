@@ -78,9 +78,9 @@ export default {
       setLoading(this.statData);
       this.getProfitLoss();
     });
-    eventBus.$on("netEquityTotal", (value) => {
-      this.yesterDaysNetEquityTotal = value;
-    });
+    // eventBus.$on("netEquityTotal", (value) => {
+    //   this.yesterDaysNetEquityTotal = value;
+    // });
     this.getProfitLoss();
   },
   props: {
@@ -152,7 +152,7 @@ export default {
       for (let i = 0; i <= 6; i++) {
         otherExpArray[i] = this.netEquityArray[i] - this.profitLossGraphData[i];
       }
-      console.log({ otherExpArray });
+
       return otherExpArray;
     },
   },
@@ -202,6 +202,7 @@ export default {
           displayCurrency(yesterdaysData.net_equity),
           graphData
         );
+        this.yesterDaysNetEquityTotal = yesterdaysData.net_equity;
       } catch (error) {
         console.log(error);
         updateGraphData(
