@@ -16,11 +16,13 @@ import {
   setLoading,
 } from "../../utils";
 import { mapState, mapGetters, mapActions } from "vuex";
+import Axios from "axios";
 
 export default {
   components: { Stat, Transactions },
   data() {
     return {
+      netEquityArray: [],
       statData: [
         {
           icon: "bx bx-copy-alt",
@@ -30,6 +32,12 @@ export default {
             "This balance represents the total fluctuation in Net Equity between Yesterday and the day before.",
           loading: true,
           showGraph: true,
+          series: [
+            {
+              name: "Net Equity",
+              data: [0, 0, 0, 0, 0, 0, 0],
+            },
+          ],
         },
         {
           icon: "bx bx-archive-in",
@@ -54,6 +62,12 @@ export default {
           value: "$0",
           loading: true,
           showGraph: true,
+          series: [
+            {
+              name: "Other Expenses",
+              data: [0, 0, 0, 0, 0, 0, 0],
+            },
+          ],
         },
       ],
       yesterDaysNetEquityTotal: 0,
@@ -66,11 +80,6 @@ export default {
     });
     eventBus.$on("netEquityTotal", (value) => {
       this.yesterDaysNetEquityTotal = value;
-      updateData(
-        this.statData,
-        YESTERDAYS_NET_EQUITY_FLUCTUATION,
-        displayCurrency(value)
-      );
     });
     this.getProfitLoss();
   },
@@ -138,9 +147,18 @@ export default {
         ).toFixed(2);
       });
     },
+    otherExpensesData() {
+      let otherExpArray = [0, 0, 0, 0, 0, 0, 0];
+      for (let i = 0; i <= 6; i++) {
+        otherExpArray[i] = this.netEquityArray[i] - this.profitLossGraphData[i];
+      }
+      console.log({ otherExpArray });
+      return otherExpArray;
+    },
   },
   methods: {
     async getProfitLoss() {
+      this.yesterdaysNetEquityFluctuation();
       setTimeout(() => {
         updateGraphData(
           this.statData,
@@ -149,14 +167,50 @@ export default {
           this.profitLossGraphData
         );
 
-        updateData(
+        updateGraphData(
           this.statData,
           OTHER_EXPENSES,
           displayCurrency(
             this.yesterDaysNetEquityTotal - this.yesterdayProfitLoss
-          )
+          ),
+          this.otherExpensesData
         );
       }, 2000);
+    },
+    async yesterdaysNetEquityFluctuation() {
+      try {
+        const result = await axios.get("dailynetequity");
+        const dailyEquityArray = result.data;
+
+        const yesterdaysData = dailyEquityArray.find(
+          (e) => moment(e.created_at).format("MM-DD-YYYY") === this.yesterday
+        );
+        const graphData = this.lastSevenDaysArray.map((day) => {
+          const foundObject = _.find(dailyEquityArray, function (e) {
+            return moment(e.created_at).format("MM-DD-YYYY") === day;
+          });
+          if (foundObject) {
+            return foundObject.net_equity;
+          } else {
+            return 0;
+          }
+        });
+        this.netEquityArray = graphData;
+        updateGraphData(
+          this.statData,
+          YESTERDAYS_NET_EQUITY_FLUCTUATION,
+          displayCurrency(yesterdaysData.net_equity),
+          graphData
+        );
+      } catch (error) {
+        console.log(error);
+        updateGraphData(
+          this.statData,
+          YESTERDAYS_NET_EQUITY_FLUCTUATION,
+          displayCurrency(0),
+          [0, 0, 0, 0, 0, 0, 0]
+        );
+      }
     },
   },
 };

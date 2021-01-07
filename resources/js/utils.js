@@ -50,8 +50,7 @@ export const updateGraphData = (data, title, value, graphData) => {
     data.forEach(d => {
         if (d.title === title) {
             d.value = `${value}`;
-
-            d.series = [{ name: "Profit", data: graphData }];
+            d.series = [{ name: d.series[0].name, data: graphData }];
             d.loading = false;
         }
     });

@@ -23,7 +23,7 @@
         <div class="col-sm-12 col-md-2">
           <b-dropdown variant="primary" class="m-2" right text="Right align">
             <template v-slot:button-content>
-              Tags({{ tagsLenght }}) <i class="fas fa-angle-down pl-1"></i>
+              Tags ({{ tagsLenght }}) <i class="fas fa-angle-down pl-1"></i>
             </template>
             <b-dropdown-form>
               <div class="chip-container align-items-center">

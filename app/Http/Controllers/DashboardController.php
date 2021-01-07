@@ -74,17 +74,22 @@ class DashboardController extends Controller
     }
 
 
-    public function mastersheet()
+    public static function mastersheet($user = null)
     {
+
+        if (empty($user)) {
+            $user = Auth::user();
+        };
+
         //return values
-        $total_cash = 0;
+        $total_cash = 200;
         $total_inventory = 0;
         $total_reserves = 0;
         $total_credit_card = 0;
         $total_supplier_payable = 0;
 
         //Funciton to get Shopify store balance
-        $shopify_balance = $this->getShopifyStoreBalance();
+        $shopify_balance = self::getShopifyStoreBalance($user);
         // will call a funciton to get available bank cash
         $cash_bank_account = 0;
         // will call a funciton to get available paypal balance
@@ -92,7 +97,7 @@ class DashboardController extends Controller
         // will call a funciton to get available stripe balance
         $cash_stripe = 0;
 
-        $total_cash = $shopify_balance + $cash_bank_account + $cash_paypal + $cash_stripe;
+        $total_cash += $shopify_balance + $cash_bank_account + $cash_paypal + $cash_stripe;
 
         return [
             'total_cash' => $total_cash,
@@ -102,7 +107,7 @@ class DashboardController extends Controller
             'total_supplier_payable' => $total_supplier_payable
         ];
     }
-    public function msdebts()
+    public function msdebts($user = null)
     {
         //function call to get Credit Card Total
         $debts_credit_card = 0;
@@ -115,11 +120,12 @@ class DashboardController extends Controller
         ];
     }
 
-    public function getShopifyStoreBalance()
+    public static function getShopifyStoreBalance($user = null)
     {
-        $user = Auth::user();
+
+
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        $store_balance = 0;
+        $store_balance = 110;
         foreach ($enabled_on_dashboard as $store_id) {
 
             // For Development: to save network requests
