@@ -12,6 +12,7 @@
 <script>
 import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
+import SubscriptionCost from "../modals/subscription-cost";
 
 import {
   displayCurrency,
@@ -27,10 +28,11 @@ import {
   MERCHANT_FEE,
   AD_SPEND_FACEBOOK,
   AD_SPEND_GOOGLE,
+  SUBSCRIPTION_COST,
 } from "../../../constants";
 
 export default {
-  components: { Stat },
+  components: { Stat, SubscriptionCost },
   data() {
     return {
       data: [
@@ -73,6 +75,12 @@ export default {
         {
           id: 7,
           title: AD_SPEND_GOOGLE,
+          value: `0`,
+          loading: true,
+        },
+        {
+          id: 8,
+          title: SUBSCRIPTION_COST,
           value: `0`,
           loading: true,
         },
@@ -131,6 +139,7 @@ export default {
       updateData(this.data, AD_SPEND_FACEBOOK, displayCurrency(0));
       updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
       updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
+      updateData(this.data, SUBSCRIPTION_COST, displayCurrency(0));
     },
   },
 };
