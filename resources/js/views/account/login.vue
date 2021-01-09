@@ -8,23 +8,23 @@ export default {
       email: "",
       password: "",
       tryingToLogIn: false,
-      isAuthError: false
+      isAuthError: false,
     };
   },
   props: {
     submitUrl: {
       type: String,
-      required: true
+      required: true,
     },
     authError: {
       type: String,
       required: false,
-      default: () => null
-    }
+      default: () => null,
+    },
   },
   mounted() {
     this.isAuthError = !!this.authError;
-  }
+  },
 };
 </script>
 
@@ -39,9 +39,17 @@ export default {
       <div class="card card-login overflow-hidden">
         <div class="card-body pt-0">
           <div class="text-center">
-            <h4 class="text-white text-uppercase mb-4 mt-4">Log in</h4>
+            <h4 class="text-white text-uppercase mb-4 mt-4">
+              Log in - Heroku Test
+            </h4>
           </div>
-          <b-alert v-model="isAuthError" variant="danger" class="mt-3" dismissible>{{authError}}</b-alert>
+          <b-alert
+            v-model="isAuthError"
+            variant="danger"
+            class="mt-3"
+            dismissible
+            >{{ authError }}</b-alert
+          >
 
           <b-form class="p-2" :action="submitUrl" method="POST">
             <slot />
@@ -67,11 +75,22 @@ export default {
               ></b-form-input>
             </b-form-group>
             <div class="custom-control custom-checkbox">
-              <input id="customControlInline" type="checkbox" class="custom-control-input" />
-              <label class="custom-control-label" for="customControlInline">Remember me</label>
+              <input
+                id="customControlInline"
+                type="checkbox"
+                class="custom-control-input"
+              />
+              <label class="custom-control-label" for="customControlInline"
+                >Remember me</label
+              >
             </div>
             <div class="mt-3">
-              <b-button type="submit" variant="primary" class="btn-block btn-success">Log In</b-button>
+              <b-button
+                type="submit"
+                variant="primary"
+                class="btn-block btn-success"
+                >Log In</b-button
+              >
             </div>
             <div class="mt-4 text-center">
               <a href="/password/reset" class="text-muted forgot-password">
@@ -87,10 +106,9 @@ export default {
       <div class="mt-5 text-center">
         <p>
           Don't have an account ?
-          <a
-            href="/register"
-            class="font-weight-medium text-primary"
-          >Signup now</a>
+          <a href="/register" class="font-weight-medium text-primary"
+            >Signup now</a
+          >
         </p>
       </div>
       <!-- end row -->
