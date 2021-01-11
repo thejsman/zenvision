@@ -5,8 +5,24 @@
       <h3>{{ totalCost }}</h3>
     </div>
     <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
-      <Stat :title="cost.title" :value="cost.value" :loading="cost.loading" />
+      <Stat
+        :title="cost.title"
+        :value="cost.value"
+        :loading="cost.loading"
+        :onClick="cost.onClick"
+        :totalSubscriptionCount="cost.totalSubscriptionCount"
+      />
     </div>
+
+    <b-modal
+      id="subscription-details"
+      size="lg"
+      centered
+      hide-footer
+      hide-header
+    >
+      <SubscriptionCost @handle-close="handleSubscriptionClose" />
+    </b-modal>
   </div>
 </template>
 <script>
@@ -35,6 +51,7 @@ export default {
   components: { Stat, SubscriptionCost },
   data() {
     return {
+      totalSubscriptionCount: 0,
       data: [
         {
           id: 1,
@@ -83,6 +100,8 @@ export default {
           title: SUBSCRIPTION_COST,
           value: `0`,
           loading: true,
+          onClick: this.handleSubscriptionClick,
+          totalSubscriptionCount: 2,
         },
       ],
       totalDiscount: 0,
@@ -97,6 +116,9 @@ export default {
       return displayCurrency(
         this.merchantFees + this.refundTotal + this.totalDiscount
       );
+    },
+    totalSubscription() {
+      return this.getSubscriptionTotal();
     },
   },
 
@@ -139,7 +161,30 @@ export default {
       updateData(this.data, AD_SPEND_FACEBOOK, displayCurrency(0));
       updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
       updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
-      updateData(this.data, SUBSCRIPTION_COST, displayCurrency(0));
+      updateData(
+        this.data,
+        SUBSCRIPTION_COST,
+        displayCurrency(this.totalSubscription)
+      );
+    },
+    handleSubscriptionClick() {
+      this.$bvModal.show("subscription-details");
+    },
+    handleSubscriptionClose() {
+      this.$bvModal.hide("subscription-details");
+    },
+
+    async getSubscriptionTotal(date = []) {
+      try {
+        const result = await axios.get("/subscriptioncost");
+        const { data } = result;
+        if (data.length > 0) {
+          this.totalSubscriptionCount = data.length;
+          //   data.forEach((d) => this.calculateSubscription(d, date));
+        }
+      } catch (error) {
+        console.log({ error });
+      }
     },
   },
 };

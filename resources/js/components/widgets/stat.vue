@@ -26,6 +26,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    onClick: {
+      type: Function,
+      default: () => {},
+    },
+    totalSubscriptionCount: {
+      type: Number,
+      default: null,
+    },
   },
 };
 </script>
@@ -33,10 +41,19 @@ export default {
 <template>
   <div class="card mini-stats-wid">
     <PlaceholderLoader v-if="loading" />
-    <div class="card-body" v-else>
+    <div class="card-body" v-else @click="onClick">
       <div class="media">
         <div class="media-body">
-          <p class="text-muted font-weight-medium">{{ title }}</p>
+          <div class="d-flex justify-content-between align-items-baseline">
+            <p class="text-muted font-weight-medium">{{ title }}</p>
+            <b-badge
+              variant="primary"
+              class="p-1"
+              v-if="totalSubscriptionCount"
+              >{{ totalSubscriptionCount }}</b-badge
+            >
+          </div>
+
           <h4 class="mb-0">{{ value }}</h4>
         </div>
       </div>

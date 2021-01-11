@@ -38,4 +38,11 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
+
+    //Subscription Cost APIs
+    Route::get('subscriptioncost', 'SubscriptionCostController@index');
+    Route::post('subscriptioncost', 'SubscriptionCostController@store');
+    Route::delete('subscriptioncost/{id}', 'SubscriptionCostController@destroy');
+    Route::patch('subscriptioncost/{id}', 'SubscriptionCostController@update');
+    Route::patch('endSubscriptioncost/{id}', 'SubscriptionCostController@endSubscription');
 });
