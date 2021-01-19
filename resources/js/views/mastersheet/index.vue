@@ -4,7 +4,9 @@ import AddChannel from "./add-channel";
 import Sidepanel from "./sidepanel";
 import Mainpanel from "./mainpanel";
 import ShopifyConnect from "../../components/custom-components/modals/ShopifyConnect-modal";
-import StoreIcon from "../../components/custom-components/Store-icon";
+import ShopifyStoreIcon from "../../components/custom-components/shopifystore-icon";
+import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
+import StripeAccount from "../../components/custom-components/stripe-icon";
 
 import { eventBus } from "../../app";
 export default {
@@ -19,7 +21,9 @@ export default {
     Sidepanel,
     Mainpanel,
     ShopifyConnect,
-    StoreIcon,
+    ShopifyStoreIcon,
+    PaypalAccountIcon,
+    StripeAccount,
   },
   created() {
     eventBus.$on("toggleShopifyStore", () => {
@@ -44,7 +48,9 @@ export default {
       <div class="col-12 my-2 d-flex justify-content-between">
         <div class="d-flex justify-content-start align-items-center">
           <AddChannel />
-          <StoreIcon />
+          <ShopifyStoreIcon :disableFeature="false" />
+          <PaypalAccountIcon :disableFeature="false" />
+          <StripeAccount :disableFeature="false" />
         </div>
         <b-button class="border-0 mr-4 btn-export" variant="dark"
           >Export</b-button

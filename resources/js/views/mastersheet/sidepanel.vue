@@ -81,6 +81,8 @@ export default {
       this.getMastersheetData();
     });
     this.getMastersheetData();
+    this.getStripeBalance();
+    this.getStripeTransactions();
   },
   methods: {
     async getMastersheetData() {
@@ -135,6 +137,33 @@ export default {
         NET_EQUITY,
         displayCurrency(netEquityTotal)
       );
+    },
+    async getStripeBalance() {
+      try {
+        const result = await axios.get("getstripeaccountsbalance");
+        const stripeBalance = result.data.available[0].amount;
+
+        //   "connect_reserved": [
+        //     {
+        //       "amount": 0,
+        //       "currency": "inr"
+        //     }
+        //   ],
+        const stripeReserve = result.data.connect_reserved[0].amount;
+      } catch (err) {
+        console.log(err);
+        return [];
+      }
+    },
+    async getStripeTransactions() {
+      try {
+        const result = await axios.get("getbalancetransactions");
+        const data = result.data;
+        console.log(data);
+      } catch (err) {
+        console.log(err);
+        return [];
+      }
     },
   },
 };

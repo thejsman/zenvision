@@ -1,0 +1,89 @@
+<template>
+  <div class="flex-start pl-1">
+    <div class="d-flex flex-row dropdown">
+      <div v-for="Account in stripeAccounts" :key="Account.id">
+        <div
+          class="border rounded p-2 ml-1 dropbtn"
+          :class="{ 'border-primary': Account.enabled_on_dashboard }"
+          @click="disableFeature ? handleClick(Account) : null"
+          v-b-tooltip.hover="Account.stripe_user_id"
+        >
+          <img src="/images/icons/stripe-icon.svg" alt height="21" />
+        </div>
+        <div class="dropdown-content">
+          <a href="#" @click="handleClick(Account)" v-if="disableFeature">
+            {{ Account.enabled_on_dashboard ? "Disable" : "Enable" }}</a
+          >
+          <a href="#" @click="showMsgBoxOne(Account, $event)">Remove</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import axios from "axios";
+export default {
+  name: "StripeAccount",
+  data() {
+    return {
+      stripeAccounts: [],
+    };
+  },
+  props: {
+    disableFeature: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  created() {
+    this.getStripeAccounts();
+  },
+  methods: {
+    async getStripeAccounts() {
+      try {
+        const result = await axios.get("getstripeaccounts");
+
+        this.stripeAccounts = result.data;
+      } catch (err) {
+        console.log(err);
+        this.stripeAccounts = [];
+      }
+    },
+    showMsgBoxOne(account) {
+      this.boxOne = "";
+      this.$bvModal
+        .msgBoxConfirm("Are you sure you want to remove the Stripe account?")
+        .then((value) => {
+          this.boxOne = value;
+          console.log("Yes", value);
+          if (value) {
+            this.removeChannel(account);
+          }
+        })
+        .catch((err) => {
+          // An error occurred
+        });
+    },
+    async handleClick(account) {
+      try {
+        await axios.patch("stripeconnect", account);
+        this.$emit("toggleStripeAccount", account.id);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async removeChannel(account, event) {
+      try {
+        await axios.patch("stripeconnectdelete", account);
+        this.$emit("removeStripeAccount", account.id);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
+};
+</script>
+
+<style>
+</style>
