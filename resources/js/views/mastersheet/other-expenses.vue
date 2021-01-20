@@ -59,26 +59,6 @@
     </b-tab>
 
     <div class="row">
-      <!-- <div class="col-md-12 mt-3">
-        <b-table
-          :items="items"
-          :fields="fields"
-          responsive="sm"
-          thead-class="d-none"
-          id="infinite-list"
-          class="list-group"
-        >
-          <template v-slot:cell(image)="row">
-            <img
-              src="/images/icons/paypal-transactions.svg"
-              alt
-              height="25"
-              width="25"
-              class="channel-icons"
-            />
-          </template>
-        </b-table>
-      </div> -->
       <div class="col-md-12 mt-3">
         <div class="list-group-wrapper">
           <transition name="fade">
@@ -87,23 +67,33 @@
             </div>
           </transition>
           <div class="list-group" id="infinite-list">
-            <div v-for="(i, index) in items" :key="i.transaction_id">
+            <div v-for="(i, index) in items" :key="index">
               <p class="p-2 bg-light sticky">{{ index }}</p>
-              <div v-for="item in i" :key="item.transaction_id">
+              <div v-for="item in i" :key="item.id">
                 <div class="d-flex flex-row justify-content-start mb-1">
                   <img
+                    v-if="item.type === 'paypal'"
                     src="/images/icons/paypal-transactions.svg"
                     alt
                     height="30"
                     width="30"
                     class="channel-icons ml-3"
                   />
+                  <img
+                    v-if="item.type === 'stripe'"
+                    src="/images/icons/stripe-icon.svg"
+                    alt
+                    height="30"
+                    width="30"
+                    class="channel-icons ml-3"
+                  />
+
                   <div
                     class="d-flex justify-content-between flex-fill align-items-center"
                   >
-                    <p class="pl-3">{{ showName(item) }}</p>
+                    <p class="pl-3">{{ item.description }}</p>
                     <p class="pr-3">
-                      {{ showAmount(item.transaction_amount.value) }}
+                      {{ item.amount }}
                     </p>
                   </div>
                 </div>
@@ -191,14 +181,12 @@ export default {
     async getPaypalTransactions() {
       try {
         const result = await axios.get("paypaltransactions");
-
         const data = result.data.reverse();
-
         const items = data.map((d) => d.transaction_info);
+        return items;
         var groups = _.groupBy(items, function (date) {
           return moment(date.transaction_initiation_date).format("LL");
         });
-
         var ordered = {};
         _(groups)
           .keys()
@@ -207,21 +195,59 @@ export default {
             ordered[key] = groups[key];
           })
           .reverse();
-
         this.items = groups;
       } catch (err) {
         console.log(err);
         return [];
       }
     },
-    async loadMore() {
+    async getStripeTransactions() {
+      const result = await axios.get("./stripedata.json");
+      return result.data.data;
+    },
+    async getTransactions() {
       this.loading = true;
-      await this.getPaypalTransactions();
+      const allTransactions = [];
+      const paypal = await this.getPaypalTransactions();
+      const stripe = await this.getStripeTransactions();
+      paypal.forEach((p) =>
+        allTransactions.push({
+          type: "paypal",
+          id: p.transaction_id,
+          date: moment(p.transaction_initiation_date).format("LL"),
+          description: this.showName(p),
+          amount: p.transaction_amount.value,
+        })
+      );
+      stripe.forEach((s) =>
+        allTransactions.push({
+          type: "stripe",
+          id: s.id,
+          date: moment(moment.unix(s.available_on)).format("LL"),
+          description: s.description,
+          amount: displayCurrency(s.amount),
+        })
+      );
+
+      //Group all transaction by date
+      var groups = _.groupBy(allTransactions, function (transaction) {
+        return transaction.date;
+      });
+
+      var ordered = {};
+      _(groups)
+        .keys()
+        .sort()
+        .each(function (key) {
+          ordered[key] = groups[key];
+        })
+        .reverse();
+      console.log(ordered);
+      this.items = ordered;
       this.loading = false;
-      // this.message = "No records found";
-      // setTimeout(() => {
-      //   t
-      // }, 1000);
+    },
+    async loadMore() {
+      this.getTransactions();
     },
     showName(item) {
       if (item.hasOwnProperty("transaction_subject")) {
@@ -229,9 +255,6 @@ export default {
       } else if (item.hasOwnProperty("transaction_note")) {
         return item.transaction_note;
       } else return "Transaction";
-    },
-    showAmount(amount) {
-      return displayCurrency(amount);
     },
   },
 };

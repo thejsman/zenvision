@@ -159,7 +159,7 @@ export default {
       try {
         const result = await axios.get("getbalancetransactions");
         const data = result.data;
-        console.log(data);
+        return data;
       } catch (err) {
         console.log(err);
         return [];
