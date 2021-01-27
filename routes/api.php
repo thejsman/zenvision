@@ -25,3 +25,14 @@ Route::group(['middleware' => 'guest:api'], function () {
     /*register route*/
     Route::post('register', 'Auth\RegisterController@register');
 });
+
+//Order webHooks
+Route::post('webhooks/create-order', 'WebhookController@createorder');
+Route::post('webhooks/orders-updated', 'WebhookController@ordersUpdated');
+Route::post('webhooks/orders-cancelled', 'WebhookController@ordersCancelled');
+Route::post('webhooks/orders-delete', 'WebhookController@ordersDelete');
+
+
+// Product Webhooks
+Route::post('webhooks/product-create', 'ProductsController@store');
+Route::post('webhooks/product-update', 'ProductsController@update');
