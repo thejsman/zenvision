@@ -13,19 +13,19 @@ export default {
       isRegisterError: false,
       registerSuccess: false,
       phoneFocus: false,
-      passwordFocus: false
+      passwordFocus: false,
     };
   },
   props: {
     submitUrl: {
       type: String,
-      required: true
+      required: true,
     },
     regError: {
       type: String,
       required: false,
-      default: () => null
-    }
+      default: () => null,
+    },
   },
   mounted() {
     this.isRegisterError = !!this.regError;
@@ -36,8 +36,8 @@ export default {
     },
     passwordState() {
       return this.password.length > 5 ? true : false;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -59,9 +59,16 @@ export default {
             class="mt-3"
             variant="success"
             dismissible
-          >Registration successfull.</b-alert>
+            >Registration successfull.</b-alert
+          >
 
-          <b-alert v-model="isRegisterError" class="mt-3" variant="danger" dismissible>{{regError}}</b-alert>
+          <b-alert
+            v-model="isRegisterError"
+            class="mt-3"
+            variant="danger"
+            dismissible
+            >{{ regError }}</b-alert
+          >
 
           <b-form class="p-2" :action="submitUrl" method="POST">
             <slot />
@@ -99,7 +106,8 @@ export default {
               <b-form-input
                 id="phone"
                 v-model="phone"
-                @focus="phoneFocus=true"
+                @focus="phoneFocus = false"
+                @blur="phoneFocus = true"
                 aria-describedby="phone-feedback"
                 name="phone"
                 type="tel"
@@ -107,15 +115,18 @@ export default {
                 required
               ></b-form-input>
               <b-form-invalid-feedback
-                :state="phoneFocus? phoneState : true"
+                :state="phoneFocus ? phoneState : true"
                 id="phone-feedback"
-              >Phone number should be a 10 digit number</b-form-invalid-feedback>
+                >Phone number should be a 10 digit
+                number</b-form-invalid-feedback
+              >
             </b-form-group>
             <b-form-group id="password-group">
               <b-form-input
                 id="password"
                 v-model="password"
-                @focus="passwordFocus=true"
+                @focus="passwordFocus = false"
+                @blur="passwordFocus = true"
                 aria-descrivedby="password-feedback"
                 name="password"
                 type="password"
@@ -124,21 +135,27 @@ export default {
               ></b-form-input>
               <b-form-invalid-feedback
                 id="password-feeback"
-                :state="passwordFocus? passwordState : true"
-              >Password must be at least 6 character long</b-form-invalid-feedback>
+                :state="passwordFocus ? passwordState : true"
+                >Password must be at least 6 character
+                long</b-form-invalid-feedback
+              >
             </b-form-group>
 
             <div class="mt-4">
-              <b-button type="submit" variant="primary" class="btn-block btn-success">Register</b-button>
+              <b-button
+                type="submit"
+                variant="primary"
+                class="btn-block btn-success"
+                >Register</b-button
+              >
             </div>
 
             <div class="mt-4 text-center">
               <p class="mb-0">
                 By registering you agree to the
-                <a
-                  href="javascript: void(0);"
-                  class="text-primary"
-                >Terms & Conditions</a>
+                <a href="javascript: void(0);" class="text-primary"
+                  >Terms & Conditions</a
+                >
               </p>
             </div>
           </b-form>
