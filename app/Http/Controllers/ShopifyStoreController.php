@@ -116,10 +116,32 @@ class ShopifyStoreController extends Controller
         $store = ShopifyStore::find($request->id);
         $store->isDeleted = true;
         $store->save();
+
+        $access_token = $request->api_token;
+        $revoke_url   = "https://" . $request->store_url . "/admin/api_permissions/current.json";
+
+        $headers = array(
+            "Content-Type: application/json",
+            "Accept: application/json",
+            "Content-Length: 0",
+            "X-Shopify-Access-Token: " . $access_token
+        );
+
+        $handler = curl_init($revoke_url);
+        curl_setopt($handler, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handler, CURLOPT_HTTPHEADER, $headers);
+
+        $result =  curl_exec($handler);
+        if (!curl_errno($handler)) {
+            $info = curl_getinfo($handler);
+        }
+        curl_close($handler);
     }
     private function registerWebhook($shop_domain = '', $access_token = '')
     {
         // shopify API url for webhook
+
         $curl_url = "https://" . $shop_domain . "/admin/webhooks.json";
 
         // iterate webhook array
