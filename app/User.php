@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'lastname' , 'email','phone', 'password'
+        'firstname', 'lastname', 'email', 'phone', 'password'
     ];
 
     /**
@@ -37,13 +37,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function stores() {
+    public function stores()
+    {
         return $this->hasMany(ShopifyStore::class);
     }
-    public function getEnabledShopifyStores() {
+    public function getEnabledShopifyStores()
+    {
         return $this->stores()->where('enabled_on_dashboard', true)->get()->pluck('id');
     }
-    public function getAdAccounts() {
-        return $this->hasMany(FacebookAd::class,'user_id')->get();
+    public function getAdAccounts()
+    {
+        return $this->hasMany(FacebookAd::class, 'user_id')->get();
+    }
+    public function getPaypalAccounts()
+    {
+        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->get();
     }
 }

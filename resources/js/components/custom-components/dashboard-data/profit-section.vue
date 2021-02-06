@@ -2,14 +2,13 @@
   <div class="row">
     <div class="col-xl-8 mt-4">
       <h3>Profit</h3>
-      <div
-        class="d-flex flex-row card profit-card">
+      <div class="d-flex flex-row card profit-card">
         <div class="card-body">
           <div class="d-flex flex-row justify-content-between">
             <div class="media">
               <div class="media-body">
                 <p class="text-muted font-weight-medium">Profit</p>
-                <h4 class="mb-0">${{ profit }}</h4>
+                <h4 class="mb-0">{{ totalProfit }}</h4>
               </div>
             </div>
             <div class="align-self-center ml-3 mr-1">
@@ -31,6 +30,8 @@
 import Stat from "../../widgets/stat";
 import _ from "lodash";
 import moment from "moment";
+import { eventBus } from "../../../app";
+import { displayCurrency, getSumBy, updateData } from "../../../utils";
 
 export default {
   components: { Stat },
@@ -38,6 +39,9 @@ export default {
     return {
       data: [],
       profit: 0,
+      totalCost: 0,
+      totalRevenue: 0,
+
       ProfitlineChart: {
         chartOptions: {
           chart: {
@@ -77,6 +81,31 @@ export default {
       },
     };
   },
+  computed: {
+    totalProfit() {
+      eventBus.$emit(
+        "totalProfitValue",
+        parseFloat(this.totalRevenue - this.totalCost)
+      );
+      return displayCurrency(this.totalRevenue - this.totalCost);
+    },
+    profitSeries() {
+      if (this.profitData.length > 0) {
+        const test = _(this.profitData)
+          .groupBy("created_on_shopify")
+          .map((objs, key) => _.sumBy(objs, "total_price"))
+          .value();
+
+        return test;
+      } else {
+        return [0, 0, 0, 0, 0];
+      }
+    },
+  },
+  created() {
+    eventBus.$on("totalCostValue", (value) => (this.totalCost = value));
+    eventBus.$on("totalRevenueValue", (value) => (this.totalRevenue = value));
+  },
   props: {
     profitData: {
       type: Array,
@@ -85,55 +114,60 @@ export default {
   },
   watch: {
     profitData(value, newValue) {
-      this.assignData(this.profitData);
-    },
-  },
-  methods: {
-    assignData(orders) {
-      const revenue = _.sumBy(orders, (order) => parseFloat(order.total_price));
-      const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
-      const profit = parseFloat(revenue - cogs).toFixed(2);
+      //   this.assignData(this.profitData);
 
-      // Create an array of last 11 days
-      const dates = [...Array(11)].map((_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        return moment(d).format("DD-MM-YYYY");
-      });
-
-      let apexData = [];
-      //iterate over each date & calculate profit
-      dates.forEach((date) => {
-        const sum_profit = _.sumBy(orders, (order) => {
-          if (moment(order.created_on_shopify).format("DD-MM-YYYY") == date) {
-            const profit =
-              parseFloat(order.total_price).toFixed(2) - parseFloat(order.cogs);
-
-            return profit;
-          } else {
-            return 0;
-          }
-        });
-        apexData.push(sum_profit);
-      });
-
-      const profit_of_elevendays = _.sum(apexData);
-
-      this.profit = profit_of_elevendays;
-      // parse the array
-      const sumArray = apexData.map((item) =>
-        item == 0 ? 0 : parseFloat(item).toFixed(2)
-      );
-      //assign data to the chart
       this.ProfitlineChart = {
         ...this.ProfitlineChart,
         series: [
           {
             name: "Profit",
-            data: sumArray,
+            data: this.profitSeries,
           },
         ],
       };
+    },
+  },
+  methods: {
+    assignData(orders) {
+      //   const revenue = _.sumBy(orders, (order) => parseFloat(order.total_price));
+      //   const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
+      //   const profit = parseFloat(revenue - cogs).toFixed(2);
+      //   // Create an array of last 11 days
+      //   const dates = [...Array(11)].map((_, i) => {
+      //     const d = new Date();
+      //     d.setDate(d.getDate() - i);
+      //     return moment(d).format("DD-MM-YYYY");
+      //   });
+      //   let apexData = [];
+      //   //iterate over each date & calculate profit
+      //   dates.forEach((date) => {
+      //     const sum_profit = _.sumBy(orders, (order) => {
+      //       if (moment(order.created_on_shopify).format("DD-MM-YYYY") == date) {
+      //         const profit =
+      //           parseFloat(order.total_price).toFixed(2) - parseFloat(order.cogs);
+      //         return profit;
+      //       } else {
+      //         return 0;
+      //       }
+      //     });
+      //     apexData.push(sum_profit);
+      //   });
+      //   const profit_of_elevendays = _.sum(apexData);
+      //   this.profit = profit_of_elevendays;
+      //   // parse the array
+      //   const sumArray = apexData.map((item) =>
+      //     item == 0 ? 0 : parseFloat(item).toFixed(2)
+      //   );
+      //   //assign data to the chart
+      // this.ProfitlineChart = {
+      //   ...this.ProfitlineChart,
+      //   series: [
+      //     {
+      //       name: "Profit",
+      //       data: sumArray,
+      //     },
+      //   ],
+      // };
     },
   },
 };
