@@ -22,6 +22,8 @@ class DashboardController extends Controller
         $refundTotal = 0;
         $fb_spend = [];
         $fb_ad_accounts = $user->getAdAccounts();
+        $paypalAccounts = $user->getPaypalAccounts();
+        $paypalTransactions = $this->getPaypalTransactions();
 
         foreach ($fb_ad_accounts as $key => $fb_ad_account) {
             $url_account_data = "https://graph.facebook.com/v8.0/" . $fb_ad_account->ad_account_id . "/?fields=insights&access_token=" . $fb_ad_account->access_token;
@@ -46,8 +48,52 @@ class DashboardController extends Controller
             'orders' => $orders,
             'refund_total' => $refundTotal,
             'fb_spend' => $fb_spend,
-            'fb_ad_accounts' => $fb_ad_accounts
+            'fb_ad_accounts' => $fb_ad_accounts,
+            'paypalAccounts' => $paypalAccounts,
+            'paypalTransactions' => $paypalTransactions
         ];
+    }
+
+    public function getEnabledShopifyStores()
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+
+        $numberOfProducts = 0;
+        $refundTotal = 0;
+
+        foreach ($enabled_on_dashboard as $store_id) {
+            $store = ShopifyStore::find($store_id);
+            $numberOfProducts += $store->getOrderedProductCount();
+            $refundTotal += $store->getRefundTotal();
+        }
+    }
+    public function getPaypalTransactions()
+    {
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2020-12-01T00:00:00-0700&end_date=2020-12-30T23:59:59-0700&fields=transaction_info&transaction_type=T0000');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Authorization: Bearer A23AAIiTKgWqZiFhSx3kJPN7DsmbM5vnhbkhSAprq-DoLXYnC0s_aUyJ5HTvXnJgmvnJXggDX5pUK2P7-CvRp3Mn5AmtfqVbA';
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+
+        curl_close($ch);
+        $response = json_decode($result, true);
+        if (array_key_exists('transaction_details', $response)) {
+            return $response['transaction_details'];
+        } else {
+            return [];
+        }
     }
 
     // Funciton to get abandoned cart count

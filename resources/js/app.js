@@ -20,16 +20,19 @@ Vue.config.devtools = Vue.prototype.$isDev;
 Vue.config.debug = Vue.prototype.$isDev;
 Vue.config.silent = !Vue.prototype.$isDev;
 
+export const eventBus = new Vue();
+
 // Vue.use(require("vue-chartist"), {
 //     messageNoData: "You have not enough data",
 //     classNoData: "empty"
 // });
 Vue.use(require("vue-chartist"), {
-    plugins: [chartist_tooltip]
+    plugins: [chartistPluginTooltip]
 });
 
 Vue.use(BootstrapVue);
 Vue.use(vClickOutside);
+Vue.use(VTooltip);
 Vue.component(
     "dynamic-component",
     require("./components/dynamic-component").default
@@ -52,6 +55,7 @@ export const eventBus = new Vue();
  */
 
 import "./views";
+import store from "./store";
 const app = new Vue({
     el: "#app",
     store,

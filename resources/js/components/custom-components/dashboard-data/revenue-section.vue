@@ -63,6 +63,7 @@ export default {
   },
   watch: {
     revenueData(value, newValue) {
+      console.log("AllOrders:", this.revenueData);
       this.assignData(this.revenueData);
     },
   },

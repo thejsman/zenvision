@@ -142,7 +142,7 @@ export default {
       const { startDate, endDate } = dateRange;
       const s_date = moment(startDate).format("MM-DD-YYYY");
       const e_date = moment(endDate).format("MM-DD-YYYY");
-
+      console.log("Called");
       const filteredOrders = this.backupOrders.filter((order) => {
         const orderDate = moment(order.created_on_shopify).format("MM-DD-YYYY");
         return (
