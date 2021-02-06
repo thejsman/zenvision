@@ -6,9 +6,8 @@ import axios from "axios";
 //Top Nav imports
 import ChannelDropdown from "../components/custom-components/channel-dropdown";
 import DateRange from "../components/custom-components/date-range";
-import StoreIcon from "../components/custom-components/Store-icon";
-
-import PaypalAccount from "../components/custom-components/Paypal-icon";
+import StoreIcon from "../components/custom-components/shopifystore-icon";
+import PaypalAccount from "../components/custom-components/paypal-icon";
 
 //Dashboard Data sections import
 import Profit from "../components/custom-components/dashboard-data/profit-section";

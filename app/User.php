@@ -49,4 +49,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(FacebookAd::class, 'user_id')->get();
     }
+
+    public function getPaypalAccounts()
+    {
+        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+    }
+
+    public function getStripeAccounts()
+    {
+        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+    }
+    public function getStripeAccountConnectIds()
+    {
+        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
+    }
 }

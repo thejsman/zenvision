@@ -46,4 +46,20 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('subscriptioncost/{id}', 'SubscriptionCostController@destroy');
     Route::patch('subscriptioncost/{id}', 'SubscriptionCostController@update');
     Route::patch('endSubscriptioncost/{id}', 'SubscriptionCostController@endSubscription');
+
+    //Paypal
+    Route::get('getpaypalaccounts', 'PaypalController@index');
+    Route::get('paypal', 'PaypalController@store');
+    Route::patch('paypal', 'PaypalController@toogleAccount');
+    Route::patch('paypaldelete', 'PaypalController@destroy');
+    Route::get('paypaltransactions', 'PaypalController@getPaypalTransactions');
+
+
+    //Stripe
+    Route::get('getstripeaccounts', 'StripeController@index');
+    Route::get('stripeconnect', 'StripeController@store');
+    Route::get('getstripeaccountsbalance', 'StripeController@getAccountBalance');
+    Route::get('getbalancetransactions', 'StripeController@getBalanceTransactions');
+    Route::patch('stripeconnect', 'StripeController@toogleAccount');
+    Route::patch('stripeconnectdelete', 'StripeController@destroy');
 });
