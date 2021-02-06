@@ -86,6 +86,9 @@ export default {
     this.getShopifyStoreData();
 
     eventBus.$on("changeDateRange", (date) => this.handleDateChange(date));
+    eventBus.$on("toggleShopifyStore", async () => {
+      this.getShopifyStoreData();
+    });
   },
   methods: {
     ...mapActions(["fetchShopifyData"]),
