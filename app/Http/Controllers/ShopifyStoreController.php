@@ -8,6 +8,7 @@ use App\ShopifyStore;
 use App\Http\CustomRequests;
 use App\Http\GetAllOrders;
 use App\Http\GetAllProducts;
+use App\ShopifyOrder;
 
 class ShopifyStoreController extends Controller
 
@@ -43,6 +44,11 @@ class ShopifyStoreController extends Controller
                 'address'    => env('APP_URL', null) . '/api/webhooks/product-update',
                 'format'    => 'json'
             ],
+            [
+                'topic'        => 'app/uninstalled',
+                'address'    => env('APP_URL', null) . '/api/webhooks/app-uninstalled',
+                'format'    => 'json'
+            ],
 
         ];
     }
@@ -57,7 +63,7 @@ class ShopifyStoreController extends Controller
     public function validateUrl(Request $request)
     {
         $store_url = $request->store_url;
-        $count = ShopifyStore::where('store_url', $store_url)->where('user_id', Auth::user()->id)->count();
+        $count = ShopifyStore::where('store_url', $store_url)->where('user_id', Auth::user()->id)->where('isDeleted', false)->count();
         return ['count' => $count];
     }
 
@@ -71,24 +77,41 @@ class ShopifyStoreController extends Controller
         $access_token = $this->getAccessToken($shop_domain, $response_code);
 
         if ($access_token != "") {
-            $store_id = ShopifyStore::firstOrCreate([
-                'user_id'    => Auth::user()->id,
-                'store_name' => $shop_domain,
-                'store_url'    => $shop_domain,
-                'api_token'    => $access_token
-            ]);
+            $shop_exists = ShopifyStore::where('store_url', $shop_domain)->where('isDeleted', true)->first();
 
-            $this->registerWebhook($shop_domain, $access_token);
-            $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
-            $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
+            if ($shop_exists) {
+                $shop_exists->api_token = $access_token;
+                $shop_exists->isDeleted = false;
+
+                $created_at_min = 0;
+                $latest_order = ShopifyOrder::where('store_id', $shop_exists->id)->latest('created_on_shopify')->first();
+
+
+                if ($latest_order) {
+                    $created_at_min = $latest_order;
+                }
+
+                $this->registerWebhook($shop_domain, $access_token);
+                $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $shop_exists->id, $created_at_min);
+                $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $shop_exists->id);
+                $shop_exists->save();
+                return redirect('/');
+            } else {
+                $store_id = ShopifyStore::updateOrCreate([
+                    'user_id'    => Auth::user()->id,
+                    'store_name' => $shop_domain,
+                    'store_url'    => $shop_domain,
+                    'api_token'    => $access_token
+                ]);
+                $this->registerWebhook($shop_domain, $access_token);
+                $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
+                $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
+                return redirect('/');
+            }
         }
-
-
-        return redirect('/');
     }
     public function getAccessToken($shop_domain = '', $code = '')
     {
-
         $query = array(
             "client_id" => config('shopify.api_key'), // Your API key
             "client_secret" => config('shopify.api_secret'), // Your app credentials (secret key)
@@ -114,12 +137,10 @@ class ShopifyStoreController extends Controller
     public function destroy(Request $request)
     {
         $store = ShopifyStore::find($request->id);
-        $store->isDeleted = true;
-        $store->save();
-
         $access_token = $request->api_token;
         $revoke_url   = "https://" . $request->store_url . "/admin/api_permissions/current.json";
-
+        $store->isDeleted = true;
+        $store->save();
         $headers = array(
             "Content-Type: application/json",
             "Accept: application/json",
@@ -141,7 +162,6 @@ class ShopifyStoreController extends Controller
     private function registerWebhook($shop_domain = '', $access_token = '')
     {
         // shopify API url for webhook
-
         $curl_url = "https://" . $shop_domain . "/admin/webhooks.json";
 
         // iterate webhook array
@@ -149,6 +169,24 @@ class ShopifyStoreController extends Controller
 
             $curl_data = array('webhook' => $webhook);
             $response = CustomRequests::postRequest($curl_url, $curl_data, $access_token);
+        }
+    }
+
+    function getDisputes()
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        //check if there are enabled/active stores
+        if (!$enabled_on_dashboard->isEmpty()) {
+            foreach ($enabled_on_dashboard as $store_id) {
+                $store = ShopifyStore::find($store_id);
+                $url = "https://" . $store->store_url . "/admin/api/2021-01/shopify_payments/disputes.json?status=lost,charge_refunded";
+                $access_token = $store->api_token;
+                $response = CustomRequests::getRequest($url, [], $access_token);
+                return $response;
+            }
+        } else {
+            return ["disputes" => []];
         }
     }
 }
