@@ -89,11 +89,12 @@ class DashboardController extends Controller
 
         curl_close($ch);
         $response = json_decode($result, true);
-        if (array_key_exists('transaction_details', $response)) {
-            return $response['transaction_details'];
-        } else {
-            return [];
-        }
+        // if (array_key_exists('transaction_details', $response)) {
+        //     return $response['transaction_details'];
+        // } else {
+        //     return [];
+        // }
+        return [];
     }
 
     // Funciton to get abandoned cart count
