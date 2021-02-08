@@ -72,7 +72,6 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../../app";
-
 export default {
   data() {
     return {
@@ -98,8 +97,7 @@ export default {
     async onSubmit(evt) {
       evt.preventDefault();
       const result = await axios.post("/subscriptioncost", this.form);
-      console.log({ result });
-      this.$emit("updateSubscription");
+      eventBus.$emit("updateSubscription");
       this.$emit("handle-close");
       eventBus.$emit("subscriptionUpdate");
     },
