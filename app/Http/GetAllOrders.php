@@ -10,7 +10,7 @@ use Auth;
 class GetAllOrders
 
 {
-    public function getAllOrders($shop_domain, $access_token, $store_id)
+    public function getAllOrders($shop_domain, $access_token, $store_id, $created_at_min = 0)
     {
 
         $param = [];
@@ -19,7 +19,7 @@ class GetAllOrders
         // order record per page
         $param['limit'] = 250;
 
-        $param['since_id'] = 0;
+        $param['since_id'] = $created_at_min;
 
         $param['access_token'] = $access_token;
 
@@ -30,7 +30,6 @@ class GetAllOrders
     {
         // initialize variable
         $nextPageToken = null;
-
 
         do {
             // check if next page token is not null
@@ -90,8 +89,8 @@ class GetAllOrders
 
                                 'user_id' =>  Auth::user()->id,
                                 'store_id' => $store_id,
-                                'order_id' => (int) $order['id'],
-                                'order_number' => (int) $order['order_number'],
+                                'order_id' => $order['id'],
+                                'order_number' => $order['order_number'],
                                 'line_item_id' => $line_item['id'],
                                 'variant_id' => $line_item['variant_id'],
                                 'title' => $line_item['title'],
