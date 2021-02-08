@@ -57,7 +57,7 @@
             day: 'numeric',
           }"
           locale="en"
-          v-model="formData.starting_date"
+          v-model="form.starting_date"
         ></b-form-datepicker>
       </b-form-group>
       <!-- <date-range-picker
@@ -82,7 +82,6 @@
 import axios from "axios";
 import DateRangePicker from "vue2-daterange-picker";
 import { eventBus } from "../../../app";
-
 export default {
   components: { DateRangePicker },
   data() {
@@ -118,9 +117,7 @@ export default {
         `/subscriptioncost/${this.formData.id}`,
         this.formData
       );
-      console.log({ result });
-      eventBus.$emit("updateSubscription2");
-
+      eventBus.$emit("updateSubscription");
       this.$emit("handle-close");
       eventBus.$emit("subscriptionUpdate");
     },

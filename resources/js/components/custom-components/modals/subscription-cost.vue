@@ -88,14 +88,12 @@ import SubscriptionForm from "./AddSubscriptionCost-modal";
 import EditSubForm from "./editSubscriptionCost-modal";
 import { eventBus } from "../../../app";
 import moment from "moment";
-
 export default {
   components: { SubscriptionForm, EditSubForm },
   data() {
     return {
       sortBy: "end_date",
       sortDesc: false,
-
       fields: [
         {
           key: "subscription_name",
@@ -132,15 +130,11 @@ export default {
       preItems: [],
       searchText: "",
       showMessage: true,
-
       editFormData: {},
     };
   },
   async created() {
     await this.getSubscriptionCostData();
-    // eventBus.$on("updateSubscription2", async () => {
-    //   await this.getSubscriptionCostData();
-    // });
   },
   methods: {
     async updateSubscription() {
@@ -152,16 +146,12 @@ export default {
         this.items = result.data;
         this.isLoading = false;
       } catch (error) {
-        console.log({ error });
         this.items = [];
         this.isLoading = false;
       }
     },
     handleAddSubscriptionCost() {
       this.$bvModal.show("subscription-form");
-    },
-    async updateSubscription() {
-      await this.getSubscriptionCostData();
     },
     formatDateAssigned(value) {
       if (value === null) {
@@ -184,16 +174,17 @@ export default {
     },
     editSubscription(row) {
       this.editFormData = { ...row.item };
-      console.log(this.editFormData);
       this.$bvModal.show("editSubscription-form");
     },
     async deleteSubscription(row) {
       const result = await axios.delete(`subscriptioncost/${row.item.id}`);
       await this.getSubscriptionCostData();
+      eventBus.$emit("updateSubscription");
     },
     async endSubscription(row) {
       const result = await axios.patch(`endSubscriptioncost/${row.item.id}`);
       await this.getSubscriptionCostData();
+      eventBus.$emit("updateSubscription");
     },
   },
 };

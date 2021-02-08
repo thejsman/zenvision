@@ -29,13 +29,8 @@
 import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
-
-import {
-  displayCurrency,
-  displayNumber,
-  getSumBy,
-  updateData,
-} from "../../../utils";
+import { moment } from "moment";
+import { displayCurrency, updateData } from "../../../utils";
 import {
   COGS_TOTAL,
   DISCOUNTS_TOTAL,
@@ -46,12 +41,11 @@ import {
   AD_SPEND_GOOGLE,
   SUBSCRIPTION_COST,
 } from "../../../constants";
-
 export default {
   components: { Stat, SubscriptionCost },
   data() {
     return {
-      totalSubscriptionCount: 0,
+      subscriptionData: [],
       data: [
         {
           id: 1,
@@ -101,7 +95,7 @@ export default {
           value: `0`,
           loading: true,
           onClick: this.handleSubscriptionClick,
-          totalSubscriptionCount: 2,
+          totalSubscriptionCount: 0,
         },
       ],
       totalDiscount: 0,
@@ -117,11 +111,7 @@ export default {
         this.merchantFees + this.refundTotal + this.totalDiscount
       );
     },
-    totalSubscription() {
-      return this.getSubscriptionTotal();
-    },
   },
-
   props: {
     costData: {
       type: Array,
@@ -141,31 +131,26 @@ export default {
       this.assignData(this.refundTotal, this.costData);
     },
   },
+  created() {
+    eventBus.$on("updateSubscription", async () => {
+      await this.getSubscriptionData();
+    });
+  },
   methods: {
     assignData(refundTotal, orders) {
       const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
       updateData(this.data, COGS_TOTAL, displayCurrency(cogs));
-
       const discounts = _.sumBy(orders, (order) =>
         parseFloat(order.total_discounts)
       );
       this.totalDiscount = discounts;
-
       updateData(this.data, DISCOUNTS_TOTAL, displayCurrency(discounts));
-
       updateData(this.data, REFUNDS_TOTAL, displayCurrency(refundTotal));
-
-      setTimeout(() => {
-        updateData(this.data, CHARGEBACKS_TOTAL, displayCurrency(0));
-      }, 3000);
       updateData(this.data, AD_SPEND_FACEBOOK, displayCurrency(0));
       updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
       updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
-      updateData(
-        this.data,
-        SUBSCRIPTION_COST,
-        displayCurrency(this.totalSubscription)
-      );
+      this.getSubscriptionData();
+      this.getChargebackTotal();
     },
     handleSubscriptionClick() {
       this.$bvModal.show("subscription-details");
@@ -173,17 +158,131 @@ export default {
     handleSubscriptionClose() {
       this.$bvModal.hide("subscription-details");
     },
-
-    async getSubscriptionTotal(date = []) {
+    async getSubscriptionData() {
       try {
         const result = await axios.get("/subscriptioncost");
         const { data } = result;
         if (data.length > 0) {
-          this.totalSubscriptionCount = data.length;
-          //   data.forEach((d) => this.calculateSubscription(d, date));
+          const subTotal2 = this.getSubscriptionTotal(data);
+          this.updateSubscriptionData(
+            this.data,
+            SUBSCRIPTION_COST,
+            displayCurrency(subTotal2),
+            data.length
+          );
+        } else {
+          this.updateSubscriptionData(
+            this.data,
+            SUBSCRIPTION_COST,
+            displayCurrency(0),
+            0
+          );
         }
       } catch (error) {
-        console.log({ error });
+        this.updateSubscriptionData(
+          this.data,
+          SUBSCRIPTION_COST,
+          displayCurrency(0),
+          0
+        );
+      }
+    },
+    updateSubscriptionData(data, title, value, totalCount) {
+      data.forEach((d) => {
+        if (d.title === title) {
+          d.value = `${value}`;
+          d.loading = false;
+          d.totalSubscriptionCount = totalCount;
+        }
+      });
+    },
+    getSubscriptionTotal(subscriptions) {
+      let subTotal = 0;
+      subscriptions.forEach((sub) => {
+        subTotal += this.calculateSubscription(sub);
+      });
+      console.log("SubTotal", subTotal);
+      return subTotal;
+    },
+    calculateSubscription(sub) {
+      let total = 0;
+      if (sub.billing_period === "Daily") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+        }
+        return total;
+      } else if (sub.billing_period === "Weekly") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(startDate.setDate(startDate.getDate() + 7));
+        }
+        return total;
+      } else if (sub.billing_period === "Monthly") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(startDate.setMonth(startDate.getMonth() + 1));
+          console.log(startDate);
+        }
+        return total;
+      } else if (sub.billing_period === "Every 3 months") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(startDate.setMonth(startDate.getMonth() + 3));
+        }
+        return total;
+      } else if (sub.billing_period === "Every 6 months") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(startDate.setMonth(startDate.getMonth() + 6));
+        }
+        return total;
+      } else if (sub.billing_period === "Yearly") {
+        let startDate = new Date(sub.starting_date);
+        const endDate =
+          sub.end_date === null ? new Date() : new Date(sub.end_date);
+        while (startDate <= endDate) {
+          total += parseFloat(sub.subscription_price);
+          startDate = new Date(
+            startDate.setFullYear(startDate.getFullYear() + 1)
+          );
+        }
+        return total;
+      }
+    },
+    async getChargebackTotal() {
+      try {
+        const result = await axios.get("getshopifydisputes");
+        const { disputes } = result.data;
+        let totalChargeback = 0;
+        if (disputes.length > 1) {
+          data.forEach((dispute) => {
+            totalChargeback += parseFloat(dispute.amount);
+          });
+        }
+        updateData(
+          this.data,
+          CHARGEBACKS_TOTAL,
+          displayCurrency(totalChargeback)
+        );
+      } catch (err) {
+        console.log(err);
+        updateData(this.data, CHARGEBACKS_TOTAL, displayCurrency(0));
       }
     },
   },
