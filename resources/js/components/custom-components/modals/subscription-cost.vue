@@ -135,6 +135,9 @@ export default {
   },
   async created() {
     await this.getSubscriptionCostData();
+    eventBus.$on("updateSubscription", async () => {
+      await this.getSubscriptionCostData();
+    });
   },
   methods: {
     async updateSubscription() {
@@ -178,13 +181,15 @@ export default {
     },
     async deleteSubscription(row) {
       const result = await axios.delete(`subscriptioncost/${row.item.id}`);
-      await this.getSubscriptionCostData();
+      await this.getSubscriptionCostData();     
       eventBus.$emit("updateSubscription");
+      await this.updateSubscription();
     },
     async endSubscription(row) {
       const result = await axios.patch(`endSubscriptioncost/${row.item.id}`);
       await this.getSubscriptionCostData();
       eventBus.$emit("updateSubscription");
+      await this.updateSubscription();
     },
   },
 };

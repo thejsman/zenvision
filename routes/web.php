@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
+    Route::get('getshopifydisputes', 'ShopifyStoreController@getDisputes');
 
     //Subscription Cost APIs
     Route::get('subscriptioncost', 'SubscriptionCostController@index');
