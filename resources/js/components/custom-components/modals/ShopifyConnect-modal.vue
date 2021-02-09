@@ -175,7 +175,7 @@ export default {
           if (count) {
             this.showAlert("Shopify store already connected.");
           } else {
-            window.location = `https://${this.store_url}/admin/oauth/authorize?client_id=6475dbe1c3d0b763d819fc4d053d771e&scope=read_orders,write_orders,read_all_orders,read_shopify_payments_payouts&redirect_uri=https://44b530560b13.ngrok.io/shopify/auth`;
+            window.location = `https://${this.store_url}/${process.env.MIX_SHOPIFY_AUTH_URL}`;
           }
         } catch (error) {
           console.log(error);
