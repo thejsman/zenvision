@@ -3,7 +3,7 @@
     <div class="font-weight-bold font-size-18 text-white mt-4 pb-3">
       Add Subscription Cost
     </div>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form @submit="onSubmit" v-if="show">
       <b-form-group id="input-group-1" label="Name" label-for="name">
         <b-form-input
           id="name"
@@ -96,21 +96,16 @@ export default {
   methods: {
     async onSubmit(evt) {
       evt.preventDefault();
-      const result = await axios.post("/subscriptioncost", this.form);
-      eventBus.$emit("updateSubscription");
-      this.$emit("handle-close");
-      eventBus.$emit("subscriptionUpdate");
+      try {
+        const result = await axios.post("/subscriptioncost", this.form);
+        eventBus.$emit("updateSubscription");
+        this.$emit("handle-close");
+      } catch (err) {
+        eventBus.$emit("updateSubscription");
+        this.$emit("handle-close");
+      }
     },
-    onReset(evt) {
-      evt.preventDefault();
-      // Reset our form values
-      this.form.email = "";
-      this.form.name = "";
-      this.form.food = null;
-      this.form.checked = [];
-      // Trick to reset/clear native browser form validation state
-      this.show = false;
-    },
+   
   },
 };
 </script>
