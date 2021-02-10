@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+if (App::environment('production')) {
+    URL::forceScheme('https');
+}
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -20,7 +23,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'guest:api'], function () {
     /*login route*/
-    Route::post('login', 'Auth\LoginController@login');
+    Route::post('login', 'Auth\LoginController@login', 'https');
 
     /*register route*/
     Route::post('register', 'Auth\RegisterController@register');
