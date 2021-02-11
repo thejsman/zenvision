@@ -51,7 +51,7 @@ class StripeController extends Controller
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
-        return redirect('/mastersheet');
+        return redirect('/');
     }
 
     public function toogleAccount(Request $request)
