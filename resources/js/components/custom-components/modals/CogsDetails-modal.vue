@@ -164,6 +164,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "../../../app";
 
 export default {
   data() {
@@ -279,8 +280,9 @@ export default {
         } else {
           const updateResult = await axios.post("cogs", updateTable);
           this.showAlert("COGS updated succesfully", "success");
-          this.$emit("cogs-updated");
+
           setTimeout(() => {
+            eventBus.$emit("cogs-updated");
             this.$emit("handle-close");
           }, 2000);
         }

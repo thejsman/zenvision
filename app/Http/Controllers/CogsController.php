@@ -39,4 +39,10 @@ class CogsController extends Controller
             $lineItem->save();
         }
     }
+    public function showCogsIcon()
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        return  ShopifyOrderProduct::whereIn('store_id', $enabled_on_dashboard)->whereNull('cogs')->count();
+    }
 }
