@@ -88,6 +88,9 @@ export default {
     eventBus.$on("toggleShopifyStore", async () => {
       this.getShopifyStoreData();
     });
+    eventBus.$on("cogs-updated", async () => {
+      this.getShopifyStoreData();
+    });
   },
   methods: {
     ...mapActions(["fetchShopifyData"]),

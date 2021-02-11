@@ -17,14 +17,14 @@
 
     <b-modal
       id="subscription-details"
-      size="lg"
+      size="xl"
       centered
       hide-footer
       hide-header
     >
       <SubscriptionCost @handle-close="handleSubscriptionClose" />
     </b-modal>
-    <b-modal id="cogs-details" size="lg" centered hide-footer hide-header>
+    <b-modal id="cogs-details" size="xl" centered hide-footer hide-header>
       <CogsModal @handle-close="handleCogsClose" />
     </b-modal>
   </div>
@@ -51,6 +51,7 @@ export default {
   data() {
     return {
       subscriptionData: 0,
+      cogsTotal: 0,
       data: [
         {
           id: 1,
@@ -110,13 +111,16 @@ export default {
   },
   computed: {
     totalCost() {
-      eventBus.$emit(
-        "totalCostValue",
-        parseFloat(this.merchantFees + this.refundTotal + this.totalDiscount + this.subscriptionData)
+      const totalCost = parseFloat(
+        this.merchantFees +
+          this.refundTotal +
+          this.totalDiscount +
+          this.subscriptionData +
+          this.cogsTotal
       );
-      return displayCurrency(
-        this.merchantFees + this.refundTotal + this.totalDiscount + this.subscriptionData
-      );
+
+      eventBus.$emit("totalCostValue", totalCost);
+      return displayCurrency(totalCost);
     },
   },
   props: {
@@ -143,9 +147,7 @@ export default {
       await this.getSubscriptionData();
     });
 
-    eventBus.$on("cogs-updated", async () => {
-      this.assignData(this.refundTotal, this.costData);
-    });
+   
   },
   methods: {
     assignData(refundTotal, orders) {
@@ -179,10 +181,11 @@ export default {
 
     async getCogsData(orders) {
       try {
-        console.log("Checking orders");
         const result = await axios.get("/cogsicon");
         const showIcon = result.data === 0 ? false : true;
         const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
+        this.cogsTotal = cogs;
+
         this.updateCogsData(
           this.data,
           COGS_TOTAL,
