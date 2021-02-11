@@ -67,7 +67,7 @@ export default {
     async handleClick(account) {
       try {
         await axios.patch("stripeconnect", account);
-        this.$emit("toggleStripeAccount", account.id);
+        await this.getStripeAccounts();
       } catch (error) {
         console.log(error);
       }
@@ -76,7 +76,7 @@ export default {
     async removeChannel(account, event) {
       try {
         await axios.patch("stripeconnectdelete", account);
-        this.$emit("removeStripeAccount", account.id);
+        await this.getStripeAccounts();
       } catch (error) {
         console.log(error);
       }
