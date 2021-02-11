@@ -82,11 +82,7 @@ export default {
   display: none;
   position: absolute;
   top: 50px;
-<<<<<<< HEAD
   right: -35px;
-=======
-  right: -25px;
->>>>>>> 6847277766f3af3b4e89e17eab5a25eed7d44088
   background-color: #2e3549;
   min-width: 100px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
