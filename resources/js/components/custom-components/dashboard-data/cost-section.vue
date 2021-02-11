@@ -11,6 +11,7 @@
         :loading="cost.loading"
         :onClick="cost.onClick"
         :totalSubscriptionCount="cost.totalSubscriptionCount"
+        :showCogsWarning="cost.showCogsWarning"
       />
     </div>
 
@@ -23,6 +24,9 @@
     >
       <SubscriptionCost @handle-close="handleSubscriptionClose" />
     </b-modal>
+    <b-modal id="cogs-details" size="lg" centered hide-footer hide-header>
+      <CogsModal @handle-close="handleCogsClose" />
+    </b-modal>
   </div>
 </template>
 <script>
@@ -31,6 +35,7 @@ import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import { moment } from "moment";
 import { displayCurrency, updateData } from "../../../utils";
+import CogsModal from "../modals/CogsDetails-modal";
 import {
   COGS_TOTAL,
   DISCOUNTS_TOTAL,
@@ -42,7 +47,7 @@ import {
   SUBSCRIPTION_COST,
 } from "../../../constants";
 export default {
-  components: { Stat, SubscriptionCost },
+  components: { Stat, SubscriptionCost, CogsModal },
   data() {
     return {
       subscriptionData: [],
@@ -52,6 +57,8 @@ export default {
           title: COGS_TOTAL,
           value: `0`,
           loading: true,
+          onClick: this.handleCogsClick,
+          showCogsWarning: true,
         },
         {
           id: 2,
@@ -135,11 +142,14 @@ export default {
     eventBus.$on("updateSubscription", async () => {
       await this.getSubscriptionData();
     });
+
+    eventBus.$on("cogs-updated", async () => {
+      this.assignData(this.refundTotal, this.costData);
+    });
   },
   methods: {
     assignData(refundTotal, orders) {
-      const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
-      updateData(this.data, COGS_TOTAL, displayCurrency(cogs));
+      this.getCogsData(orders);
       const discounts = _.sumBy(orders, (order) =>
         parseFloat(order.total_discounts)
       );
@@ -152,11 +162,36 @@ export default {
       this.getSubscriptionData();
       this.getChargebackTotal();
     },
+
     handleSubscriptionClick() {
       this.$bvModal.show("subscription-details");
     },
     handleSubscriptionClose() {
       this.$bvModal.hide("subscription-details");
+    },
+    handleCogsClick() {
+      this.$bvModal.show("cogs-details");
+    },
+
+    handleCogsClose() {
+      this.$bvModal.hide("cogs-details");
+    },
+
+    async getCogsData(orders) {
+      try {
+        console.log("Checking orders");
+        const result = await axios.get("/cogsicon");
+        const showIcon = result.data === 0 ? false : true;
+        const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
+        this.updateCogsData(
+          this.data,
+          COGS_TOTAL,
+          displayCurrency(cogs),
+          showIcon
+        );
+      } catch (err) {
+        this.updateCogsData(this.data, COGS_TOTAL, displayCurrency(0), false);
+      }
     },
     async getSubscriptionData() {
       try {
@@ -193,6 +228,15 @@ export default {
           d.value = `${value}`;
           d.loading = false;
           d.totalSubscriptionCount = totalCount;
+        }
+      });
+    },
+    updateCogsData(data, title, value, showicon) {
+      data.forEach((d) => {
+        if (d.title === title) {
+          d.value = `${value}`;
+          d.loading = false;
+          d.showCogsWarning = showicon;
         }
       });
     },

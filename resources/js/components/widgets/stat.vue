@@ -34,6 +34,10 @@ export default {
       type: Number,
       default: null,
     },
+    showCogsWarning: {
+      type: Boolean,
+      default: null,
+    },
   },
 };
 </script>
@@ -52,6 +56,10 @@ export default {
               v-if="totalSubscriptionCount"
               >{{ totalSubscriptionCount }}</b-badge
             >
+            <i
+              class="fas fa-exclamation-circle text-warning"
+              v-if="showCogsWarning"
+            ></i>
           </div>
 
           <h4 class="mb-0">{{ value }}</h4>

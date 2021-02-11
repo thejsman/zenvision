@@ -10,20 +10,21 @@ body {
     background-color: #222736;
 }
 
-b, strong {
-    font-weight: 700!important;
+b,
+strong {
+    font-weight: 700 !important;
 }
 
 .card-login {
-  padding: 25px;
-  border-radius: 10px!important;
-  margin-top: 40px;
+    padding: 25px;
+    border-radius: 10px !important;
+    margin-top: 40px;
 }
 
 .form-control {
     display: block;
     width: 100%;
-    height: 45px;
+    height: 45px !important;
     padding: 0.47rem 0.75rem;
     font-size: 0.8125rem;
     font-weight: 400;
@@ -53,20 +54,21 @@ b, strong {
 }
 
 .forgot-password {
-  transition: 0.3s;
-}
-
-.forgot-password:hover {
-  opacity: 0.5;
-}
-
-.text-primary {
-    color: #F77062 !important;
     transition: 0.3s;
 }
 
-a.text-primary:hover, a.text-primary:focus {
-    color: #BE5348 !important;
+.forgot-password:hover {
+    opacity: 0.5;
+}
+
+.text-primary {
+    color: #f77062 !important;
+    transition: 0.3s;
+}
+
+a.text-primary:hover,
+a.text-primary:focus {
+    color: #be5348 !important;
 }
 
 .card-body {
@@ -81,13 +83,13 @@ a.text-primary:hover, a.text-primary:focus {
 }
 
 .profit-card {
-  background: #2f3863;
-  border-radius: 10px;
+    background: #2f3863;
+    border-radius: 10px;
 }
 
 .pa-chart {
     width: 100%;
-    height: 377px!important;
+    height: 377px !important;
     background-color: #2a3042;
 }
 
@@ -101,18 +103,18 @@ a.text-primary:hover, a.text-primary:focus {
 }
 
 .bx-cog {
-  transition: 0.3s;
+    transition: 0.3s;
 }
 
 .bx-cog:hover {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 .dropdown-menu.show {
-  transition: 0.3s;
-  box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  margin-top: 10px;
+    transition: 0.3s;
+    box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
 .navbar-header .dropdown.show .header-item {
@@ -149,20 +151,22 @@ a.text-primary:hover, a.text-primary:focus {
     opacity: 0.7;
 }
 
-.mr-2, .mx-2 {
+.mr-2,
+.mx-2 {
     margin-top: 13px !important;
     margin-right: 15px !important;
 }
 
-td[data-v-aab6e828], th[data-v-aab6e828] {
+td[data-v-aab6e828],
+th[data-v-aab6e828] {
     padding: 5px !important;
     background-color: #2a3142 !important;
 }
 
 .daterangepicker .calendar-table {
-    border: 1px solid #2a3142!important;
+    border: 1px solid #2a3142 !important;
     border-radius: 4px;
-    background-color: #2a3142!important;
+    background-color: #2a3142 !important;
 }
 
 .daterangepicker td.in-range {
@@ -172,18 +176,19 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
     border-radius: 0;
 }
 
-.daterangepicker td.active, .daterangepicker td.active:hover {
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
     background-color: #d8634f !important;
     border-color: transparent;
     color: #fff;
 }
 
 .vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
-    padding: 15px!important;
-    background: #2a3142!important;
+    padding: 15px !important;
+    background: #2a3142 !important;
     padding: 0;
     border: 0px;
-    box-shadow: 0 12px 70px 0 rgba(0,0,0,0.50);
+    box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
 }
 
 .fa-calendar:before {
@@ -195,7 +200,7 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
     clear: both;
     text-align: right;
     padding: 10px;
-    border-top: 0px!important;
+    border-top: 0px !important;
     line-height: 12px;
     vertical-align: middle;
 }
@@ -222,7 +227,7 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 }
 
 .daterangepicker.opensleft[data-v-267f4ee2] {
-    right: 0px!important;
+    right: 0px !important;
     left: auto;
     margin-top: 20px;
 }
@@ -230,9 +235,9 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 .daterangepicker .drp-buttons .btn {
     margin-left: 8px;
     font-size: 12px;
-    font-weight: 500!important;
+    font-weight: 500 !important;
     transition: 0.3s;
-    padding: 14px 25px!important;
+    padding: 14px 25px !important;
 }
 
 .daterangepicker .drp-buttons .btn:hover {
@@ -241,28 +246,30 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 
 .btn-primary {
     color: #fff;
-    background-color: #556EE7!important;
-    border-color: #556EE7!important;
-    padding: 12px 17px 12px 17px!important;
+    background-color: #556ee7 !important;
+    border-color: #556ee7 !important;
+    padding: 12px 17px 12px 17px !important;
     transition: 0.3s;
     border-radius: 5px;
 }
 
 .btn-primary:hover {
     color: #fff;
-    background-color: #556ee6!important;
-    border-color: none!important;
+    background-color: #556ee6 !important;
+    border-color: none !important;
     transform: scale(1.04);
 }
 
-.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
     color: #fff;
-    background-color: #556ee6!important;
-    border-color: #556ee6!important;
+    background-color: #556ee6 !important;
+    border-color: #556ee6 !important;
 }
 
 .channel-icons {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 .dropdown-item {
@@ -276,38 +283,38 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
     background-color: transparent;
     border: 0;
     transition: 0.3s;
-    padding: 13px 30px 10px 24px!important;
+    padding: 13px 30px 10px 24px !important;
 }
 
 @media (min-width: 576px) {
-.modal-dialog {
-    max-width: 650px!important;
-    margin: 1.75rem auto;
-}
+    .modal-dialog {
+        max-width: 650px !important;
+        margin: 1.75rem auto;
+    }
 }
 
 .modal-body {
     position: relative;
     flex: 1 1 auto;
-    padding: 40px 40px 40px 50px !important
+    padding: 40px 40px 40px 50px !important;
 }
 
 .shopify-icon {
-  margin-right: 15px;
-  margin-top: -10px;
+    margin-right: 15px;
+    margin-top: -10px;
 }
 
 .text100 {
-  font-weight: 100;
-  margin-top: 30px;
-  margin-bottom: 15px;
+    font-weight: 100;
+    margin-top: 30px;
+    margin-bottom: 15px;
 }
 
 .font-size-10 {
     font-size: 13px !important;
     color: #fff;
-   text-decoration: underline !important;
-   transition: 0.3s;
+    text-decoration: underline !important;
+    transition: 0.3s;
 }
 
 .font-size-10:hover {
@@ -316,21 +323,21 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 }
 
 .btn-cancel {
-  color: #ffffff !important;
-  background-color: #32394F !important;
-  padding: 13px 23px 13px 23px;
-  transition: 0.3s;
+    color: #ffffff !important;
+    background-color: #32394f !important;
+    padding: 13px 23px 13px 23px;
+    transition: 0.3s;
 }
 
 .btn-cancel:hover {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 .underlined {
-  text-decoration: underline!important;
-  transition: 0.3s;
+    text-decoration: underline !important;
+    transition: 0.3s;
 }
 
 .underlined:hover {
-  opacity: 0.5;
+    opacity: 0.5;
 }
