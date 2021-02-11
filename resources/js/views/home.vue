@@ -8,6 +8,7 @@ import ChannelDropdown from "../components/custom-components/channel-dropdown";
 import DateRange from "../components/custom-components/date-range";
 import StoreIcon from "../components/custom-components/shopifystore-icon";
 import PaypalAccount from "../components/custom-components/paypal-icon";
+import StripeAccount from "../components/custom-components/stripe-icon";
 
 //Dashboard Data sections import
 import Profit from "../components/custom-components/dashboard-data/profit-section";
@@ -38,6 +39,7 @@ export default {
     KeyPerformance,
     Chart,
     PaypalAccount,
+    StripeAccount,
   },
   data() {
     return {
@@ -167,6 +169,7 @@ export default {
           <ChannelDropdown />
           <StoreIcon />
           <PaypalAccount :ppAccounts="paypalAccounts" />
+          <StripeAccount />
           <DateRange @changeDateRange="handleDateChange" />
         </div>
       </div>
