@@ -45,7 +45,7 @@ export default {
   components: { Stat, SubscriptionCost },
   data() {
     return {
-      subscriptionData: [],
+      subscriptionData: 0,
       data: [
         {
           id: 1,
@@ -105,10 +105,10 @@ export default {
     totalCost() {
       eventBus.$emit(
         "totalCostValue",
-        parseFloat(this.merchantFees + this.refundTotal + this.totalDiscount)
+        parseFloat(this.merchantFees + this.refundTotal + this.totalDiscount + this.subscriptionData)
       );
       return displayCurrency(
-        this.merchantFees + this.refundTotal + this.totalDiscount
+        this.merchantFees + this.refundTotal + this.totalDiscount + this.subscriptionData
       );
     },
   },
@@ -164,6 +164,7 @@ export default {
         const { data } = result;
         if (data.length > 0) {
           const subTotal2 = this.getSubscriptionTotal(data);
+          this.subscriptionData = subTotal2;
           this.updateSubscriptionData(
             this.data,
             SUBSCRIPTION_COST,
