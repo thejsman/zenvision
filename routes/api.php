@@ -23,7 +23,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'guest:api'], function () {
     /*login route*/
-    Route::post('login', 'Auth\LoginController@login', 'https');
+    Route::post('login', 'Auth\LoginController@login');
 
     /*register route*/
     Route::post('register', 'Auth\RegisterController@register');
