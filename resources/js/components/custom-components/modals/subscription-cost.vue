@@ -1,8 +1,7 @@
 <template>
   <b-row>
-    <h1>Subscription cost</h1>
     <b-col cols="10" offset="1">
-      <div class="font-weight-bold font-size-18 text-white mt-4">
+      <div class="font-weight-bold font-size-24 text-white mt-4">
         Subscription Costs
       </div>
       <div class="d-flex justify-content-between align-items-center">
@@ -181,7 +180,7 @@ export default {
     },
     async deleteSubscription(row) {
       const result = await axios.delete(`subscriptioncost/${row.item.id}`);
-      await this.getSubscriptionCostData();     
+      await this.getSubscriptionCostData();
       eventBus.$emit("updateSubscription");
       await this.updateSubscription();
     },

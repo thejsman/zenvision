@@ -10,6 +10,7 @@
           v-model="form.subscription_name"
           required
           placeholder="Product Name"
+          autocomplete="off"
         ></b-form-input>
       </b-form-group>
 
@@ -29,6 +30,7 @@
         id="input-group-3"
         label="Price"
         label-for="price"
+        autocomplete="off"
         prepend="$"
       >
         <b-form-input
@@ -37,6 +39,7 @@
           required
           placeholder="0.00"
           prepend="$"
+          autocomplete="off"
         ></b-form-input>
       </b-form-group>
 
@@ -61,7 +64,7 @@
         ></b-form-datepicker>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Add</b-button>
+      <b-button type="submit" variant="green">Add</b-button>
       <b-button class="btn btn-cancel" @click="$emit('handle-close')"
         >Cancel</b-button
       >
@@ -105,7 +108,7 @@ export default {
         this.$emit("handle-close");
       }
     },
-   
+
   },
 };
 </script>
