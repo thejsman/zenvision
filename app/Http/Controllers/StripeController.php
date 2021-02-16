@@ -26,18 +26,15 @@ class StripeController extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $code);
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
         $headers = array();
         $headers[] = 'Authorization: Bearer sk_test_51HuhJxFYxNaGdsEt7j5ZlD9UN7ksUzcXvJy9UNvcfuf55pzIOGOm1tVho1091eW1q8Qn9wTs6oBCLdPNLSy3Z0DU00FXjCeYZR';
-        // $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        //Windows Dev system disable SSL
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
 
         $response = json_decode($result, true);
-
-
-
         $stripeData = [];
         $stripeData['user_id'] = Auth::user()->id;
         $stripeData['access_token']  =  $response['access_token'];
@@ -71,49 +68,80 @@ class StripeController extends Controller
     {
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        $headers = array(
-            'Stripe-Account:' . $stripeAccounts[0]->stripe_user_id,
-            'Authorization: Bearer sk_test_51HuhJxFYxNaGdsEt7j5ZlD9UN7ksUzcXvJy9UNvcfuf55pzIOGOm1tVho1091eW1q8Qn9wTs6oBCLdPNLSy3Z0DU00FXjCeYZR'
-        );
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-            return [];
+        $availableBalance = [];
+        if($stripeAccounts->count()) {          
+            foreach($stripeAccounts as $account) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                //Windows Dev system disable SSL
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+                $headers = array(
+                    'Stripe-Account:' . $account->stripe_user_id,
+                    'Authorization: Bearer ' . $account->access_token,
+                );                
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                    return [];
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+               
+              array_push($availableBalance,  $response['available'][0]);
+            } 
+            return $availableBalance;
+        } 
+        else {
+          return   $availableBalance;
         }
-        curl_close($ch);
-        $response = json_decode($result, true);
-        return $response;
     }
 
-    public function getBalanceTransactions()
+    public function getStripeTransactions()
     {
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        $stripeTransactions = [];
 
-        $headers = array(
-            'Stripe-Account:' . $stripeAccounts[0]->stripe_user_id,
-            'Authorization: Bearer sk_test_51HuhJxFYxNaGdsEt7j5ZlD9UN7ksUzcXvJy9UNvcfuf55pzIOGOm1tVho1091eW1q8Qn9wTs6oBCLdPNLSy3Z0DU00FXjCeYZR'
-        );
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        if($stripeAccounts->count()) {
+            foreach($stripeAccounts as $account) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                //Windows Dev system disable SSL
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
 
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-            return [];
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+                $headers = array(
+                    'Stripe-Account:' . $account->stripe_user_id,
+                    'Authorization: Bearer ' . $account->access_token,
+                );
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                    return [];
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+              
+                if(count($response['data'])) {
+                    array_push($stripeTransactions, $response['data']);
+                }               
+            }
+            return $stripeTransactions;
+
+        } else {
+            return $stripeTransactions;
         }
-        curl_close($ch);
-        $response = json_decode($result, true);
-        return $response;
+       
     }
 }

@@ -3,6 +3,7 @@
     <div class="font-weight-bold font-size-18 text-white mt-4 pb-3">
       Edit Subscription Cost
     </div>
+
     <b-form @submit="onSubmit" v-if="show">
       <b-form-group id="input-group-1" label="Name" label-for="name">
         <b-form-input
@@ -41,40 +42,19 @@
       </b-form-group>
 
       <b-form-group id="input-group-4" label="Starting date" label-for="date">
-        <!-- <b-form-input
-          id="starting_date"
-          v-model="form.starting_date"
-          required
-          placeholder="Starting Date"
-        ></b-form-input> -->
-
         <b-form-datepicker
           id="starting_date"
-          placeholder="Starting Date"
-          :date-format-options="{
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-          }"
+          :placeholder="dateFormated"
           locale="en"
-          v-model="form.starting_date"
+          v-model="formData.starting_date"
         ></b-form-datepicker>
       </b-form-group>
-      <!-- <date-range-picker
-        ref="picker"
-        :opens="opens"
-        :ranges="false"
-        v-model="form.starting_date"
-        :singleDatePicker="singleDatePicker"
-      ></date-range-picker> -->
+
       <b-button type="submit" variant="primary">Save</b-button>
       <b-button class="btn btn-cancel" @click="$emit('handle-close')"
         >Cancel</b-button
       >
     </b-form>
-    <!-- <b-card class="mt-3" header="Form Data Result">
-      <pre class="m-0">{{ formData }}</pre>
-    </b-card> -->
   </div>
 </template>
 
@@ -82,6 +62,7 @@
 import axios from "axios";
 import DateRangePicker from "vue2-daterange-picker";
 import { eventBus } from "../../../app";
+import moment from "moment";
 export default {
   components: { DateRangePicker },
   data() {
@@ -108,6 +89,14 @@ export default {
     formData: {
       type: Object,
       default: () => {},
+    },
+  },
+  computed: {
+    dateFormated() {
+      if (this.formData.starting_date === null) {
+        return "Select a date";
+      }
+      return moment(this.formData.starting_date).format("LL");
     },
   },
   methods: {

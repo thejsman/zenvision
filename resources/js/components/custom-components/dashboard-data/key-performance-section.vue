@@ -145,13 +145,12 @@ export default {
         displayNumber(average_us_percentage)
       );
       // Development - saving network requst
-      // this.getAbandonedCartCount();
+      this.getAbandonedCartCount();
     },
     async getAbandonedCartCount() {
-      let count = "0";
       try {
         const result = await axios.get("abandonedcart");
-        count = await result.data;
+        const count = result.data;
         updateData(this.data, ABANDONED_CART, count);
       } catch (error) {
         console.log(error);

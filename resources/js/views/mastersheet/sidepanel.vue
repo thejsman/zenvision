@@ -157,7 +157,7 @@ export default {
     },
     async getStripeTransactions() {
       try {
-        const result = await axios.get("getbalancetransactions");
+        const result = await axios.get("getStripeTransactions");
         const data = result.data;
         return data;
       } catch (err) {
