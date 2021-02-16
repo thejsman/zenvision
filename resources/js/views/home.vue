@@ -206,7 +206,7 @@ export default {
         />
       </div>
     </div>
-    <b-modal id="shopify-connect" size="lg" centered hide-footer hide-header>
+    <b-modal id="shopify-connect" size="lg"  centered hide-footer hide-header>
       <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
     </b-modal>
   </Layout>
