@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col cols="10" offset="1">
-      <div class="font-weight-bold font-size-24 text-white mt-4">
+      <div class="font-weight-bold font-size-24 text-white mt-4 subscription-header">
         Subscription Costs
       </div>
       <div class="d-flex justify-content-between align-items-center">
@@ -11,7 +11,7 @@
           </p>
         </div>
         <b-button
-          variant="primary"
+          variant="green"
           class="btn btn-success"
           @click="handleAddSubscriptionCost"
           >Add</b-button

@@ -405,6 +405,15 @@ th[data-v-aab6e828] {
     opacity: 0.7;
 }
 
+.btn-link:hover {
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+.subscription-header {
+  margin-bottom: -15px;
+}
+
 .custom-select {
     display: inline-block;
     width: 100%;
@@ -422,4 +431,25 @@ th[data-v-aab6e828] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+}
+
+.btn-group > .btn, .btn-group-vertical > .btn {
+    position: relative;
+    flex: 1 1 auto;
+    color: #fff;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 0px solid #32394e;
+    color: #fff;
+    padding: 15px 0px 21px 29px;
+}
+
+.table .thead-dark th {
+    color: #fff;
+    background-color: #32394e;
+    border: 0px solid #fff;
+    padding: 25px 0px 21px 29px;
 }
