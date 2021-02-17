@@ -142,7 +142,7 @@
           </div>
         </div>
 
-        <div class="mr-5 pr-3">
+        <div>
           <b-button
             variant="cancel"
             class="btn btn-cancel border-0"
