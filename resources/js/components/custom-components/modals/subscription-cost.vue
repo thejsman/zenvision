@@ -22,7 +22,7 @@
       <div v-if="isLoading">
         <div class="col-lg-12 mt-4">
           <div class="d-flex justify-content-center mb-3">
-            <b-spinner type="grow" label="Loading..."></b-spinner>
+            <b-spinner class="spinner-border" type="border" label="Loading..."></b-spinner>
           </div>
         </div>
       </div>
