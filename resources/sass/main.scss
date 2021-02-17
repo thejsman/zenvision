@@ -353,10 +353,6 @@ th[data-v-aab6e828] {
     opacity: 0.5;
 }
 
-.cogs-card {
-  cursor: pointer;
-}
-
 .b-calendar .b-calendar-grid-body .col[data-date] .btn {
     width: 32px;
     height: 32px;
@@ -452,4 +448,34 @@ th[data-v-aab6e828] {
     background-color: #32394e;
     border: 0px solid #fff;
     padding: 25px 0px 21px 29px;
+}
+
+.border-primary {
+    border-color: #556ee6 !important;
+    cursor: pointer;
+}
+
+.apex-charts {
+    min-height: 10px !important;
+    cursor: crosshair;
+}
+
+.text-warning {
+    color: #f1b44c !important;
+    font-size: 17px;
+}
+
+.cogscard {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cogscard:hover {
+  transform: scale(1.04);
+}
+
+.badge-primary {
+    color: #fff;
+    background-color: #556ee6;
+    font-size: 13px;
 }

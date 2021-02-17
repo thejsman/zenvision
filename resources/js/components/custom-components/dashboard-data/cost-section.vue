@@ -17,7 +17,7 @@
 
     <b-modal
       id="subscription-details"
-      size="xl"
+      size="lg"
       centered
       hide-footer
       hide-header
@@ -147,7 +147,7 @@ export default {
       await this.getSubscriptionData();
     });
 
-   
+
   },
   methods: {
     assignData(refundTotal, orders) {

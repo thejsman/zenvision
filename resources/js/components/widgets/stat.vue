@@ -43,7 +43,7 @@ export default {
 </script>
 
 <template>
-  <div class="card mini-stats-wid">
+  <div class="card mini-stats-wid" :class="{ cogscard: (title ===  'COGS' || title === 'Subscriptions')}">
     <PlaceholderLoader v-if="loading" />
     <div class="card-body" v-else @click="onClick">
       <div class="media">
@@ -52,7 +52,7 @@ export default {
             <p class="text-muted font-weight-medium">{{ title }}</p>
             <b-badge
               variant="primary"
-              class="p-1"
+              class="p-2"
               v-if="totalSubscriptionCount"
               >{{ totalSubscriptionCount }}</b-badge
             >
@@ -74,3 +74,6 @@ export default {
     </div>
   </div>
 </template>
+<style>
+
+</style>

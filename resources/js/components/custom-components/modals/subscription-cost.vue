@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <b-col cols="10" offset="1">
+    <b-col cols="12">
       <div class="font-weight-bold font-size-24 text-white mt-4 subscription-header">
         Subscription Costs
       </div>
@@ -18,7 +18,7 @@
         >
       </div>
     </b-col>
-    <b-col cols="10" offset="1">
+    <b-col cols="12">
       <div v-if="isLoading">
         <div class="col-lg-12 mt-4">
           <div class="d-flex justify-content-center mb-3">
@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-12 mt-4" v-else>
+      <div cols="12" class="mt-4" v-else>
         <b-table
           hover
           :items="items"
