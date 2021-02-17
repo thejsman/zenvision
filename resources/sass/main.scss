@@ -589,3 +589,21 @@ align-content: center;
 .header-key-perf {
   padding-top: 22px;
 }
+
+.loss-circle {
+    background: #E75555 !important;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
+}
+
+.profit-circle {
+    background: #34C48F;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
+}
