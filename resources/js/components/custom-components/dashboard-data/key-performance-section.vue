@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-xl-12 mt-4">
+    <div class="col-xl-12 mt-4 header-key-perf">
       <h3>Key Performance Metrics</h3>
     </div>
     <div v-for="performance of data" :key="performance.id" class="col-md-3 p-2">
@@ -160,4 +160,3 @@ export default {
   },
 };
 </script>
-

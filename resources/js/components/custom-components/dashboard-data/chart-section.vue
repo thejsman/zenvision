@@ -1,11 +1,11 @@
 <template>
   <div class="row">
-    <div class="col-xl-12 mt-4 mb-3 ml-2">
+    <div class="col-xl-12 mt-4">
       <h3>Profit Analysis</h3>
     </div>
-    <div class="card w-100">
+    <div class="card w-100 ml-2 mr-1">
       <div class="card-body">
-        <div class="d-flex justify-content-end mt-3 legends">
+        <div class="d-flex justify-content-end mt-3 mb-4 legends">
           <i class="profit-circle"></i>
           <span class="mr-3">Profit</span>
           <i class="loss-circle"></i><span class="mr-3 pr-3">Loss</span>
@@ -368,4 +368,3 @@ export default {
   }
 }
 </style>
-

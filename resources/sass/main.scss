@@ -82,6 +82,18 @@ a.text-primary:focus {
     border-radius: 10px !important;
 }
 
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #2a3042;
+    background-clip: border-box;
+    border: 0 solid #32394e;
+    border-radius: 10px;
+}
+
 .mini-stats-wid {
     border-radius: 10px;
 }
@@ -572,4 +584,8 @@ align-content: center;
     color: #ffffff;
     background-color: #e78c54;
     border-color: #e78c54;
+}
+
+.header-key-perf {
+  padding-top: 22px;
 }

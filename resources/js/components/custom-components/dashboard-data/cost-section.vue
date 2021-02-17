@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-xl-12 mt-4 d-flex justify-content-between">
+    <div class="col-xl-12 mt-5 d-flex justify-content-between">
       <h3>Cost</h3>
       <h3>{{ totalCost }}</h3>
     </div>
