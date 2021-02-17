@@ -47,11 +47,11 @@
                 ><i class="fas fa-pencil-alt text-success mr-1" /> Edit
               </b-dropdown-item>
               <b-dropdown-item href="#" @click="endSubscription(row)"
-                ><i class="fas fa-power-off text-warning mr-1" /> End
+                ><i class="fas fa-stop-circle text-warning mr-1" /> End
                 Subscription
               </b-dropdown-item>
               <b-dropdown-item href="#" @click="deleteSubscription(row)"
-                ><i class="fas fa-trash-alt text-danger mr-1" /> Delete
+                ><i class="fas fa-trash text-danger mr-1" /> Delete
               </b-dropdown-item>
             </b-dropdown>
           </template>
@@ -122,7 +122,11 @@ export default {
           tdClass: "tdcenter",
           formatter: "formatPrice",
         },
-        "action",
+        {
+          key: "action",
+          label: "Action",
+          tdClass: "actionbutton",
+        },
       ],
       isLoading: true,
       items: [],

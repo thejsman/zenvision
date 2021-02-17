@@ -11,6 +11,7 @@
           v-model="formData.subscription_name"
           required
           placeholder="Product Name"
+          autocomplete="off"
         ></b-form-input>
       </b-form-group>
 
@@ -29,6 +30,7 @@
       <b-form-group
         id="input-group-3"
         label="Price"
+        autocomplete="off"
         label-for="price"
         prepend="$"
       >
@@ -50,7 +52,7 @@
         ></b-form-datepicker>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Save</b-button>
+      <b-button type="submit" variant="green">Save</b-button>
       <b-button class="btn btn-cancel" @click="$emit('handle-close')"
         >Cancel</b-button
       >

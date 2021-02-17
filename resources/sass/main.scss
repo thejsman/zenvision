@@ -35,6 +35,11 @@ strong {
     border: 1px solid #32394e;
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: 0.3s;
+}
+
+.form-control:hover {
+    background-color: #333c4e;
 }
 
 .btn-success {
@@ -427,6 +432,12 @@ th[data-v-aab6e828] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.custom-select:hover {
+    background: #333c4e;
 }
 
 .btn-group > .btn, .btn-group-vertical > .btn {
@@ -440,7 +451,7 @@ th[data-v-aab6e828] {
     vertical-align: top;
     border-top: 0px solid #32394e;
     color: #fff;
-    padding: 15px 0px 21px 29px;
+    padding: 5px 0px 5px 29px;
 }
 
 .table .thead-dark th {
@@ -478,4 +489,37 @@ th[data-v-aab6e828] {
     color: #fff;
     background-color: #556ee6;
     font-size: 13px;
+}
+
+.actionbutton .btn {
+  font-size: 27px;
+  display: flex;
+  margin-bottom: 14px;
+}
+
+.actionBtn {
+display: flex;
+justify-content: center;
+align-content: center;
+}
+
+.table-hover tbody tr:hover {
+    color: #a6b0cf;
+    background-color: #32394e;
+}
+
+.btn:focus, .btn.focus {
+    outline: 0;
+    box-shadow: 0 0 0 0rem rgb(85 110 230 / 0%);
+}
+
+.custom-select:focus {
+    border-color: #363e54;
+    outline: 0;
+    box-shadow: 0 0 0 0rem rgb(85 110 230 / 0%);
+}
+
+.btn-link:focus, .btn-link.focus {
+    text-decoration: none;
+    box-shadow: none;
 }
