@@ -315,6 +315,19 @@ th[data-v-aab6e828] {
     padding: 40px 60px 40px 60px !important;
 }
 
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #2a3042;
+    background-clip: padding-box;
+    border: 1px solid #32394e;
+    border-radius: 15px;
+    outline: 0;
+}
+
 .shopify-icon {
     margin-right: 15px;
     margin-top: -10px;
