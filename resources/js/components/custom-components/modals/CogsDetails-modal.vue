@@ -207,7 +207,7 @@ export default {
 
         {
           key: "cost",
-          label: "Product Cost(Per unit)",
+          label: "Product Cost (Per unit)",
 
           formatter: (value) => {
             if (value !== null) {
@@ -217,7 +217,7 @@ export default {
         },
         {
           key: "shipping_cost",
-          label: "Shipping Cost(Per unit)",
+          label: "Shipping Cost (Per unit)",
         },
       ],
 
@@ -256,7 +256,7 @@ export default {
         this.showAlert("Please select at least two rows", "danger");
       } else if (this.bulk_cost <= 0 || this.bulk_shipping <= 0) {
         this.showAlert(
-          "Please enter values for both product cost & shipping cost",
+          "Product Cost & shipping Cost must be provided",
           "danger"
         );
       } else {
@@ -331,11 +331,13 @@ export default {
 .cogs_cost_width {
   width: 120px;
 }
+
 .table-active,
 .table-active > th,
 .table-active > td {
   background-color: #222736 !important;
 }
+
 .tdcenter {
   vertical-align: middle !important;
 }
