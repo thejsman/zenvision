@@ -533,6 +533,12 @@ align-content: center;
     background-color: #222736;
 }
 
+.dropdown-item:hover, .dropdown-item:focus {
+    color: #e9ecef;
+    text-decoration: none;
+    background-color: #222736;
+}
+
 .btn:focus, .btn.focus {
     outline: 0;
     box-shadow: 0 0 0 0rem rgb(85 110 230 / 0%);

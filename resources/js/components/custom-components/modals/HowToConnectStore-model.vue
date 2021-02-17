@@ -20,7 +20,7 @@
       >
         <div>
           Still unable to connect?
-          <a href="mailto:support@zenvision.com" class="text-white underlined"
+          <a href="mailto:support@zenvision.io" class="text-white underlined"
             >Contact our support</a
           >
         </div>
