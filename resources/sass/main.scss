@@ -55,7 +55,6 @@ strong {
     display: block;
     min-height: 1.21875rem;
     padding-left: 1.5rem;
-    margin-bottom: 30px;
 }
 
 .forgot-password {
@@ -451,18 +450,18 @@ th[data-v-aab6e828] {
     vertical-align: top;
     border-top: 0px solid #32394e;
     color: #fff;
-    padding: 5px 0px 5px 29px;
+    padding: 10px 0px 10px 29px;
 }
 
 .table .thead-dark th {
     color: #fff;
     background-color: #32394e;
     border: 0px solid #fff;
-    padding: 25px 0px 21px 29px;
+    padding: 25px 17px 21px 28px;
 }
 
 .border-primary {
-    border-color: #556ee6 !important;
+    border: 2px #556ee6 solid !important;
     cursor: pointer;
 }
 
@@ -522,4 +521,55 @@ align-content: center;
 .btn-link:focus, .btn-link.focus {
     text-decoration: none;
     box-shadow: none;
+}
+
+:focus {
+    outline: -webkit-focus-ring-color auto 0px;
+}
+
+.ct-chart {
+    max-height: 300px;
+    cursor: crosshair;
+}
+
+.emptyInput {
+    border: 0.5px solid #e78d55;
+    border-radius: 5px;
+}
+
+.tablecogs {
+  padding: 25px 0px 25px 30px;
+  background-color: red;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px #c8c8c8 !important;
+    border-radius: 0px !important;
+    background-color: #32394e;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #556de6 !important;
+    -webkit-box-shadow: inset 0 0 0px rgb(90 90 90 / 70%) !important;
+}
+
+.app-search span {
+    line-height: 40px !important;
+}
+
+.app-search span {
+    position: absolute;
+    z-index: 10;
+    font-size: 13px;
+    line-height: 38px;
+    left: 14px;
+    top: 0;
+    color: #c3cbe4;
+}
+
+.alert-danger {
+    color: #ffffff;
+    background-color: #e78c54;
+    border-color: #e78c54;
 }

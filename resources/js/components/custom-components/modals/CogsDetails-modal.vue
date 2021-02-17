@@ -1,7 +1,7 @@
 <template>
   <b-row>
-    <b-col cols="10" offset="1">
-      <div class="font-weight-bold font-size-18 text-white mt-4">COGS</div>
+    <b-col cols="12">
+      <div class="font-weight-bold font-size-24 text-white mt-4 subscription-header">COGS</div>
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <p class="mt-4 mb-4 text-white">
@@ -19,20 +19,20 @@
               @keyup="handleSearch"
               v-model="searchText"
             />
-            <span class="bx bx-search-alt"></span>
+            <span class="fas fa-search"></span>
           </div>
         </div>
       </div>
     </b-col>
-    <b-col cols="10" offset="1">
+    <b-col cols="12">
       <div v-if="is_loading">
-        <div class="col-lg-12 mt-4">
+        <div>
           <div class="d-flex justify-content-center mb-3">
-            <b-spinner type="grow" label="Loading..."></b-spinner>
+            <b-spinner type="border" label="Loading..."></b-spinner>
           </div>
         </div>
       </div>
-      <div class="col-lg-12 mt-4" v-else>
+      <div v-else>
         <b-table
           @row-selected="onRowSelected"
           ref="cogsTable"
@@ -109,7 +109,7 @@
         >
       </div>
     </b-col>
-    <b-col cols="10" offset="1">
+    <b-col cols="12">
       <div class="d-flex mt-4 justify-content-between flex-cloumn">
         <div>
           <div
@@ -134,10 +134,9 @@
               placeholder="Shipping Cost"
             />
             <b-button
-              variant="success"
+              variant="primary"
               class="btn ml-2 border-0"
               @click="handleBulkUpdate"
-              :style="{ 'background-color': '#556ee6' }"
               >Bulk update pricing</b-button
             >
           </div>
@@ -145,15 +144,15 @@
 
         <div class="mr-5 pr-3">
           <b-button
-            variant="primary"
-            class="btn btn-dark border-0"
+            variant="cancel"
+            class="btn btn-cancel border-0"
             @click="$emit('handle-close')"
             >Cancel</b-button
           >
           <b-button
             type="submit"
-            variant="primary"
-            class="btn btn-success"
+            variant="green"
+            class="btn btn-green ml-2"
             @click="handleClick"
             >Confirm</b-button
           >
@@ -170,10 +169,15 @@ export default {
   data() {
     return {
       fields: [
-        "selected",
+        {
+          key: "selected",
+          label: "selected",
+          tdClass: "tdcenter",
+        },
         {
           key: "product_title",
           label: "Product Name",
+          tdClass: "tdcenter",
         },
         {
           key: "color",
@@ -324,44 +328,15 @@ export default {
 </script>
 
 <style >
-.emptyInput {
-  border: 0.5px solid #e78d55;
-}
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
 .cogs_cost_width {
   width: 120px;
 }
 .table-active,
 .table-active > th,
 .table-active > td {
-  background-color: transparent !important;
-}
-
-.cogs_filter {
-  background-color: #32384c !important;
-  color: white;
+  background-color: #222736 !important;
 }
 .tdcenter {
   vertical-align: middle !important;
 }
-::-webkit-scrollbar {
-  width: 6px;
-  min-height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px #262525;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px #000;
-}
 </style>
-
-
