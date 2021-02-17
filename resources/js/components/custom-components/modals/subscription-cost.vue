@@ -21,7 +21,7 @@
     <b-col cols="12">
       <div v-if="isLoading">
         <div class="col-lg-12 mt-4">
-          <div class="d-flex justify-content-center mb-3">
+          <div class="d-flex justify-content-center mt-5 mb-5">
             <b-spinner class="spinner-border" type="border" label="Loading..."></b-spinner>
           </div>
         </div>

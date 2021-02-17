@@ -507,6 +507,7 @@ th[data-v-aab6e828] {
 
 .cogscard:hover {
   transform: scale(1.04);
+  box-shadow: 0 2px 34px 0 rgba(0,0,0,0.19);
 }
 
 .badge-primary {
@@ -529,7 +530,7 @@ align-content: center;
 
 .table-hover tbody tr:hover {
     color: #a6b0cf;
-    background-color: #32394e;
+    background-color: #222736;
 }
 
 .btn:focus, .btn.focus {
@@ -623,4 +624,23 @@ align-content: center;
 
 ::placeholder {
   color: #ffffff7d !important;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.b-table-sticky-header {
+    overflow-y: auto;
+    max-height: 300px;
+    border-radius: 10px;
+}
+
+.custom-control-label {
+    position: relative;
+    margin-bottom: 0;
+    cursor: pointer;
+    vertical-align: top;
 }
