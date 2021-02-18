@@ -63,7 +63,6 @@ export default {
   },
   watch: {
     revenueData(value, newValue) {
-      console.log("AllOrders:", this.revenueData);
       this.assignData(this.revenueData);
     },
   },
@@ -76,13 +75,13 @@ export default {
       const shipping_revenue = _.sumBy(orders, (order) =>
         _.sumBy(order.shipping_lines, (line) => parseFloat(line.price))
       );
-      this.totalRevenue = displayCurrency(revenue + total_tax);
-      eventBus.$emit("totalRevenueValue", parseFloat(revenue + total_tax));
+      this.totalRevenue = displayCurrency(revenue);
+      eventBus.$emit("totalRevenueValue", parseFloat(revenue));
       updateData(this.data, NUMBER_OF_ORDERS, number_of_orders);
       updateData(
         this.data,
         ORDER_REVENUE,
-        displayCurrency(revenue - shipping_revenue)
+        displayCurrency(revenue - shipping_revenue - total_tax)
       );
       updateData(
         this.data,
