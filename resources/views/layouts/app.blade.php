@@ -15,6 +15,7 @@
         name="description" />
     <script src="/js/app.js" defer></script>
     <link href="/css/app-dark.css" rel="stylesheet" id="layout-css">
+    <link href="/css/custom.css" rel="stylesheet" id="custom-layout-css">
 </head>
 <body>
     <noscript>
