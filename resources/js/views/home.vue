@@ -152,6 +152,8 @@ export default {
       console.log("Called");
       const filteredOrders = this.backupOrders.filter((order) => {
         const orderDate = moment(order.created_on_shopify).format("MM-DD-YYYY");
+        order.created_on_shopify = orderDate;
+        order.total_price = parseFloat(order.total_price);
         return (
           new Date(orderDate) >= new Date(s_date) &&
           new Date(orderDate) <= new Date(e_date)
