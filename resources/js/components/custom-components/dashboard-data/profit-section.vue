@@ -97,7 +97,7 @@ export default {
           .map((objs, key) => _.sumBy(objs, "total_price"))
           .value();
 
-        return test;
+        return test.map((t) => parseFloat(t).toFixed(2));
       } else {
         return [0, 0, 0, 0, 0];
       }
