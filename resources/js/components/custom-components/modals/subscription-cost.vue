@@ -1,7 +1,9 @@
 <template>
   <b-row>
     <b-col cols="12">
-      <div class="font-weight-bold font-size-24 text-white mt-4 subscription-header">
+      <div
+        class="font-weight-bold font-size-24 text-white mt-4 subscription-header"
+      >
         Subscription Costs
       </div>
       <div class="d-flex justify-content-between align-items-center">
@@ -22,7 +24,11 @@
       <div v-if="isLoading">
         <div class="col-lg-12 mt-4">
           <div class="d-flex justify-content-center mt-5 mb-5">
-            <b-spinner class="spinner-border" type="border" label="Loading..."></b-spinner>
+            <b-spinner
+              class="spinner-border"
+              type="border"
+              label="Loading..."
+            ></b-spinner>
           </div>
         </div>
       </div>
@@ -41,7 +47,7 @@
               class="actionBtn"
               variant="link"
               text="..."
-              v-if="row.item.end_date === null"
+              :class="{'invisible':  row.item.end_date !== null}"
             >
               <b-dropdown-item href="#" @click="editSubscription(row)"
                 ><i class="fas fa-pencil-alt text-success mr-1" /> Edit
