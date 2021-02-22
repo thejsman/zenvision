@@ -1,7 +1,11 @@
 <template>
   <b-row>
     <b-col cols="12">
-      <div class="font-weight-bold font-size-24 text-white mt-4 subscription-header">COGS</div>
+      <div
+        class="font-weight-bold font-size-24 text-white mt-4 subscription-header"
+      >
+        COGS
+      </div>
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <p class="mt-4 mb-4 text-white">
@@ -41,6 +45,7 @@
           :items="items"
           :fields="fields"
           responsive="sm"
+          no-border-collapse
           head-variant="dark"
         >
           <template v-slot:head(selected)>
@@ -331,13 +336,11 @@ export default {
 .cogs_cost_width {
   width: 120px;
 }
-
 .table-active,
 .table-active > th,
 .table-active > td {
   background-color: #222736 !important;
 }
-
 .tdcenter {
   vertical-align: middle !important;
 }

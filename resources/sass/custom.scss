@@ -672,3 +672,8 @@ body {
 body::-webkit-scrollbar {
     display: none;
 }
+
+// Style to disble scroll in Cogs and other b-table link
+// .b-table-sticky-header::-webkit-scrollbar {
+//     display: none;
+// }
