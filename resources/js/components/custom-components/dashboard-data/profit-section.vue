@@ -29,9 +29,8 @@
 <script>
 import Stat from "../../widgets/stat";
 import _ from "lodash";
-import moment from "moment";
 import { eventBus } from "../../../app";
-import { displayCurrency, getSumBy, updateData } from "../../../utils";
+import { displayCurrency } from "../../../utils";
 
 export default {
   components: { Stat },
@@ -87,17 +86,17 @@ export default {
         "totalProfitValue",
         parseFloat(this.totalRevenue - this.totalCost)
       );
-      //   alert("Emitted the event");
+
       return displayCurrency(this.totalRevenue - this.totalCost);
     },
     profitSeries() {
       if (this.profitData.length > 0) {
-        const test = _(this.profitData)
+        const profitSeriesData = _(this.profitData)
           .groupBy("created_on_shopify")
           .map((objs, key) => _.sumBy(objs, "total_price"))
           .value();
 
-        return test.map((t) => parseFloat(t).toFixed(2));
+        return profitSeriesData.map((ps) => parseFloat(ps).toFixed(2));
       } else {
         return [0, 0, 0, 0, 0];
       }
@@ -106,7 +105,6 @@ export default {
   created() {
     eventBus.$on("totalCostValue", (value) => (this.totalCost = value));
     eventBus.$on("totalRevenueValue", (value) => (this.totalRevenue = value));
-    eventBus.$on("RandomEvent", (value) => alert("random event"));
   },
   props: {
     profitData: {
@@ -116,8 +114,6 @@ export default {
   },
   watch: {
     profitData(value, newValue) {
-      //   this.assignData(this.profitData);
-      eventBus.$emit("profitDataSeries", this.profitSeries);
       this.ProfitlineChart = {
         ...this.ProfitlineChart,
         series: [
@@ -128,9 +124,6 @@ export default {
         ],
       };
     },
-  },
-  methods: {
-    assignData(orders) {},
   },
 };
 </script>
