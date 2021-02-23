@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 if (App::environment('production')) {
     URL::forceScheme('https');
 }
@@ -39,3 +40,7 @@ Route::post('webhooks/orders-delete', 'WebhookController@ordersDelete');
 // Product Webhooks
 Route::post('webhooks/product-create', 'ProductsController@store');
 Route::post('webhooks/product-update', 'ProductsController@update');
+
+//Inventory Items Webhook
+Route::post('webhooks/inventory-create', 'InventoryController@store');
+Route::post('webhooks/inventory-update', 'InventoryController@update');
