@@ -73,7 +73,7 @@ class GetAllProducts
                             'product_title' => $product['title'],
                         );
                         foreach ($product['variants'] as $variant_key => $variant) {
-                            array_push($inventory_item_array, $variant['inventory_item_id']);
+
                             $inventory_url = 'https://' . $shop_domain . '/admin/api/2021-01/inventory_items.json?ids=' . $variant['inventory_item_id'] . '?' . http_build_query($param);
                             $inventory = $this->shopRequest('get', $inventory_url);
                             $cost = $inventory['products'][0]['cost'];
