@@ -49,7 +49,16 @@ class ShopifyStoreController extends Controller
                 'address'    => env('APP_URL', null) . '/api/webhooks/app-uninstalled',
                 'format'    => 'json'
             ],
-
+            // [
+            //     'topic'        => 'inventory_items/create',
+            //     'address'    => env('APP_URL', null) . '/api/webhooks/inventory-create',
+            //     'format'    => 'json'
+            // ],
+            [
+                'topic'        => 'inventory_items/update',
+                'address'    => env('APP_URL', null) . '/api/webhooks/inventory-update',
+                'format'    => 'json'
+            ],
         ];
     }
 

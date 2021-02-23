@@ -66,24 +66,30 @@ class GetAllProducts
                             }
                         }
 
-                        // TODO: product processing here
+                        //product processing here
                         $new_product = array(
                             'store_id' => $store_id,
                             'product_id' => $product['id'],
                             'product_title' => $product['title'],
                         );
                         foreach ($product['variants'] as $variant_key => $variant) {
+                            array_push($inventory_item_array, $variant['inventory_item_id']);
+                            $inventory_url = 'https://' . $shop_domain . '/admin/api/2021-01/inventory_items.json?ids=' . $variant['inventory_item_id'] . '?' . http_build_query($param);
+                            $inventory = $this->shopRequest('get', $inventory_url);
+                            $cost = $inventory['products'][0]['cost'];
                             $product_variant = array(
                                 'variant_id' => $variant['id'],
                                 'variant_title' => $variant['title'],
                                 'sku' => $variant['sku'],
                                 'sales_price' => $variant['price'],
+                                'inventory_item_id' => $variant['inventory_item_id'],
                                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
                                 "size" => isset($sizeOption) ? $variant['option' . $sizeOption] : null,
-                                // 'cost' => 0,
+                                'cost' => $cost,
                                 // "shipping_cost" => 0
                             );
                             $newProduct =  array_merge($new_product,  $product_variant);
+
                             ShopifyProductVariant::create($newProduct);
                         }
                     }
