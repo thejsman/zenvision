@@ -48,7 +48,7 @@ export default {
             <form :action="submitUrl" method="POST">
               <slot />
               <div class="form-group">
-               
+
                 <input
                   type="email"
                   name="email"
@@ -78,7 +78,7 @@ export default {
               </b-form-group>
               <div class="form-group row mb-0">
                 <div class="col-12 text-right">
-                  <button class="btn btn-primary btn-success btn-block" type="submit">Reset</button>
+                  <button class="btn btn-primary btn-block" type="submit">Reset</button>
                 </div>
               </div>
             </form>
