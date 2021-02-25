@@ -349,7 +349,7 @@ td[data-v-aab6e828], th[data-v-aab6e828] {
 }
 
 .btn-cancel {
-  color: #ffffff;
+  color: #fff !important;
   background-color: #32394f;
   padding: 13px 23px 13px 23px;
   transition: 0.3s;
