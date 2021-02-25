@@ -55,6 +55,7 @@
                     <h4 class="text-white text-uppercase mb-4 mt-4">Sign Up</h4>
                 </div>
 
+
                 <div class="card-body pt-0">
                     <b-alert
                         v-model="registerSuccess"
@@ -173,6 +174,16 @@
                     </b-form>
                 </div>
                 <!-- end card-body -->
+
+            <div class="mt-4">
+              <b-button
+                type="submit"
+                variant="primary"
+                class="btn-block"
+                :disabled="!phoneState || !emailState || !passwordState"
+                >Register</b-button
+              >
+
             </div>
             <!-- end card -->
 

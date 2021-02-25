@@ -18,6 +18,7 @@ class CreateShopifyProductVariantsTable extends Migration
             $table->unsignedBigInteger('store_id');
             $table->bigInteger('product_id');
             $table->bigInteger('variant_id');
+            $table->bigInteger('inventory_item_id')->nullable();
             $table->string('product_title');
             $table->string('variant_title')->nullable();
             $table->string('sku')->nullable();

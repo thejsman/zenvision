@@ -88,7 +88,7 @@ export default {
               <b-button
                 type="submit"
                 variant="primary"
-                class="btn-block btn-success"
+                class="btn-block"
                 >Log In</b-button
               >
             </div>

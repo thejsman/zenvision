@@ -72,16 +72,19 @@ export default {
       const number_of_orders = _.size(orders);
       const revenue = getSumBy(orders, "total_price");
       const total_tax = getSumBy(orders, "total_tax");
+      const discounts = _.sumBy(orders, (order) =>
+        parseFloat(order.total_discounts)
+      );
       const shipping_revenue = _.sumBy(orders, (order) =>
         _.sumBy(order.shipping_lines, (line) => parseFloat(line.price))
       );
-      this.totalRevenue = displayCurrency(revenue);
-      eventBus.$emit("totalRevenueValue", parseFloat(revenue));
+      this.totalRevenue = displayCurrency(revenue + discounts);
+      eventBus.$emit("totalRevenueValue", parseFloat(revenue + discounts));
       updateData(this.data, NUMBER_OF_ORDERS, number_of_orders);
       updateData(
         this.data,
         ORDER_REVENUE,
-        displayCurrency(revenue - shipping_revenue - total_tax)
+        displayCurrency(revenue - shipping_revenue - total_tax + discounts)
       );
       updateData(
         this.data,

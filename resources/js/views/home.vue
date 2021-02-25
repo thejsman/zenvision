@@ -149,7 +149,7 @@ export default {
       const { startDate, endDate } = dateRange;
       const s_date = moment(startDate).format("MM-DD-YYYY");
       const e_date = moment(endDate).format("MM-DD-YYYY");
-      console.log("Called");
+
       const filteredOrders = this.backupOrders.filter((order) => {
         const orderDate = moment(order.created_on_shopify).format("MM-DD-YYYY");
         order.created_on_shopify = orderDate;
@@ -160,7 +160,7 @@ export default {
         );
       });
       this.dateRangeSelected = [moment(s_date), moment(e_date)];
-      this.allOrders = filteredOrders;
+      this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
       this.getMerchantfeesTotal(s_date, e_date);
     },
   },
@@ -208,7 +208,7 @@ export default {
         />
       </div>
     </div>
-    <b-modal id="shopify-connect" size="lg"  centered hide-footer hide-header>
+    <b-modal id="shopify-connect" size="lg" centered hide-footer hide-header>
       <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
     </b-modal>
   </Layout>
