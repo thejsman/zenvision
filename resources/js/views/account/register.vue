@@ -145,7 +145,7 @@
               <b-button
                 type="submit"
                 variant="primary"
-                class="btn-block btn-success"
+                class="btn-block"
                 :disabled="!phoneState || !emailState || !passwordState"
                 >Register</b-button
               >
