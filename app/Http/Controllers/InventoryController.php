@@ -68,9 +68,10 @@ class InventoryController extends Controller
         $shop_details = ShopifyStore::where('store_url', $shop_domain)->first();
 
         $productVariant = ShopifyProductVariant::where('inventory_item_id', $request->id)->where('store_id', $shop_details->id)->first();
-
-        $productVariant->cost = $request->cost;
-        $productVariant->save();
+        if ($productVariant) {
+            $productVariant->cost = $request->cost;
+            $productVariant->save();
+        }
 
         response()->json(['success' => 'success'], 200);
     }
