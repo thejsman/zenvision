@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
     margin: 0;
     font-family: "Poppins", sans-serif;
@@ -152,13 +153,12 @@ a.text-primary:focus {
 }
 
 .reportrange-text[data-v-267f4ee2] {
-    background: #fff;
+    background: #2a3043 !important;
     cursor: pointer;
-    padding: 5px 5px;
-    border: 0px;
+    border: 0px !important;
     width: 100%;
     background: #2a3142;
-    padding: 12px 20px 12px 20px;
+    padding: 12px 20px 12px 20px !important;
     transition: 0.3s;
     border-radius: 7px;
 }
@@ -180,28 +180,33 @@ th[data-v-aab6e828] {
 }
 
 .daterangepicker .calendar-table {
-    border: 1px solid #2a3142;
+    border: 1px solid #2a3142 !important;
     border-radius: 4px;
-    background-color: #2a3142;
+    background-color: #2a3142 !important;
 }
 
 .daterangepicker td.in-range {
-    background-color: #fa836f;
+    background-color: #fa836f !important;
     border-color: transparent;
-    color: #ffffff;
+    color: #ffffff !important;
     border-radius: 0;
 }
 
 .daterangepicker td.active,
 .daterangepicker td.active:hover {
-    background-color: #d8634f;
+    background-color: #d8634f !important;
     border-color: transparent;
     color: #fff;
 }
 
+td[data-v-aab6e828],
+th[data-v-aab6e828] {
+    background-color: #2a3242 !important;
+}
+
 .vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
     padding: 15px;
-    background: #2a3142;
+    background: #2a3142 !important;
     padding: 0;
     border: 0px;
     box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
@@ -253,7 +258,7 @@ th[data-v-aab6e828] {
     font-size: 12px;
     font-weight: 500;
     transition: 0.3s;
-    padding: 14px 25px;
+    padding: 14px 25px !important;
 }
 
 .daterangepicker .drp-buttons .btn:hover {
@@ -302,13 +307,6 @@ th[data-v-aab6e828] {
     padding: 13px 30px 10px 24px;
 }
 
-// @media (min-width: 576px) {
-//     .modal-dialog {
-//         max-width: 650px;
-//         margin: 1.75rem auto;
-//     }
-// }
-
 .modal-body {
     position: relative;
     flex: 1 1 auto;
@@ -352,7 +350,7 @@ th[data-v-aab6e828] {
 }
 
 .btn-cancel {
-    color: #ffffff;
+    color: #fff !important;
     background-color: #32394f;
     padding: 13px 23px 13px 23px;
     transition: 0.3s;
@@ -393,7 +391,7 @@ th[data-v-aab6e828] {
 
 .btn-success:focus,
 .btn-success.focus {
-    box-shadow: 0 0 0 0rem rgb(82 204 160 / 0%);
+    box-shadow: 0 0 0 0rem rgba(82, 204, 160, 0);
 }
 
 .btn-green {
@@ -449,7 +447,7 @@ th[data-v-aab6e828] {
     font-weight: 400;
     line-height: 1.5;
     height: 45px;
-    color: #bfc8e2;
+    color: #fff;
     vertical-align: middle;
     background: #2e3548;
     border: 1px solid #32394e;
@@ -489,7 +487,7 @@ th[data-v-aab6e828] {
 }
 
 .border-primary {
-    border: 2px #556ee6 solid;
+    border: 2px #556ee6 solid !important;
     cursor: pointer;
 }
 
@@ -546,13 +544,13 @@ th[data-v-aab6e828] {
 .btn:focus,
 .btn.focus {
     outline: 0;
-    box-shadow: 0 0 0 0rem rgb(85 110 230 / 0%);
+    box-shadow: 0 0 0 0rem rgba(85, 110, 230, 0);
 }
 
 .custom-select:focus {
     border-color: #363e54;
     outline: 0;
-    box-shadow: 0 0 0 0rem rgb(85 110 230 / 0%);
+    box-shadow: 0 0 0 0rem rgba(85, 110, 230, 0);
 }
 
 .btn-link:focus,
@@ -581,15 +579,15 @@ th[data-v-aab6e828] {
 }
 
 ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 0px #c8c8c8;
-    border-radius: 0px;
-    background-color: #32394e;
+    -webkit-box-shadow: inset 0 0 0px #c8c8c8 !important;
+    border-radius: 0px !important;
+    background-color: #32394e !important;
 }
 
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #556de6;
-    -webkit-box-shadow: inset 0 0 0px rgb(90 90 90 / 70%);
+    background-color: #556de6 !important;
+    -webkit-box-shadow: inset 0 0 0px rgba(90, 90, 90, 0.7);
 }
 
 .app-search span {
@@ -634,6 +632,22 @@ th[data-v-aab6e828] {
     margin-top: 3px;
 }
 
+::-webkit-input-placeholder {
+    color: #ffffff7d;
+}
+
+::-moz-placeholder {
+    color: #ffffff7d;
+}
+
+:-ms-input-placeholder {
+    color: #ffffff7d;
+}
+
+::-ms-input-placeholder {
+    color: #ffffff7d;
+}
+
 ::placeholder {
     color: #ffffff7d;
 }
@@ -657,7 +671,6 @@ th[data-v-aab6e828] {
     vertical-align: top;
 }
 
-// Disable Scrollbar visibility  on Home screen
 @-moz-document url-prefix() {
     /* Disable scrollbar Firefox */
     html {
@@ -665,15 +678,13 @@ th[data-v-aab6e828] {
     }
 }
 body {
-    scrollbar-width: none; /* Disable scrollbar Firefox */
-    -ms-overflow-style: none; /* Disable scrollbar IE 10+ */
+    scrollbar-width: none;
+    /* Disable scrollbar Firefox */
+    -ms-overflow-style: none;
+    /* Disable scrollbar IE 10+ */
     overflow-y: scroll;
 }
+
 body::-webkit-scrollbar {
     display: none;
 }
-
-// Style to disble scroll in Cogs and other b-table link
-// .b-table-sticky-header::-webkit-scrollbar {
-//     display: none;
-// }
