@@ -46,6 +46,7 @@ class ProductsController extends Controller
                 'sales_price' => $variant['price'],
                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
                 "size" => isset($sizeOption) ? $variant['option' . $sizeOption] : null,
+                'inventory_item_id' => $variant['inventory_item_id']
                 // 'cost' => 0,
                 // "shipping_cost" => 0
             );
@@ -95,6 +96,7 @@ class ProductsController extends Controller
                 'sales_price' => $variant['price'],
                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
                 "size" => isset($sizeOption) ? $variant['option' . $sizeOption] : null,
+                'inventory_item_id' => $variant['inventory_item_id']
                 // 'cost' => 0,
                 // "shipping_cost" => 0
             );
