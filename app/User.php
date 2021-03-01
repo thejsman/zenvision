@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'lastname', 'email', 'phone', 'password'
+        'firstname', 'lastname', 'email', 'phone', 'password',
     ];
 
     /**
@@ -62,5 +62,9 @@ class User extends Authenticatable
     public function getStripeAccountConnectIds()
     {
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
+    }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
