@@ -146,8 +146,6 @@ export default {
     eventBus.$on("updateSubscription", async () => {
       await this.getSubscriptionData();
     });
-
-
   },
   methods: {
     assignData(refundTotal, orders) {
@@ -210,6 +208,7 @@ export default {
             data.length
           );
         } else {
+          this.subscriptionData = 0;
           this.updateSubscriptionData(
             this.data,
             SUBSCRIPTION_COST,
@@ -249,7 +248,7 @@ export default {
       subscriptions.forEach((sub) => {
         subTotal += this.calculateSubscription(sub);
       });
-     
+
       return subTotal;
     },
     calculateSubscription(sub) {
@@ -279,7 +278,6 @@ export default {
         while (startDate <= endDate) {
           total += parseFloat(sub.subscription_price);
           startDate = new Date(startDate.setMonth(startDate.getMonth() + 1));
-         
         }
         return total;
       } else if (sub.billing_period === "Every 3 months") {
@@ -329,7 +327,6 @@ export default {
           displayCurrency(totalChargeback)
         );
       } catch (err) {
-        
         updateData(this.data, CHARGEBACKS_TOTAL, displayCurrency(0));
       }
     },
