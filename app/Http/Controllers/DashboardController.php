@@ -8,6 +8,7 @@ use App\ShopifyStore;
 use App\ShopifyOrder;
 use App\Http\CustomRequests;
 use App\FacebookAd;
+use App\ShopifyOrderProduct;
 
 class DashboardController extends Controller
 {
@@ -131,5 +132,19 @@ class DashboardController extends Controller
             // $store_balance +=  array_column($response['balance'], 'amount')[0];
         }
         return $store_balance;
+    }
+
+    public function getAvgUnitsPerOrder()
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+
+        $orders =  ShopifyOrder::whereIn('store_id', $enabled_on_dashboard)->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->pluck('order_id');
+        if (count($orders)) {
+            $productsCount = ShopifyOrderProduct::whereIn('order_id', $orders)->sum('quantity');
+            return round($productsCount / count($orders), 2);
+        } else {
+            return 0;
+        }
     }
 }

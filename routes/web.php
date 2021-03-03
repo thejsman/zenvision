@@ -35,6 +35,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('msdebts', 'DashboardController@msdebts');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
     Route::get('shopifybalance', 'DashboardController@getShopifyStoreBalance');
+    Route::get('getavgunitperorder', 'DashboardController@getAvgUnitsPerOrder');
 
 
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');

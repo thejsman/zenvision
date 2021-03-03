@@ -113,19 +113,9 @@ export default {
       );
       this.totalRevenue = displayCurrency(revenue + total_tax);
 
-      const average_order = displayCurrency(
-        (revenue - shipping_revenue) / number_of_orders
-      );
+      const average_order = displayCurrency(revenue / number_of_orders);
 
       updateData(this.data, AVERAGE_ORDER_VALUE, average_order);
-
-      const average_unit = number_of_products / number_of_orders || 0;
-
-      updateData(
-        this.data,
-        AVERAGE_UNITS_PER_ORDER,
-        displayNumber(average_unit)
-      );
 
       const average_profit = displayCurrency(
         this.totalProfitValue / number_of_orders
@@ -144,6 +134,9 @@ export default {
         US_ORDERS_PERCENTAGE,
         displayNumber(average_us_percentage)
       );
+      // Avg Unit Per Order
+      this.getAvgUnitCount();
+
       // Development - saving network requst
       this.getAbandonedCartCount();
     },
@@ -155,6 +148,16 @@ export default {
       } catch (error) {
         console.log(error);
         updateData(this.data, ABANDONED_CART, 0);
+      }
+    },
+    async getAvgUnitCount() {
+      try {
+        const result = await axios.get("getavgunitperorder");
+        const count = result.data;
+        updateData(this.data, AVERAGE_UNITS_PER_ORDER, count);
+      } catch (error) {
+        console.log(error);
+        updateData(this.data, AVERAGE_UNITS_PER_ORDER, 0);
       }
     },
   },

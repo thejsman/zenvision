@@ -318,7 +318,7 @@ export default {
     async getCogsData() {
       try {
         const result = await axios.get("cogs");
-        console.log({ result });
+        console.log("Check this", { result });
         this.items = result.data.products;
         this.is_loading = false;
         this.preItems = JSON.parse(JSON.stringify(this.items));
