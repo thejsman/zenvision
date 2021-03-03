@@ -113,9 +113,7 @@ export default {
       );
       this.totalRevenue = displayCurrency(revenue + total_tax);
 
-      const average_order = displayCurrency(
-        (revenue - shipping_revenue) / number_of_orders
-      );
+      const average_order = displayCurrency(revenue / number_of_orders);
 
       updateData(this.data, AVERAGE_ORDER_VALUE, average_order);
 
