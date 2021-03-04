@@ -16,8 +16,8 @@ class ShopifyOrder extends Model
         'shipping_lines' => 'array'
     ];
 
-    public function getCogs() {
-        return $this->hasMany(ShopifyOrderProduct::class, 'order_id', 'order_id')->get()->sum('cogs');
+    public function getCogs()
+    {
+        return $this->hasMany(ShopifyOrderProduct::class, 'order_id', 'order_id')->get()->sum('total_cost');
     }
-
 }

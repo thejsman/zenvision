@@ -15,7 +15,7 @@ class CogsController extends Controller
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
 
-        $products = ShopifyProductVariant::select('id', 'variant_id', 'product_title', 'sku', 'color', 'size', 'sales_price', 'cost', 'shipping_cost')->whereIn('store_id', $enabled_on_dashboard)->get();
+        $products = ShopifyProductVariant::select('id', 'variant_id', 'product_title',  'sku', 'color', 'size', 'sales_price', 'cost', 'shipping_cost')->whereIn('store_id', $enabled_on_dashboard)->get();
         return [
             'products' => $products
         ];
@@ -35,7 +35,7 @@ class CogsController extends Controller
         $lineItems = ShopifyOrderProduct::where('variant_id', $varian_id)->get();
         foreach ($lineItems as $lineItem) {
             $lineItem_cogs = $lineItem->quantity * $cogs;
-            $lineItem->cogs = $lineItem_cogs;
+            $lineItem->total_cost = $lineItem_cogs;
             $lineItem->save();
         }
     }
@@ -43,6 +43,6 @@ class CogsController extends Controller
     {
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        return  ShopifyOrderProduct::whereIn('store_id', $enabled_on_dashboard)->whereNull('cogs')->count();
+        return  ShopifyOrderProduct::whereIn('store_id', $enabled_on_dashboard)->whereNull('total_cost')->count();
     }
 }
