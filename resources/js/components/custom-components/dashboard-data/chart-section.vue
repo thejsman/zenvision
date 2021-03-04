@@ -96,7 +96,7 @@ export default {
           const data_per_day = dates.map((day) => {
             const sum = _.sumBy(this.chartData, (order) => {
               if (moment(order.created_on_shopify).format("M/D/YY") === day) {
-                return parseFloat(order.total_price - order.cogs);
+                return parseFloat(order.total_price - order.total_cost);
               } else {
                 return 0;
               }
@@ -138,7 +138,7 @@ export default {
                   "[]"
                 )
               ) {
-                return parseFloat(order.total_price - order.cogs);
+                return parseFloat(order.total_price - order.total_cost);
               } else {
                 return 0;
               }
@@ -148,7 +148,7 @@ export default {
           //   const data_per_day = result.map((week) => {
           //     const sum = _.sumBy(this.chartData, (order) => {
           //       if (moment(order.created_on_shopify).format("M/D/YY") === week) {
-          //         return parseFloat(order.total_price - order.cogs);
+          //         return parseFloat(order.total_price - order.total_cost);
           //       } else {
           //         return 0;
           //       }
@@ -164,7 +164,7 @@ export default {
             const sum = _.sumBy(this.chartData, (order) => {
               let googleSum = 0;
               if (moment(order.created_on_shopify).format("MMM") === month) {
-                return parseFloat(order.total_price - order.cogs);
+                return parseFloat(order.total_price - order.total_cost);
               } else {
                 return 0;
               }

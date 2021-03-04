@@ -125,7 +125,7 @@ export default {
           this.yesterday
         ) {
           yesterdaysOrder +=
-            order.total_price - order.cogs - order.total_discounts;
+            order.total_price - order.total_cost - order.total_discounts;
         }
       });
 
@@ -138,7 +138,7 @@ export default {
           _.sumBy(this.orders, (order) => {
             if (moment(order.created_on_shopify).format("MM-DD-YYYY") === day) {
               return parseFloat(
-                order.total_price - order.cogs - order.total_discounts
+                order.total_price - order.total_cost - order.total_discounts
               );
             } else {
               return 0;
