@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ShopifyStore;
 use App\ShopifyOrder;
 use App\ShopifyOrderProduct;
+use App\ShopifyProductVariant;
 
 
 class WebhookController extends Controller
@@ -24,7 +25,6 @@ class WebhookController extends Controller
             'order_id' => $request->id,
             'order_number' => $request->order_number,
             'created_on_shopify' => $request->created_at,
-            'test' => $request->test,
             'total_price' => $request->total_price,
             'total_tax' => $request->total_tax,
             'currency' => $request->currency,
@@ -43,6 +43,7 @@ class WebhookController extends Controller
             'current_total_duties_set' => $request->current_total_duties_set,
             'shipping_lines' => $request->shipping_lines,
         );
+
         ShopifyOrder::create($new_order);
         $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number);
     }
@@ -67,7 +68,6 @@ class WebhookController extends Controller
                 $order_exists->order_id = $request->id;
                 $order_exists->order_number = $request->order_number;
                 $order_exists->created_on_shopify = $request->created_at;
-                $order_exists->test = $request->test;
                 $order_exists->total_price = $request->total_price;
                 $order_exists->total_tax = $request->total_tax;
                 $order_exists->currency = $request->currency;
@@ -131,12 +131,23 @@ class WebhookController extends Controller
                 'fulfillment_service' => $line_item['fulfillment_service'],
                 'product_id' => $line_item['product_id'],
                 'price' => $line_item['price'],
+                'total_cost' => $this->getTotalCost($line_item['variant_id']),
                 'total_discount' => $line_item['total_discount'],
                 'fulfillment_status' => $line_item['fulfillment_status'],
                 'duties' => $line_item['duties'],
                 'tax_lines' => $line_item['tax_lines'],
             );
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
+        }
+    }
+
+    public function getTotalCost($variant_id)
+    {
+        $product = ShopifyProductVariant::where('variant_id', $variant_id)->select('cost', 'shipping_cost')->first();
+        if ($product == null) {
+            return null;
+        } else {
+            return $product->cost + $product->shipping_cost;
         }
     }
 }
