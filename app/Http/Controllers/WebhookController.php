@@ -100,7 +100,9 @@ class WebhookController extends Controller
 
     public function ordersDelete(Request $request)
     {
-        $order = ShopifyOrder::where('order_id',  $request->id)->first();
+
+        $order = ShopifyOrder::where('order_id', $request->id)->first();
+
         $order->is_deleted = true;
         $order->save();
     }

@@ -208,6 +208,7 @@ export default {
             data.length
           );
         } else {
+          this.subscriptionData = 0;
           this.updateSubscriptionData(
             this.data,
             SUBSCRIPTION_COST,
