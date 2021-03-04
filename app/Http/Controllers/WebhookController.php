@@ -100,7 +100,7 @@ class WebhookController extends Controller
 
     public function ordersDelete(Request $request)
     {
-        $order = ShopifyOrder::where('order_id', '=', $request->id);
+        $order = ShopifyOrder::where('order_id',  $request->id)->first();
         $order->is_deleted = true;
         $order->save();
     }
@@ -131,7 +131,7 @@ class WebhookController extends Controller
                 'fulfillment_service' => $line_item['fulfillment_service'],
                 'product_id' => $line_item['product_id'],
                 'price' => $line_item['price'],
-                'total_cost' => $this->getTotalCost($line_item['variant_id']),
+                'total_cost' => $this->getTotalCost($line_item['variant_id']) * $line_item['quantity'],
                 'total_discount' => $line_item['total_discount'],
                 'fulfillment_status' => $line_item['fulfillment_status'],
                 'duties' => $line_item['duties'],
