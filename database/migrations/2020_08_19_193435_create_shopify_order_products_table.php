@@ -27,9 +27,9 @@ class CreateShopifyOrderProductsTable extends Migration
             $table->string('variant_title')->nullable();
             $table->string('fulfillment_service');
             $table->bigInteger('product_id');
-            $table->decimal('price',8,2);
-            $table->decimal('cogs')->nullable();
-            $table->decimal('total_discount', 8,2);
+            $table->decimal('price', 8, 2);
+            $table->decimal('total_cost')->nullable();
+            $table->decimal('total_discount', 8, 2);
             $table->string('fulfillment_status')->nullable();
             $table->json('duties')->nullable();
             $table->json('tax_lines')->nullable();

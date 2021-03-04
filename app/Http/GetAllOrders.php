@@ -15,7 +15,7 @@ class GetAllOrders
 
         $param = [];
         // how to get specific fields only
-        $param['fields'] = 'id, order_number, name, line_items, created_at, test, total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
+        $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
         // order record per page
         $param['limit'] = 250;
 
@@ -60,7 +60,7 @@ class GetAllOrders
                             'order_id' => $order['id'],
                             'order_number' => $order['order_number'],
                             'created_on_shopify' => $order['created_at'],
-                            'test' => $order['test'],
+
                             'total_price' => $order['total_price'],
                             'total_tax' => $order['total_tax'],
                             'currency' => $order['currency'],

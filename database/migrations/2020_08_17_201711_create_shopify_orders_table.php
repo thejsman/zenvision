@@ -20,16 +20,15 @@ class CreateShopifyOrdersTable extends Migration
             $table->bigInteger('order_id')->unique();
             $table->integer('order_number');
             $table->timestamp('created_on_shopify');
-            $table->boolean('test');
             $table->decimal('total_price', 8, 2);
             $table->decimal('total_tax', 6, 2);
             $table->string('currency');
             $table->string('financial_status');
-            $table->decimal('total_discounts', 6,2);
+            $table->decimal('total_discounts', 6, 2);
             $table->string('referring_site')->nullable();
             $table->string('landing_site')->nullable();
             $table->string('cancelled_at')->nullable();
-            $table->decimal('total_price_usd',8,2);
+            $table->decimal('total_price_usd', 8, 2);
             $table->json('discount_applications')->nullable();
             $table->string('fulfillment_status')->nullable();
             $table->json('tax_lines')->nullable();

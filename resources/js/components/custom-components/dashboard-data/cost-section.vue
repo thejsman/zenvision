@@ -181,7 +181,7 @@ export default {
       try {
         const result = await axios.get("/cogsicon");
         const showIcon = result.data === 0 ? false : true;
-        const cogs = _.sumBy(orders, (order) => parseFloat(order.cogs));
+        const cogs = _.sumBy(orders, (order) => parseFloat(order.total_cost));
         this.cogsTotal = cogs;
 
         this.updateCogsData(
