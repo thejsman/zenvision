@@ -43,6 +43,9 @@ class CogsController extends Controller
     {
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        return  ShopifyOrderProduct::whereIn('store_id', $enabled_on_dashboard)->whereNull('total_cost')->count();
+        $cost_count =  ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('cost')->count();
+        $shipping_count = ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('shipping_cost')->count();
+
+        return $cost_count + $shipping_count;
     }
 }
