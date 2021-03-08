@@ -39,6 +39,9 @@ export default {
     return {
       totalProfitValue: 0,
       data: [
+        /*
+
+        // Disabling Conversion Rate & Abandoned Cart
         {
           id: 1,
           title: CONVERSION_RATE,
@@ -51,6 +54,7 @@ export default {
           value: `0`,
           loading: true,
         },
+        */
         {
           id: 3,
           title: AVERAGE_ORDER_VALUE,
@@ -138,7 +142,7 @@ export default {
       this.getAvgUnitCount();
 
       // Development - saving network requst
-      this.getAbandonedCartCount();
+      //   this.getAbandonedCartCount();
     },
     async getAbandonedCartCount() {
       try {
