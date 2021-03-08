@@ -154,7 +154,7 @@ export default {
           const data_per_month = months.map((month) => {
             const sum = _.sumBy(this.chartData, (order) => {
               let googleSum = 0;
-              if (moment(order.created_on_shopify).format("MMM") === month) {
+              if (moment(order.created_on_shopify).format("MMM YY") === month) {
                 return parseFloat(order.total_price - order.total_cost);
               } else {
                 return 0;
@@ -177,7 +177,7 @@ export default {
           );
 
           d.setMonth(d.getMonth() + i);
-          return moment(d).format("MMM");
+          return moment(d).format("MMM YY");
         }
       );
       this.polarBarChart.data.labels = months;
