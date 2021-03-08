@@ -85,7 +85,7 @@ export default {
           "days"
         );
         this.dateDifference = dateDiff;
-        if (dateDiff <= 6) {
+        if (dateDiff <= 7) {
           const dates = [...Array(dateDiff + 1)].map((_, i) => {
             const d = new Date(this.ChartdateRange[0]);
             d.setDate(d.getDate() + i);
@@ -105,7 +105,7 @@ export default {
           });
           const final = dayArray.map((day) => parseFloat(day).toFixed(2));
           this.polarBarChart.data.series = [final];
-        } else if (dateDiff <= 120 && dateDiff >= 7) {
+        } else if (dateDiff <= 120 && dateDiff >= 8) {
           var result = [];
           if (this.ChartdateRange[1].isBefore(this.ChartdateRange[0])) {
             console.log("End date must be greated than start date.");
@@ -145,16 +145,7 @@ export default {
             });
             weekArray.push(sum);
           }
-          //   const data_per_day = result.map((week) => {
-          //     const sum = _.sumBy(this.chartData, (order) => {
-          //       if (moment(order.created_on_shopify).format("M/D/YY") === week) {
-          //         return parseFloat(order.total_price - order.total_cost);
-          //       } else {
-          //         return 0;
-          //       }
-          //     });
-          //     weekArray.push(sum);
-          //   });
+
           const final = weekArray.map((day) => parseFloat(day).toFixed(2));
           this.polarBarChart.data.series = [final];
         } else {
@@ -184,7 +175,6 @@ export default {
           const d = new Date(
             moment(this.ChartdateRange[0]).format("MM-DD-YYYY")
           );
-          // const d = moment(this.ChartdateRange[0]).format("DD-MM-YYYY");
 
           d.setMonth(d.getMonth() + i);
           return moment(d).format("MMM");
