@@ -22,7 +22,7 @@ import ShopifyConnect from "../components/custom-components/modals/ShopifyConnec
 
 import moment from "moment";
 import { mapState, mapGetters, mapActions } from "vuex";
-import dayjs from "dayjs";
+
 import { eventBus } from "../app";
 
 export default {
@@ -100,14 +100,7 @@ export default {
     async getShopifyStoreData() {
       try {
         const {
-          data: {
-            enabled_on_dashboard,
-            refund_total,
-            orders,
-            number_of_products,
-            paypalAccounts,
-            paypalTransactions,
-          },
+          data: { orders, paypalAccounts, paypalTransactions },
         } = await axios.get("shopifystoredata");
 
         //assign values
@@ -125,23 +118,21 @@ export default {
         console.log(error);
       }
     },
-    getMerchantfeesTotal(s_date, e_date) {
+    async getMerchantfeesTotal(s_date, e_date) {
       let total = 0;
+      const result = await axios.get("getStripeTransactions");
 
-      //   this.paypalTransactions.map((transaction) => {
-      //     const orderDate = moment(transaction.transaction_updated_date).format(
-      //       "MM-DD-YYYY"
-      //     );
-      //     console.log(transaction.transaction_info.fee_amount.value);
-      //     if (
-      //       new Date(orderDate) >= new Date(s_date) &&
-      //       new Date(orderDate) <= new Date(e_date)
-      //     ) {
-      //       total += Math.abs(
-      //         parseFloat(transaction.transaction_info.fee_amount.value)
-      //       );
-      //     }
-      //   });
+      let stripeTransactions = result.data;
+      stripeTransactions.map((transaction) => {
+        const orderDate = moment.unix(transaction.created).format("MM-DD-YYYY");
+        console.log({ orderDate });
+        if (
+          new Date(orderDate) >= new Date(s_date) &&
+          new Date(orderDate) <= new Date(e_date)
+        ) {
+          total += parseFloat(transaction.fee / 100);
+        }
+      });
 
       this.merchantFeesTotal = total;
     },
@@ -160,8 +151,8 @@ export default {
         );
       });
       this.dateRangeSelected = [moment(s_date), moment(e_date)];
-      this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
       this.getMerchantfeesTotal(s_date, e_date);
+      this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
     },
   },
 };
