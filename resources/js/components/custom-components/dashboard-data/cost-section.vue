@@ -321,6 +321,24 @@ export default {
             totalChargeback += parseFloat(dispute.amount);
           });
         }
+
+        const stripeResult = await axios.get("getstripechargbacks");
+
+        let stripeChargebacks = stripeResult.data;
+        if (stripeChargebacks.length > 1) {
+          stripeChargebacks.forEach((sc) => {
+            const orderDate = moment.unix(sc.created).format("MM-DD-YYYY");
+            if (
+              new Date(orderDate) >= new Date(s_date) &&
+              new Date(orderDate) <= new Date(e_date)
+            ) {
+              if (sc.status === "charge_refunded" || sc.status === "lost") {
+                totalChargeback += parseFloat(sc.amount);
+              }
+            }
+          });
+        }
+
         updateData(
           this.data,
           CHARGEBACKS_TOTAL,

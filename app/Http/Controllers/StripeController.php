@@ -26,23 +26,29 @@ class StripeController extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $code);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
-        $headers[] = 'Authorization: Bearer sk_test_51HuhJxFYxNaGdsEt7j5ZlD9UN7ksUzcXvJy9UNvcfuf55pzIOGOm1tVho1091eW1q8Qn9wTs6oBCLdPNLSy3Z0DU00FXjCeYZR';
+        $headers[] = 'Authorization: Bearer ' . env('STRIPE_ACCESS_TOKEN');
         //Windows Dev system disable SSL
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
 
         $response = json_decode($result, true);
-        $stripeData = [];
-        $stripeData['user_id'] = Auth::user()->id;
-        $stripeData['access_token']  =  $response['access_token'];
-        $stripeData['refresh_token']  = $response['refresh_token'];
-        $stripeData['stripe_publishable_key']  = $response['stripe_publishable_key'];
-        $stripeData['stripe_user_id']  = $response['stripe_user_id'];
 
-        $result2 =  Stripe::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+        if ($response) {
+
+            $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
+            $stripeData = [];
+            $stripeData['user_id'] = Auth::user()->id;
+            $stripeData['access_token']  =  $response['access_token'];
+            $stripeData['refresh_token']  = $response['refresh_token'];
+            $stripeData['stripe_publishable_key']  = $response['stripe_publishable_key'];
+            $stripeData['stripe_user_id']  = $response['stripe_user_id'];
+            $stripeData['name'] = $account_name;
+
+            Stripe::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+        }
 
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
@@ -69,18 +75,18 @@ class StripeController extends Controller
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
         $availableBalance = [];
-        if($stripeAccounts->count()) {          
-            foreach($stripeAccounts as $account) {
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
                 //Windows Dev system disable SSL
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 $headers = array(
                     'Stripe-Account:' . $account->stripe_user_id,
                     'Authorization: Bearer ' . $account->access_token,
-                );                
+                );
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 $result = curl_exec($ch);
                 if (curl_errno($ch)) {
@@ -89,13 +95,12 @@ class StripeController extends Controller
                 }
                 curl_close($ch);
                 $response = json_decode($result, true);
-               
-              array_push($availableBalance,  $response['available'][0]);
-            } 
+
+                array_push($availableBalance,  $response['available'][0]);
+            }
             return $availableBalance;
-        } 
-        else {
-          return   $availableBalance;
+        } else {
+            return   $availableBalance;
         }
     }
 
@@ -105,43 +110,115 @@ class StripeController extends Controller
         $stripeAccounts = $user->getStripeAccountConnectIds();
         $stripeTransactions = [];
 
-        if($stripeAccounts->count()) {
-            foreach($stripeAccounts as $account) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-                //Windows Dev system disable SSL
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
 
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
                 $headers = array(
                     'Stripe-Account:' . $account->stripe_user_id,
                     'Authorization: Bearer ' . $account->access_token,
                 );
+
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        
+
                 $result = curl_exec($ch);
+
                 if (curl_errno($ch)) {
                     echo 'Error:' . curl_error($ch);
                     return [];
                 }
                 curl_close($ch);
-                $response = json_decode($result, true);
-              
-                if(count($response['data'])) {
-                    array_push($stripeTransactions, $response['data']);
-                }               
-            }
-            return $stripeTransactions;
 
+                $response = json_decode($result, true);
+
+                if (count($response['data'])) {
+                    array_push($stripeTransactions, $response['data']);
+                }
+            }
+
+            return $stripeTransactions;
         } else {
             return $stripeTransactions;
         }
-       
+    }
+
+    public function getStripeAccountInfo($account_id, $access_token)
+    {
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/accounts/' . $account_id);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $headers = array(
+            'Stripe-Account:' . $account_id,
+            'Authorization: Bearer ' . $access_token,
+        );
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+            return [];
+        }
+        curl_close($ch);
+
+        $response = json_decode($result, true);
+        if ($response) {
+            return $response['business_profile']['name'];
+        } else {
+            return null;
+        }
+    }
+
+    public function getStripeChargebacks()
+    {
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripe_chargebacks = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/disputes');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+                $headers = array(
+                    'Stripe-Account:' . $account->stripe_user_id,
+                    'Authorization: Bearer ' . $account->access_token,
+                );
+
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+                $result = curl_exec($ch);
+
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                    return [];
+                }
+                curl_close($ch);
+
+                $response = json_decode($result, true);
+
+                if (count($response['data'])) {
+                    array_push($stripe_chargebacks, $response['data']);
+                }
+            }
+
+            return $stripe_chargebacks;
+        } else {
+            return $stripe_chargebacks;
+        }
     }
 }

@@ -47,7 +47,7 @@
       Paypal
     </b-dropdown-item>
     <b-dropdown-item
-      href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IVj0p0IFc5yVVUGsGdtvL8aX0kQocmvQ&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect"
+      href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect"
     >
       <img
         src="/images/icons/stripe-icon.svg"

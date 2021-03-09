@@ -1,20 +1,21 @@
 <template>
   <div class="flex-start pl-1">
     <div class="d-flex flex-row dropdown">
-      <div v-for="Account in stripeAccounts" :key="Account.id">
+      <div v-for="stripeAccount in stripeAccounts" :key="stripeAccount.id">
         <div
-          class="border rounded p-2 ml-1 dropbtn"
-          :class="{ 'border-primary': Account.enabled_on_dashboard }"
-          @click="disableFeature ? handleClick(Account) : null"
-          v-b-tooltip.hover="Account.stripe_user_id"
+          class="border rounded p-2 ml-2 dropbtn"
+          :class="{ 'border-primary': stripeAccount.enabled_on_dashboard }"
+          @click="disableFeature ? handleClick(stripeAccount) : null"
+          v-b-tooltip.hover="stripeAccount.name"
         >
           <img src="/images/icons/stripe-icon.svg" alt height="21" />
         </div>
+
         <div class="dropdown-content">
-          <a href="#" @click="handleClick(Account)" v-if="disableFeature">
-            {{ Account.enabled_on_dashboard ? "Disable" : "Enable" }}</a
+          <a href="#" @click="handleClick(stripeAccount)" v-if="disableFeature">
+            {{ stripeAccount.enabled_on_dashboard ? "Disable" : "Enable" }}</a
           >
-          <a href="#" @click="showMsgBoxOne(Account, $event)">Remove</a>
+          <a href="#" @click="showMsgBoxOne(stripeAccount, $event)">Remove</a>
         </div>
       </div>
     </div>
@@ -42,7 +43,6 @@ export default {
     async getStripeAccounts() {
       try {
         const result = await axios.get("getstripeaccounts");
-
         this.stripeAccounts = result.data;
       } catch (err) {
         console.log(err);
