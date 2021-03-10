@@ -122,19 +122,23 @@ export default {
       let total = 0;
       const result = await axios.get("getStripeTransactions");
 
-      let stripeTransactions = result.data;
-      stripeTransactions.map((transaction) => {
-        const orderDate = moment.unix(transaction.created).format("MM-DD-YYYY");
-        console.log({ orderDate });
-        if (
-          new Date(orderDate) >= new Date(s_date) &&
-          new Date(orderDate) <= new Date(e_date)
-        ) {
-          total += parseFloat(transaction.fee / 100);
-        }
+      let { stripeTransactions } = result.data;
+
+      stripeTransactions.forEach((sTransaction) => {
+        sTransaction.forEach((st) => {
+          const orderDate = moment.unix(st.created).format("MM-DD-YYYY");
+
+          if (
+            new Date(orderDate) >= new Date(s_date) &&
+            new Date(orderDate) <= new Date(e_date)
+          ) {
+            total += parseFloat(st.fee / 100);
+          }
+        });
       });
 
       this.merchantFeesTotal = total;
+      eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
     },
     handleDateChange(dateRange) {
       const { startDate, endDate } = dateRange;
@@ -153,6 +157,8 @@ export default {
       this.dateRangeSelected = [moment(s_date), moment(e_date)];
       this.getMerchantfeesTotal(s_date, e_date);
       this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
+
+      eventBus.$emit("dateChanged", { s_date, e_date });
     },
   },
 };

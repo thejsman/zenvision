@@ -117,6 +117,7 @@ class StripeController extends Controller
                 curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_POSTFIELDS, "limit=100");
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
                 $headers = array(
@@ -140,10 +141,7 @@ class StripeController extends Controller
                     array_push($stripeTransactions, $response['data']);
                 }
             }
-
-            return $stripeTransactions;
-        } else {
-            return $stripeTransactions;
+            return ['stripeTransactions' => $stripeTransactions];
         }
     }
 
@@ -192,6 +190,7 @@ class StripeController extends Controller
                 curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/disputes');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_POSTFIELDS, "limit=100");
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
                 $headers = array(
@@ -215,10 +214,7 @@ class StripeController extends Controller
                     array_push($stripe_chargebacks, $response['data']);
                 }
             }
-
-            return $stripe_chargebacks;
-        } else {
-            return $stripe_chargebacks;
         }
+        return  ['stripeChargebacks' => $stripe_chargebacks];
     }
 }

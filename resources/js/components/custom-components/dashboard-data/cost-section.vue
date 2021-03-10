@@ -146,6 +146,12 @@ export default {
     eventBus.$on("updateSubscription", async () => {
       await this.getSubscriptionData();
     });
+    eventBus.$on("merchantFeeUpdated", (fees) => {
+      updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
+    });
+    eventBus.$on("dateChanged", ({ s_date, e_date }) => {
+      this.getChargebackTotal(s_date, e_date);
+    });
   },
   methods: {
     assignData(refundTotal, orders) {
@@ -160,7 +166,7 @@ export default {
       updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
       updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
       this.getSubscriptionData();
-      this.getChargebackTotal();
+      //   this.getChargebackTotal();
     },
 
     handleSubscriptionClick() {
@@ -311,7 +317,7 @@ export default {
         return total;
       }
     },
-    async getChargebackTotal() {
+    async getChargebackTotal(s_date, e_date) {
       try {
         const result = await axios.get("getshopifydisputes");
         const { disputes } = result.data;
@@ -324,21 +330,36 @@ export default {
 
         const stripeResult = await axios.get("getstripechargbacks");
 
-        let stripeChargebacks = stripeResult.data;
-        if (stripeChargebacks.length > 1) {
-          stripeChargebacks.forEach((sc) => {
-            const orderDate = moment.unix(sc.created).format("MM-DD-YYYY");
+        let { stripeChargebacks } = stripeResult.data;
+
+        for (let key in stripeChargebacks) {
+          stripeChargebacks[key].forEach((sc) => {
+            console.log(new Date(sc.created * 1000));
             if (
-              new Date(orderDate) >= new Date(s_date) &&
-              new Date(orderDate) <= new Date(e_date)
+              new Date(sc.created * 1000) >= new Date(s_date) &&
+              new Date(sc.created * 1000) <= new Date(e_date)
             ) {
-              if (sc.status === "charge_refunded" || sc.status === "lost") {
-                totalChargeback += parseFloat(sc.amount);
+              if (
+                stripeChargeback.status === "charge_refunded" ||
+                stripeChargeback.status === "lost"
+              ) {
+                totalChargeback += parseFloat(stripeChargeback.amount);
               }
             }
           });
         }
 
+        //    if (
+        //         new Date(orderDate) >= new Date(s_date) &&
+        //         new Date(orderDate) <= new Date(e_date)
+        //       ) {
+        //         if (
+        //           stripeChargeback.status === "charge_refunded" ||
+        //           stripeChargeback.status === "lost"
+        //         ) {
+        //           totalChargeback += parseFloat(stripeChargeback.amount);
+        //         }
+        //       }
         updateData(
           this.data,
           CHARGEBACKS_TOTAL,
