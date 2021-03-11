@@ -34,7 +34,7 @@ import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import { moment } from "moment";
-import { displayCurrency, updateData } from "../../../utils";
+import { displayCurrency, updateData, setLoading } from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
 import {
   COGS_TOTAL,
@@ -152,6 +152,7 @@ export default {
       updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
     });
     eventBus.$on("dateChanged", ({ s_date, e_date }) => {
+      setLoading(this.data);
       this.getChargebackTotal(s_date, e_date);
     });
   },
@@ -331,24 +332,21 @@ export default {
         }
 
         const stripeResult = await axios.get("getstripechargbacks");
-        console.log(stripeResult);
+
         let { stripeChargebacks } = stripeResult.data;
 
         for (let key in stripeChargebacks) {
           stripeChargebacks[key].forEach((sc) => {
-            // if (
-            //   new Date(sc.created * 1000) >= new Date(s_date) &&
-            //   new Date(sc.created * 1000) <= new Date(e_date)
-            // ) {
-            //   if (
-            //     stripeChargeback.status === "charge_refunded" ||
-            //     stripeChargeback.status === "lost"
-            //   ) {
-            //     totalChargeback += parseFloat(stripeChargeback.amount);
-            //   }
-            // }
-            if (sc.status === "charge_refunded" || sc.status === "lost") {
-              totalChargeback += parseFloat(sc.amount / 100);
+            const oDate = new Date(sc.created * 1000);
+
+            if (
+              new Date(oDate) >= new Date(s_date) &&
+              new Date(oDate) <= new Date(e_date)
+            ) {
+              console.log("We are in", sc.status);
+              if (sc.status === "charge_refunded" || sc.status === "lost") {
+                totalChargeback += parseFloat(sc.amount / 100);
+              }
             }
           });
         }
