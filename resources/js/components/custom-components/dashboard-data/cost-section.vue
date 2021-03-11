@@ -52,6 +52,7 @@ export default {
     return {
       subscriptionData: 0,
       cogsTotal: 0,
+      chargebackTotal: 0,
       data: [
         {
           id: 1,
@@ -116,7 +117,8 @@ export default {
           this.refundTotal +
           this.totalDiscount +
           this.subscriptionData +
-          this.cogsTotal
+          this.cogsTotal +
+          this.chargebackTotal
       );
 
       eventBus.$emit("totalCostValue", totalCost);
@@ -329,22 +331,24 @@ export default {
         }
 
         const stripeResult = await axios.get("getstripechargbacks");
-
+        console.log(stripeResult);
         let { stripeChargebacks } = stripeResult.data;
 
         for (let key in stripeChargebacks) {
           stripeChargebacks[key].forEach((sc) => {
-            console.log(new Date(sc.created * 1000));
-            if (
-              new Date(sc.created * 1000) >= new Date(s_date) &&
-              new Date(sc.created * 1000) <= new Date(e_date)
-            ) {
-              if (
-                stripeChargeback.status === "charge_refunded" ||
-                stripeChargeback.status === "lost"
-              ) {
-                totalChargeback += parseFloat(stripeChargeback.amount);
-              }
+            // if (
+            //   new Date(sc.created * 1000) >= new Date(s_date) &&
+            //   new Date(sc.created * 1000) <= new Date(e_date)
+            // ) {
+            //   if (
+            //     stripeChargeback.status === "charge_refunded" ||
+            //     stripeChargeback.status === "lost"
+            //   ) {
+            //     totalChargeback += parseFloat(stripeChargeback.amount);
+            //   }
+            // }
+            if (sc.status === "charge_refunded" || sc.status === "lost") {
+              totalChargeback += parseFloat(sc.amount / 100);
             }
           });
         }
@@ -360,12 +364,14 @@ export default {
         //           totalChargeback += parseFloat(stripeChargeback.amount);
         //         }
         //       }
+        this.chargebackTotal = totalChargeback;
         updateData(
           this.data,
           CHARGEBACKS_TOTAL,
           displayCurrency(totalChargeback)
         );
       } catch (err) {
+        this.chargebackTotal = 0;
         updateData(this.data, CHARGEBACKS_TOTAL, displayCurrency(0));
       }
     },

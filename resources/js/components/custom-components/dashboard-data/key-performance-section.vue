@@ -48,13 +48,14 @@ export default {
           value: `-`,
           loading: false,
         },
+          */
         {
           id: 2,
           title: ABANDONED_CART,
           value: `0`,
           loading: true,
         },
-        */
+
         {
           id: 3,
           title: AVERAGE_ORDER_VALUE,
@@ -142,7 +143,7 @@ export default {
       this.getAvgUnitCount();
 
       // Development - saving network requst
-      //   this.getAbandonedCartCount();
+      this.getAbandonedCartCount();
     },
     async getAbandonedCartCount() {
       try {
