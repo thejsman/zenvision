@@ -33,9 +33,10 @@
 import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
-import { moment } from "moment";
+import moment from "moment";
 import { displayCurrency, updateData, setLoading } from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
+import axios from "axios";
 import {
   COGS_TOTAL,
   DISCOUNTS_TOTAL,
@@ -53,6 +54,7 @@ export default {
       subscriptionData: 0,
       cogsTotal: 0,
       chargebackTotal: 0,
+      merchantFees: 0,
       data: [
         {
           id: 1,
@@ -134,10 +136,6 @@ export default {
       type: Number,
       default: 0,
     },
-    merchantFees: {
-      type: Number,
-      default: 0,
-    },
   },
   watch: {
     costData(value, newValue) {
@@ -148,12 +146,13 @@ export default {
     eventBus.$on("updateSubscription", async () => {
       await this.getSubscriptionData();
     });
-    eventBus.$on("merchantFeeUpdated", (fees) => {
-      updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
-    });
+    // eventBus.$on("merchantFeeUpdated", (fees) => {
+    //   updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
+    // });
     eventBus.$on("dateChanged", ({ s_date, e_date }) => {
       setLoading(this.data);
       this.getChargebackTotal(s_date, e_date);
+      this.getMerchantfeesTotal(s_date, e_date);
     });
   },
   methods: {
@@ -167,7 +166,7 @@ export default {
       updateData(this.data, REFUNDS_TOTAL, displayCurrency(refundTotal));
       updateData(this.data, AD_SPEND_FACEBOOK, displayCurrency(0));
       updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
-      updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
+      //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
       this.getSubscriptionData();
       //   this.getChargebackTotal();
     },
@@ -343,7 +342,6 @@ export default {
               new Date(oDate) >= new Date(s_date) &&
               new Date(oDate) <= new Date(e_date)
             ) {
-              console.log("We are in", sc.status);
               if (sc.status === "charge_refunded" || sc.status === "lost") {
                 totalChargeback += parseFloat(sc.amount / 100);
               }
@@ -372,6 +370,53 @@ export default {
         this.chargebackTotal = 0;
         updateData(this.data, CHARGEBACKS_TOTAL, displayCurrency(0));
       }
+    },
+    async getMerchantfeesTotal(s_date, e_date) {
+      let total = 0;
+      this.merchantFees = 0;
+      //Stripe
+
+      const result = await axios.get("getStripeTransactions");
+      let { stripeTransactions } = result.data;
+
+      stripeTransactions.forEach((sTransaction) => {
+        sTransaction.forEach((st) => {
+          const orderDate = moment.unix(st.created).format("MM-DD-YYYY");
+
+          if (
+            new Date(orderDate) >= new Date(s_date) &&
+            new Date(orderDate) <= new Date(e_date)
+          ) {
+            total += parseFloat(st.fee / 100);
+          }
+        });
+      });
+
+      //Paypal
+      const paypalResult = await axios.get("paypaltransactions");
+      const paypalTransactions = paypalResult.data;
+      if (paypalTransactions.length > 0) {
+        paypalTransactions.map((transaction) => {
+          if (transaction.transaction_info.hasOwnProperty("fee_amount")) {
+            const orderDate = moment(
+              transaction.transaction_updated_date
+            ).format("MM-DD-YYYY");
+
+            if (
+              new Date(orderDate) >= new Date(s_date) &&
+              new Date(orderDate) <= new Date(e_date)
+            ) {
+              total += Math.abs(
+                parseFloat(transaction.transaction_info.fee_amount.value)
+              );
+            }
+          }
+        });
+      }
+
+      this.merchantFees = total;
+      updateData(this.data, MERCHANT_FEE, displayCurrency(total));
+      //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
     },
   },
 };
