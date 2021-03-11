@@ -63,6 +63,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
     }
+    public function getPaypalAccountConnectIds()
+    {
+        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->select('id',  'access_token', 'refresh_token', 'enabled_on_dashboard', 'expires_at')->get();
+    }
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
