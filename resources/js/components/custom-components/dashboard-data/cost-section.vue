@@ -371,19 +371,20 @@ export default {
 
       const result = await axios.get("getStripeTransactions");
       let { stripeTransactions } = result.data;
+      if (stripeTransactions.length > 0) {
+        stripeTransactions.forEach((sTransaction) => {
+          sTransaction.forEach((st) => {
+            const orderDate = moment.unix(st.created).format("MM-DD-YYYY");
 
-      stripeTransactions.forEach((sTransaction) => {
-        sTransaction.forEach((st) => {
-          const orderDate = moment.unix(st.created).format("MM-DD-YYYY");
-
-          if (
-            new Date(orderDate) >= new Date(s_date) &&
-            new Date(orderDate) <= new Date(e_date)
-          ) {
-            total += parseFloat(st.fee / 100);
-          }
+            if (
+              new Date(orderDate) >= new Date(s_date) &&
+              new Date(orderDate) <= new Date(e_date)
+            ) {
+              total += parseFloat(st.fee / 100);
+            }
+          });
         });
-      });
+      }
 
       //Paypal
       const paypalTotal = await this.getPaypalTransactionsTotal(s_date, e_date);
