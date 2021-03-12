@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\CustomRequests;
+
 use App\Paypal;
 use Auth;
 use Carbon\Carbon as Time;
+
 
 class PaypalController extends Controller
 {
@@ -71,8 +72,9 @@ class PaypalController extends Controller
         $account->save();
     }
 
-    public function getPaypalTransactions()
+    public function getPaypalTransactions(Request $request)
     {
+
         $user = Auth::user();
         $paypalAccounts = $user->getPaypalAccountConnectIds();
 
@@ -84,7 +86,7 @@ class PaypalController extends Controller
                 }
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2020-12-01T00:00:00-0700&end_date=2020-12-30T23:59:59-0700&fields=transaction_info');
+                curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=' . $request->s_date . '&end_date=' . $request->e_date . '&fields=transaction_info');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
                 $headers = array();

@@ -34,7 +34,12 @@ import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import moment from "moment";
-import { displayCurrency, updateData, setLoading } from "../../../utils";
+import {
+  displayCurrency,
+  updateData,
+  setLoading,
+  getDatesBetweenDates,
+} from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
 import axios from "axios";
 import {
@@ -348,18 +353,6 @@ export default {
             }
           });
         }
-
-        //    if (
-        //         new Date(orderDate) >= new Date(s_date) &&
-        //         new Date(orderDate) <= new Date(e_date)
-        //       ) {
-        //         if (
-        //           stripeChargeback.status === "charge_refunded" ||
-        //           stripeChargeback.status === "lost"
-        //         ) {
-        //           totalChargeback += parseFloat(stripeChargeback.amount);
-        //         }
-        //       }
         this.chargebackTotal = totalChargeback;
         updateData(
           this.data,
@@ -393,30 +386,40 @@ export default {
       });
 
       //Paypal
-      const paypalResult = await axios.get("paypaltransactions");
-      const paypalTransactions = paypalResult.data;
-      if (paypalTransactions.length > 0) {
-        paypalTransactions.map((transaction) => {
-          if (transaction.transaction_info.hasOwnProperty("fee_amount")) {
-            const orderDate = moment(
-              transaction.transaction_updated_date
-            ).format("MM-DD-YYYY");
+      const paypalTotal = await this.getPaypalTransactionsTotal(s_date, e_date);
 
-            if (
-              new Date(orderDate) >= new Date(s_date) &&
-              new Date(orderDate) <= new Date(e_date)
-            ) {
-              total += Math.abs(
-                parseFloat(transaction.transaction_info.fee_amount.value)
-              );
-            }
-          }
-        });
-      }
-
-      this.merchantFees = total;
+      this.merchantFees = total + paypalTotal;
       updateData(this.data, MERCHANT_FEE, displayCurrency(total));
       //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
+    },
+    async getPaypalTransactionsTotal(s_date, e_date) {
+      let total = 0;
+      const dates = getDatesBetweenDates(s_date, e_date);
+      dates.forEach(async (date) => {
+        const paypalResult = await axios.get("paypaltransactions", {
+          params: { s_date: date[0], e_date: date[1] },
+        });
+        const paypalTransactions = paypalResult.data;
+        if (paypalTransactions.length > 0) {
+          paypalTransactions.map((transaction) => {
+            if (transaction.transaction_info.hasOwnProperty("fee_amount")) {
+              const orderDate = moment(
+                transaction.transaction_updated_date
+              ).format("MM-DD-YYYY");
+
+              if (
+                new Date(orderDate) >= new Date(s_date) &&
+                new Date(orderDate) <= new Date(e_date)
+              ) {
+                total += Math.abs(
+                  parseFloat(transaction.transaction_info.fee_amount.value)
+                );
+              }
+            }
+          });
+        }
+      });
+      return total;
     },
   },
 };
