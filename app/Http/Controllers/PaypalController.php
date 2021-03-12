@@ -25,13 +25,13 @@ class PaypalController extends Controller
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/oauth2/token');
+        curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'oauth2/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $code);
 
         $headers = array();
-        $headers[] = 'Authorization: Basic QWRaSXQ1MGk1aUFWVDVWNjg4eUdtZ20tWkhBeUx5bmNZME5sSVBXOVk0emtRT2ZzYkoybTQtN0JKYTdVNkVlR2l2QjA5WG51LTV4TGpzMko6RUotLXFaWHV6dlVJZ05UdDkzZXlKYUoyY2QxYloyZXhqMUZabGNOS21idjhnODVuYkR3XzdiR0dSMVRvUVRhTTNRMFptdnF4RzBDYTlacHM=';
+        $headers[] = 'Authorization: Basic ' . env('PAYPAL_BASE64_CODE');
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
@@ -86,7 +86,7 @@ class PaypalController extends Controller
                 }
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=' . $request->s_date . '&end_date=' . $request->e_date . '&fields=transaction_info');
+                curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'reporting/transactions?start_date=' . $request->s_date . '&end_date=' . $request->e_date . '&fields=transaction_info');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
                 $headers = array();
@@ -108,16 +108,47 @@ class PaypalController extends Controller
         }
     }
 
+    public function getPaypalDisputes(Request $request)
+    {
+
+        $user = Auth::user();
+        $paypalAccounts = $user->getPaypalAccountConnectIds();
+
+        if ($paypalAccounts->count()) {
+            foreach ($paypalAccounts as $account) {
+                if (Time::now() > $account->expires_at) {
+                    // generate new access token from refresh token
+                    $this->getAccessToken($account);
+                }
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'customer/disputes/?start_date=' . $request->s_date . '&end_date=' . $request->e_date);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                $headers = array();
+                $headers[] = 'Content-Type: application/json';
+                $headers[] = 'Authorization: Bearer ' . $account->access_token;
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+                return $response;
+            }
+        }
+    }
     public function getAccessToken($account)
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sandbox.paypal.com/v1/identity/openidconnect/tokenservice",
+            CURLOPT_URL => env('PAYPAL_API_URL') . "identity/openidconnect/tokenservice",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => "grant_type=refresh_token&refresh_token=" . $account->refresh_token,
             CURLOPT_HTTPHEADER => array(
-                "authorization: Basic QWRaSXQ1MGk1aUFWVDVWNjg4eUdtZ20tWkhBeUx5bmNZME5sSVBXOVk0emtRT2ZzYkoybTQtN0JKYTdVNkVlR2l2QjA5WG51LTV4TGpzMko6RUotLXFaWHV6dlVJZ05UdDkzZXlKYUoyY2QxYloyZXhqMUZabGNOS21idjhnODVuYkR3XzdiR0dSMVRvUVRhTTNRMFptdnF4RzBDYTlacHM=",
+                "authorization: Basic " . env('PAYPAL_BASE64_CODE'),
                 "content-type: application/x-www-form-urlencoded"
             ),
         ));
@@ -143,7 +174,7 @@ class PaypalController extends Controller
     {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://api-m.sandbox.paypal.com/v1/identity/oauth2/userinfo?schema=paypalv1.1');
+        curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'identity/oauth2/userinfo?schema=paypalv1.1');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
@@ -159,6 +190,7 @@ class PaypalController extends Controller
         }
         curl_close($ch);
         $response = json_decode($result, true);
+
         if (count($response)) {
             return  $response['name'];
         } else {

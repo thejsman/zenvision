@@ -55,6 +55,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('paypal', 'PaypalController@toogleAccount');
     Route::patch('paypaldelete', 'PaypalController@destroy');
     Route::get('paypaltransactions', 'PaypalController@getPaypalTransactions');
+    Route::get('paypaldisputes', 'PaypalController@getPaypalDisputes');
 
 
     //Stripe
