@@ -8,7 +8,8 @@ _________________________
 
 */
 
-import _, { values } from "lodash";
+import _ from "lodash";
+import moment from "moment";
 
 //fucntion to display numbers in currency on the dashboard
 export const displayCurrency = value => {
@@ -58,4 +59,26 @@ export const updateGraphData = (data, title, value, graphData) => {
 
 export const setLoading = data => {
     data.forEach(d => (d.loading = true));
+};
+
+// Function to calculate dates rage of 30days for  paypal transactions api call
+export const getDatesBetweenDates = (startDate, endDate) => {
+    let dates = [];
+    let s_date = moment(startDate);
+    let e_date = moment(endDate);
+
+    while (s_date < e_date) {
+        const temp_e_date = s_date.clone().add(30, "days");
+        const new_e_date = temp_e_date > e_date ? e_date : temp_e_date;
+
+        dates = [
+            ...dates,
+            [
+                moment(s_date).format("YYYY-MM-DDT00:00:00.000") + "Z",
+                moment(new_e_date).format("YYYY-MM-DDT23:59:59.000") + "Z"
+            ]
+        ];
+        s_date.add(31, "days");
+    }
+    return dates;
 };
