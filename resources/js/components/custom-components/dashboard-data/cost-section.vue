@@ -371,7 +371,7 @@ export default {
 
       const result = await axios.get("getStripeTransactions");
       let { stripeTransactions } = result.data;
-      if (stripeTransactions.length > 0) {
+      if (stripeTransactions !== undefined) {
         stripeTransactions.forEach((sTransaction) => {
           sTransaction.forEach((st) => {
             const orderDate = moment.unix(st.created).format("MM-DD-YYYY");
