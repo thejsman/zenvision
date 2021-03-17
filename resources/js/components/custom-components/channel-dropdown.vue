@@ -14,7 +14,7 @@
       Shopify
     </b-dropdown-item>
     <b-dropdown-item
-      href="https://www.facebook.com/v6.0/dialog/oauth?client_id=2837137499945173&redirect_uri=http://localhost:8000/"
+      href="https://www.facebook.com/v6.0/dialog/oauth?client_id=253783359751006&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2F"
     >
       <img
         src="/images/icons/facebook-icon.svg"
