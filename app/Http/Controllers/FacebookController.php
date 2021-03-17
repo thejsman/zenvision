@@ -35,6 +35,12 @@ class FacebookController extends Controller
         return $facebook_data;
     }
 
+    public function getAdAccounts()
+    {
+        $user = Auth::user();
+        return $user->getFacebookAccounts();
+    }
+
     public function store(Request $request)
     {
 

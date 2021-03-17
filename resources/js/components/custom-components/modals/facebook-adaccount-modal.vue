@@ -5,7 +5,8 @@
         Facebook Ad Accounts
       </div>
       <p class="mt-4 mb-4 text-white">Please select one Ad account</p>
-      <b-card-group>
+
+      <b-card-group class="flex justify-content-center flex-row">
         <div
           v-for="fbdata of facebookData"
           :key="fbdata.id"
@@ -14,7 +15,7 @@
           <b-card
             bg-variant="light"
             :header="`Account Name: ` + fbdata.name"
-            class="m-3 fb-card"
+            class="m-2 fb-card"
           >
             <b-card-text>
               <p class="fb-text">Currency: {{ fbdata.currency }}</p>
@@ -61,6 +62,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "../../../app";
 
 export default {
   data() {
@@ -84,6 +86,7 @@ export default {
       default: () => [],
     },
   },
+  created() {},
   methods: {
     async handleClick(fbData) {
       try {
@@ -97,7 +100,9 @@ export default {
           this.updateResult = "";
           this.$emit("updateData");
           this.$emit("handle-close");
-          //   window.location.href = "/";
+          console.log(this.$router);
+          eventBus.$emit("toggleShopifyStore");
+          window.location.href = "/";
         }, 2000);
       } catch (error) {
         console.log(error);
