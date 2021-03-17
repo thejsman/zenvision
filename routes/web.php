@@ -71,4 +71,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('cogs', 'CogsController@index');
     Route::post('cogs', 'CogsController@update');
     Route::get('cogsicon', 'CogsController@showCogsIcon');
+
+    //Facebook APIs
+    Route::get('getfacebookaccounts', 'FacebookController@getAdAccounts');
+    Route::get('getfacebookadsdata', 'FacebookController@getFacebookAdsData');
+    Route::get('fbconnect', 'FacebookController@index');
+
+    Route::post('fbconnect', 'FacebookController@store');
+    Route::patch('fbconnect', 'FacebookController@toogleAdAccount');
+    Route::patch('fbconnectdelete', 'FacebookController@destroy');
 });

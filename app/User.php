@@ -62,7 +62,7 @@ class User extends Authenticatable
 
     public function getFacebookAccounts()
     {
-        return $this->hasMany(FacebookAd::class, 'user_id')->where('isDeleted', false)->select('id', 'ad_account_id', 'ad_account_name', 'enabled_on_dashboard')->get();
+        return $this->hasMany(FacebookAd::class, 'user_id')->where('isDeleted', false)->select('id', 'ad_account_id', 'ad_account_name', 'enabled_on_dashboard', 'access_token')->get();
     }
     public function getStripeAccountConnectIds()
     {
