@@ -80,4 +80,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('fbconnect', 'FacebookController@store');
     Route::patch('fbconnect', 'FacebookController@toogleAdAccount');
     Route::patch('fbconnectdelete', 'FacebookController@destroy');
+
+    //Snapchat
+    Route::get('snapchat-connect', 'SnapchatController@store');
+    Route::get('getsnapchataccounts', 'SnapchatController@getAdAccounts');
+    Route::patch('snapchat-connect', 'SnapchatController@toogleAdAccount');
+    Route::patch('snapchat-connect-delete', 'SnapchatController@destroy');
 });

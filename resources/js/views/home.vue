@@ -10,6 +10,7 @@ import StoreIcon from "../components/custom-components/shopifystore-icon";
 import PaypalAccount from "../components/custom-components/paypal-icon";
 import StripeAccount from "../components/custom-components/stripe-icon";
 import FacebookAccount from "../components/custom-components/facebook-icon";
+import SnapchatAccount from "../components/custom-components/snapchat-icon";
 
 //Dashboard Data sections import
 import Profit from "../components/custom-components/dashboard-data/profit-section";
@@ -44,6 +45,7 @@ export default {
     StripeAccount,
     FacebookConnect,
     FacebookAccount,
+    SnapchatAccount,
   },
   data() {
     return {
@@ -173,6 +175,7 @@ export default {
           <PaypalAccount :ppAccounts="paypalAccounts" />
           <StripeAccount />
           <FacebookAccount />
+          <SnapchatAccount />
           <DateRange @changeDateRange="handleDateChange" />
         </div>
       </div>

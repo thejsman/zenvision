@@ -64,6 +64,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(FacebookAd::class, 'user_id')->where('isDeleted', false)->select('id', 'ad_account_id', 'ad_account_name', 'enabled_on_dashboard', 'access_token')->get();
     }
+    public function getSnapchatAccounts()
+    {
+        return $this->hasMany(Snapchat::class, 'user_id')->where('isDeleted', false)->select('id', 'snapchat_user_id', 'display_name', 'enabled_on_dashboard', 'access_token')->get();
+    }
     public function getStripeAccountConnectIds()
     {
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
