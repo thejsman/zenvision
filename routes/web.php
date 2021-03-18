@@ -83,4 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Snapchat
     Route::get('snapchat-connect', 'SnapchatController@store');
+    Route::get('getsnapchataccounts', 'SnapchatController@getAdAccounts');
+    Route::patch('snapchat-connect', 'SnapchatController@toogleAdAccount');
+    Route::patch('snapchat-connect-delete', 'SnapchatController@destroy');
 });
