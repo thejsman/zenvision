@@ -59,7 +59,7 @@
             />
             Stripe
         </b-dropdown-item>
-        <b-dropdown-item href="">
+        <b-dropdown-item :href="snapchatUrl">
             <img
                 src="/images/icons/snapchat-icon.svg"
                 alt
@@ -71,5 +71,11 @@
     </b-dropdown>
 </template>
 <script>
-export default {};
+export default {
+    data() {
+        return {
+            snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=https://zenvision.io&scope=snapchat-marketing-api`
+        };
+    }
+};
 </script>
