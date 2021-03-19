@@ -90,4 +90,5 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Snapchat Ad account
     Route::post('snapchatadaccount', 'SnapchatAdAccountController@store');
+    Route::get('updateaccesstoken', 'SnapchatAdAccountController@updateAccessToken');
 });
