@@ -22,6 +22,7 @@ import Chart from "../components/custom-components/dashboard-data/chart-section"
 //Modal import
 import ShopifyConnect from "../components/custom-components/modals/ShopifyConnect-modal";
 import FacebookConnect from "../components/custom-components/modals/facebook-adaccount-modal";
+import SnapchatConnect from "../components/custom-components/modals/snapchat-adaccount-modal";
 
 import moment from "moment";
 import { mapState, mapGetters, mapActions } from "vuex";
@@ -46,6 +47,7 @@ export default {
     FacebookConnect,
     FacebookAccount,
     SnapchatAccount,
+    SnapchatConnect,
   },
   data() {
     return {
@@ -62,8 +64,10 @@ export default {
       backupOrders: [],
       dateRangeSelected: [],
       facebookData: [],
+      snapchatAdAccounts: [],
       googleData: [],
       facebookError: false,
+      snapchatError: false,
       facebookAdAccounts: [],
       googleAdAccounts: [],
       fb_spend: [],
@@ -76,7 +80,7 @@ export default {
       paypalTransactions: [],
     };
   },
-  mounted() {},
+
   computed: {
     ...mapGetters([
       "ShopifyOrders",
@@ -89,8 +93,12 @@ export default {
   },
   created() {
     // this.fetchShopifyData();
+
     if (new URL(location.href).searchParams.get("code")) {
       this.getFacebookAds();
+    }
+    if (new URL(location.href).searchParams.get("listSnapchatAccount")) {
+      this.getSnapchatAdAccounts();
     }
 
     this.getShopifyStoreData();
@@ -135,11 +143,29 @@ export default {
           },
         });
         this.facebookData = result.data;
-        console.log({ Checkthis: this.facebookData });
+
         this.$bvModal.show("facebook-connect");
       } catch (error) {
         console.log(error);
         this.facebookError = true;
+      }
+    },
+
+    async getSnapchatAdAccounts() {
+      try {
+        const result = await axios.get("snapchat-listadaccounts", {
+          params: {
+            organization_id: new URL(location.href).searchParams.get(
+              "listSnapchatAccount"
+            ),
+          },
+        });
+        this.snapchatAdAccounts = result.data;
+        console.log(this.snapchatAdAccounts);
+        this.$bvModal.show("snapchat-connect");
+      } catch (error) {
+        console.log(error);
+        this.snapchatError = true;
       }
     },
     handleDateChange(dateRange) {
@@ -219,6 +245,13 @@ export default {
         :adAccounts="facebookAdAccounts"
         :startDate="dateRangeSelected"
         @handle-close="$bvModal.hide('facebook-connect')"
+      />
+    </b-modal>
+    <b-modal id="snapchat-connect" size="lg" centered hide-footer hide-header>
+      <SnapchatConnect
+        :snapchatData="snapchatAdAccounts"
+        :snapchatError="snapchatError"
+        @handle-close="$bvModal.hide('snapchat-connect')"
       />
     </b-modal>
   </Layout>

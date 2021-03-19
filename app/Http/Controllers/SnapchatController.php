@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon as Time;
 use App\Snapchat;
 use Auth;
+use App\Providers\RouteServiceProvider;
 
 class SnapchatController extends Controller
 {
@@ -47,7 +48,7 @@ class SnapchatController extends Controller
             'user_id' =>  Auth::user()->id, 'snapchat_user_id' => $user_info['me']['id'], 'organization_id' => $user_info['me']['organization_id'],
         ], $snapchat_table_data);
 
-        return redirect('/');
+        return redirect()->route('home', ['listSnapchatAccount' => $user_info['me']['organization_id']]);
     }
 
     protected function getSnapchatUserInfo($access_token)
@@ -72,10 +73,56 @@ class SnapchatController extends Controller
         return $response;
     }
 
+    protected function getSnapchatAdAccounts($access_token)
+    {
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, 'https://adsapi.snapchat.com/v1/organizations/' . $organization_id . '/adaccounts');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+
+        $headers = array();
+        $headers[] = 'Authorization: Bearer ' . $access_token;
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+        $response = json_decode($result, true);
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+        curl_close($ch);
+        return $response;
+    }
+
     public function getAdAccounts()
     {
         $user = Auth::user();
         return $user->getSnapchatAccounts();
+    }
+
+    public function listAdAccounts(Request $request)
+    {
+        $organization_id = $request->organization_id;
+        $snapchatAccount = Snapchat::where('organization_id', $organization_id)->first();
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, 'https://adsapi.snapchat.com/v1/organizations/' . $organization_id . '/adaccounts');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+
+        $headers = array();
+        $headers[] = 'Authorization: Bearer ' . $snapchatAccount->access_token;
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+        $response = json_decode($result, true);
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+        curl_close($ch);
+        return $response['adaccounts'];
     }
 
     public function toogleAdAccount(Request $request)
