@@ -124,17 +124,4 @@ class SnapchatController extends Controller
         curl_close($ch);
         return $response['adaccounts'];
     }
-
-    public function toogleAdAccount(Request $request)
-    {
-        $account = Snapchat::find($request->id);
-        $account->enabled_on_dashboard = !$request->enabled_on_dashboard;
-        $account->save();
-    }
-    public function destroy(Request $request)
-    {
-        $account = Snapchat::find($request->id);
-        $account->isDeleted = true;
-        $account->save();
-    }
 }

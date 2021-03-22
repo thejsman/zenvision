@@ -9,7 +9,7 @@
           class="border rounded p-2 ml-2 dropbtn"
           :class="{ 'border-primary': snapchatAccount.enabled_on_dashboard }"
           @click="disableFeature ? handleClick(snapchatAccount) : null"
-          v-b-tooltip.hover="snapchatAccount.display_name"
+          v-b-tooltip.hover="snapchatAccount.ad_account_name"
         >
           <img src="/images/icons/snapchat-icon.svg" alt height="21" />
         </div>
@@ -75,7 +75,7 @@ export default {
     },
     async handleClick(account) {
       try {
-        await axios.patch("snapchat-connect", account);
+        await axios.patch("snapchatadaccount", account);
         await this.getsnapchatAccounts();
       } catch (error) {
         console.log(error);
@@ -84,7 +84,7 @@ export default {
 
     async removeChannel(account, event) {
       try {
-        await axios.patch("snapchat-connect-delete", account);
+        await axios.patch("snapchatadaccount-delete", account);
         await this.getsnapchatAccounts();
       } catch (error) {
         console.log(error);
