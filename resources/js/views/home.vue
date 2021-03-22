@@ -161,7 +161,7 @@ export default {
           },
         });
         this.snapchatAdAccounts = result.data;
-        console.log(this.snapchatAdAccounts);
+
         this.$bvModal.show("snapchat-connect");
       } catch (error) {
         console.log(error);

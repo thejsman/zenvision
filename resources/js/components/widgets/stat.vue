@@ -38,12 +38,19 @@ export default {
       type: Boolean,
       default: null,
     },
+    iconName: {
+      type: String,
+      default: "",
+    },
   },
 };
 </script>
 
 <template>
-  <div class="card mini-stats-wid" :class="{ cogscard: (title ===  'COGS' || title === 'Subscriptions')}">
+  <div
+    class="card mini-stats-wid"
+    :class="{ cogscard: title === 'COGS' || title === 'Subscriptions' }"
+  >
     <PlaceholderLoader v-if="loading" />
     <div class="card-body" v-else @click="onClick">
       <div class="media">
@@ -56,6 +63,15 @@ export default {
               v-if="totalSubscriptionCount"
               >{{ totalSubscriptionCount }}</b-badge
             >
+            <div v-if="iconName">
+              <img
+                :src="`/images/icons/${this.iconName}`"
+                alt
+                height="19"
+                class="channel-icons"
+              />
+            </div>
+
             <i
               class="fas fa-exclamation-circle text-warning"
               v-if="showCogsWarning"
@@ -75,5 +91,4 @@ export default {
   </div>
 </template>
 <style>
-
 </style>
