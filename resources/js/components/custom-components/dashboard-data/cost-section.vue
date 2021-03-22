@@ -12,6 +12,7 @@
         :onClick="cost.onClick"
         :totalSubscriptionCount="cost.totalSubscriptionCount"
         :showCogsWarning="cost.showCogsWarning"
+        :iconName="cost.iconName"
       />
     </div>
 
@@ -50,6 +51,7 @@ import {
   MERCHANT_FEE,
   AD_SPEND_FACEBOOK,
   AD_SPEND_GOOGLE,
+  AD_SPEND_SNAPCHAT,
   SUBSCRIPTION_COST,
 } from "../../../constants";
 export default {
@@ -98,15 +100,24 @@ export default {
           title: AD_SPEND_FACEBOOK,
           value: `0`,
           loading: true,
+          iconName: "facebook-icon.svg",
         },
         {
           id: 7,
           title: AD_SPEND_GOOGLE,
           value: `0`,
           loading: true,
+          iconName: "google-icon.svg",
         },
         {
           id: 8,
+          title: AD_SPEND_SNAPCHAT,
+          value: `0`,
+          loading: true,
+          iconName: "snapchat-icon.svg",
+        },
+        {
+          id: 9,
           title: SUBSCRIPTION_COST,
           value: `0`,
           loading: true,
