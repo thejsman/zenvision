@@ -82,13 +82,14 @@ export default {
         ],
         tooltip: {
           formatter: function () {
-            var formatStr = "<b>Profit Analysis</b><hr /><br/>";
+            var formatStr =
+              "<b class='tooltip-title'>Profit Analysis</b><hr /><br/>";
 
             for (var i = 0; i < this.points.length; i++) {
               var point = this.points[i];
 
               formatStr +=
-                "<b>Date: " +
+                "<b>" +
                 moment(point.x).format("LL") +
                 "<br /><b>" +
                 (point.y >= 0 ? "Profit" : "Loss") +
@@ -199,7 +200,15 @@ export default {
           const data_per_month = months.map((month) => {
             const sum = _.sumBy(this.chartData, (order) => {
               let googleSum = 0;
-              if (moment(order.created_on_shopify).format("MMM YY") === month) {
+
+              if (
+                moment(order.created_on_shopify).format("MMM YYYY") === month
+              ) {
+                console.log(
+                  "match found",
+                  moment(order.created_on_shopify).format("MMM YYYY"),
+                  month
+                );
                 return parseFloat(order.total_price - order.total_cost);
               } else {
                 return 0;
@@ -211,6 +220,7 @@ export default {
             parseFloat(month).toFixed(2)
           );
           // this.polarBarChart.data.series = [final];
+          console.log({ final });
           this.chartOptions.series[0].data = final.map((e) => parseFloat(e));
         }
       }
@@ -226,7 +236,7 @@ export default {
           return moment(d).format("MMM YYYY");
         }
       );
-      this.polarBarChart.data.labels = months;
+      //   this.polarBarChart.data.labels = months;
       this.chartOptions.xAxis.categories = months;
       return months;
     },
@@ -284,128 +294,7 @@ export default {
   margin-right: 6px;
   margin-top: 3px;
 }
-.chartist-tooltip {
-  position: absolute;
-  display: none;
-  min-width: 5em;
-  padding: 8px 10px;
-  background: #383838;
-  color: #fff;
-  text-align: center;
-  pointer-events: none;
-  z-index: 100;
-  transition: opacity 0.2s linear;
-}
-
-.chartist-tooltip:before {
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  pointer-events: none;
-  border-color: rgba(251, 249, 228, 0);
-  border-top-color: #383838;
-  border-width: 7px;
-  margin-left: -8px;
-}
-
-.chartist-tooltip.tooltip-show {
-  display: inline-block !important;
-}
-
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-
-  .tooltip-inner {
-    background: black;
-    color: white;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-  }
-
-  .tooltip-arrow {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    position: absolute;
-    margin: 5px;
-    border-color: black;
-  }
-
-  &[x-placement^="top"] {
-    margin-bottom: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 0 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      bottom: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="bottom"] {
-    margin-top: 5px;
-
-    .tooltip-arrow {
-      border-width: 0 5px 5px 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-top-color: transparent !important;
-      top: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="right"] {
-    margin-left: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 5px 0;
-      border-left-color: transparent !important;
-      border-top-color: transparent !important;
-      border-bottom-color: transparent !important;
-      left: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[x-placement^="left"] {
-    margin-right: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 0 5px 5px;
-      border-top-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      right: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[aria-hidden="true"] {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s, visibility 0.15s;
-  }
-
-  &[aria-hidden="false"] {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
+.tooltip-title {
+  text-decoration: underline;
 }
 </style>
