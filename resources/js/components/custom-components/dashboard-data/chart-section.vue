@@ -11,36 +11,103 @@
           <i class="loss-circle"></i><span class="mr-3 pr-3">Loss</span>
         </div>
 
-        <chartist
+        <!-- <chartist
           ratio="ct-chart"
           :data="polarBarChart.data"
           :options="polarBarChart.options"
           type="Bar"
-          :event-handlers="polarBarChart.chartHandlers"
-        ></chartist>
+        ></chartist> -->
+        <highcharts :options="chartOptions"></highcharts>
       </div>
     </div>
   </div>
 </template>
 <script>
-import Stat from "../../widgets/stat";
+import { Chart } from "highcharts-vue";
 
 import moment from "moment";
 import { eventBus } from "../../../app";
 
 export default {
-  components: { Stat },
+  components: { highcharts: Chart },
   data() {
     return {
       compiledOrders: [],
       dateDifference: 0,
       subscriptionArray: [],
+      dateRangeType: "Date Range",
+      chartOptions: {
+        chart: {
+          backgroundColor: "#2a3042",
+          polar: false,
+          type: "line",
+          height: 300,
+        },
+        title: {
+          text: "",
+        },
+        legend: {
+          enabled: false,
+          align: "right",
+          verticalAlign: "middle",
+        },
+        xAxis: {
+          categories: [],
+          labels: {
+            style: {
+              color: "#FFFFFF",
+            },
+          },
+        },
+        yAxis: {
+          gridLineColor: "#32394e",
+          gridLineWidth: 1,
+          title: {
+            text: "Profit",
+          },
+          labels: {
+            style: {
+              color: "#FFFFFF",
+            },
+          },
+        },
+        series: [
+          {
+            name: "Profit",
+            color: "#34c38f",
+            negativeColor: "#FF0000",
+            data: [],
+            type: "line",
+          },
+        ],
+        tooltip: {
+          formatter: function () {
+            var formatStr = "<b>Profit Analysis</b><hr /><br/>";
+
+            for (var i = 0; i < this.points.length; i++) {
+              var point = this.points[i];
+
+              formatStr +=
+                "<b>Date: " +
+                moment(point.x).format("LL") +
+                "<br /><b>" +
+                (point.y >= 0 ? "Profit" : "Loss") +
+                ": $" +
+                point.y +
+                "</b>";
+            }
+
+            return formatStr;
+          },
+          shared: true,
+        },
+      },
+
       polarBarChart: {
         data: {
           labels: [],
           series: [[]],
         },
-
         options: {
           height: 300,
           legend: {
@@ -48,32 +115,6 @@ export default {
           },
           plugins: [this.$chartist.plugins.tooltip({})],
         },
-
-        chartHandlers: [
-          {
-            event: "draw",
-            fn(context) {
-              let red = "#ff0000";
-
-              if (context.type === "bar") {
-                context.element._node.id = "tooltip-" + context.index;
-
-                if (context.value.y < 0) {
-                  context.element.attr({
-                    style: "stroke: " + red + "; fill: " + red + ";",
-                  });
-                }
-                // console.log(context);
-                context.element._node.addEventListener("mouseover", (event) => {
-                  //   event.target.id = "tooltip-" + context.index;
-                  //   console.log(event.target);
-
-                  eventBus.$emit("fireMethod", context.index);
-                });
-              }
-            },
-          },
-        ],
       },
     };
   },
@@ -92,6 +133,7 @@ export default {
             return moment(d).format("M/D/YY");
           });
           this.polarBarChart.data.labels = dates;
+          this.chartOptions.xAxis.categories = dates;
           let dayArray = [];
           const data_per_day = dates.map((day) => {
             const sum = _.sumBy(this.chartData, (order) => {
@@ -104,7 +146,8 @@ export default {
             dayArray.push(sum);
           });
           const final = dayArray.map((day) => parseFloat(day).toFixed(2));
-          this.polarBarChart.data.series = [final];
+          // this.polarBarChart.data.series = [final];
+          this.chartOptions.series[0].data = final.map((e) => parseFloat(e));
         } else if (dateDiff <= 120 && dateDiff >= 8) {
           var result = [];
           if (this.ChartdateRange[1].isBefore(this.ChartdateRange[0])) {
@@ -119,8 +162,9 @@ export default {
             this.ChartdateRange[0] = this.ChartdateRange[0].add(1, "weeks");
           }
           this.ChartdateRange[0] = temp;
-
+          //Week wise dates
           this.polarBarChart.data.labels = result;
+          this.chartOptions.xAxis.categories = result;
 
           let weekArray = [];
 
@@ -147,7 +191,8 @@ export default {
           }
 
           const final = weekArray.map((day) => parseFloat(day).toFixed(2));
-          this.polarBarChart.data.series = [final];
+          // this.polarBarChart.data.series = [final];
+          this.chartOptions.series[0].data = final.map((e) => parseFloat(e));
         } else {
           const months = this.getMonths();
           let monthDataArray = [];
@@ -165,7 +210,8 @@ export default {
           const final = monthDataArray.map((month) =>
             parseFloat(month).toFixed(2)
           );
-          this.polarBarChart.data.series = [final];
+          // this.polarBarChart.data.series = [final];
+          this.chartOptions.series[0].data = final.map((e) => parseFloat(e));
         }
       }
     },
@@ -177,10 +223,11 @@ export default {
           );
 
           d.setMonth(d.getMonth() + i);
-          return moment(d).format("MMM YY");
+          return moment(d).format("MMM YYYY");
         }
       );
       this.polarBarChart.data.labels = months;
+      this.chartOptions.xAxis.categories = months;
       return months;
     },
   },
@@ -214,6 +261,10 @@ export default {
 
 
 <style lang="scss">
+.highcharts-credits {
+  color: #2a3042 !important;
+  fill: #2a3042 !important;
+}
 .legends {
   height: 8px;
 }
