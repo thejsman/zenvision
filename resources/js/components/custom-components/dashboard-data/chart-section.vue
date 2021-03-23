@@ -27,6 +27,7 @@ import { Chart } from "highcharts-vue";
 
 import moment from "moment";
 import { eventBus } from "../../../app";
+import { displayCurrency } from "../../../utils";
 
 export default {
   components: { highcharts: Chart },
@@ -39,7 +40,7 @@ export default {
       chartOptions: {
         chart: {
           backgroundColor: "#2a3042",
-          polar: false,
+          polar: true,
           type: "line",
           height: 300,
         },
@@ -93,8 +94,8 @@ export default {
                 moment(point.x).format("LL") +
                 "<br /><b>" +
                 (point.y >= 0 ? "Profit" : "Loss") +
-                ": $" +
-                point.y +
+                ": " +
+                displayCurrency(point.y) +
                 "</b>";
             }
 
@@ -104,19 +105,19 @@ export default {
         },
       },
 
-      polarBarChart: {
-        data: {
-          labels: [],
-          series: [[]],
-        },
-        options: {
-          height: 300,
-          legend: {
-            position: "bottom",
-          },
-          plugins: [this.$chartist.plugins.tooltip({})],
-        },
-      },
+      //   polarBarChart: {
+      //     data: {
+      //       labels: [],
+      //       series: [[]],
+      //     },
+      //     options: {
+      //       height: 300,
+      //       legend: {
+      //         position: "bottom",
+      //       },
+      //       plugins: [this.$chartist.plugins.tooltip({})],
+      //     },
+      //   },
     };
   },
   methods: {
@@ -133,7 +134,7 @@ export default {
             d.setDate(d.getDate() + i);
             return moment(d).format("M/D/YY");
           });
-          this.polarBarChart.data.labels = dates;
+          //   this.polarBarChart.data.labels = dates;
           this.chartOptions.xAxis.categories = dates;
           let dayArray = [];
           const data_per_day = dates.map((day) => {
@@ -164,7 +165,7 @@ export default {
           }
           this.ChartdateRange[0] = temp;
           //Week wise dates
-          this.polarBarChart.data.labels = result;
+          //   this.polarBarChart.data.labels = result;
           this.chartOptions.xAxis.categories = result;
 
           let weekArray = [];
