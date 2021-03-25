@@ -90,4 +90,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     //TikTok Ad account
     Route::get('tiktok-connect', 'TiktokAdController@store');
+
+    Route::get('tiktokaccount', 'TiktokAdController@index');
+    Route::patch('tiktokaccount', 'TiktokAdController@toogleAccount');
+    Route::patch('tiktokaccount-delete', 'TiktokAdController@destroy');
 });

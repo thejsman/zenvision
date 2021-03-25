@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
     }
 
+    public function getTiktokAccounts()
+    {
+        return $this->hasMany(TiktokAd::class, 'user_id')->where('isDeleted', false)->get();
+    }
+
     public function getFacebookAccounts()
     {
         return $this->hasMany(FacebookAd::class, 'user_id')->where('isDeleted', false)->select('id', 'ad_account_id', 'ad_account_name', 'enabled_on_dashboard', 'access_token')->get();
@@ -74,7 +79,7 @@ class User extends Authenticatable
     }
     public function getPaypalAccountConnectIds()
     {
-        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->select('id',  'access_token', 'refresh_token', 'enabled_on_dashboard', 'expires_at')->get();
+        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->select('id', 'access_token', 'refresh_token', 'enabled_on_dashboard', 'expires_at')->get();
     }
     public function sendPasswordResetNotification($token)
     {

@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class TiktokAdController extends Controller
 {
+
+    public function index()
+    {
+        $user = Auth::user();
+        return $user->getTiktokAccounts();
+    }
     public function store(Request $request)
     {
         $params = $request->query();
@@ -33,9 +39,6 @@ class TiktokAdController extends Controller
 
         $result = curl_exec($ch);
         $response = json_decode($result, true);
-
-        // $account_info = $this->getTiktokAccountInfo('e03ab4cc2d8b7549d844ffc52f3aeefd668ed9d9');
-        // dd($account_info['data']['display_name']);
 
         if ($response) {
             $access_token = $response['data']['access_token'];
