@@ -68,13 +68,23 @@
             />
             Snapchat
         </b-dropdown-item>
+        <b-dropdown-item :href="tiktokUrl">
+            <img
+                src="/images/icons/tiktok-icon.svg"
+                alt
+                height="21"
+                class="channel-icons"
+            />
+            TikTok
+        </b-dropdown-item>
     </b-dropdown>
 </template>
 <script>
 export default {
     data() {
         return {
-            snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=https://zenvision.io&scope=snapchat-marketing-api`
+            snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=https://zenvision.io&scope=snapchat-marketing-api`,
+            tiktokUrl: `https://ads.tiktok.com/marketing_api/auth?app_id=${process.env.MIX_TIKTOK_APP_ID}&redirect_uri=${process.env.MIX_TIKTOK_REDIRECT_URL}`
         };
     }
 };
