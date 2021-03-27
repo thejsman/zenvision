@@ -94,4 +94,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('tiktokaccount', 'TiktokAdController@index');
     Route::patch('tiktokaccount', 'TiktokAdController@toogleAccount');
     Route::patch('tiktokaccount-delete', 'TiktokAdController@destroy');
+
+    //Google APIs
+    Route::get('googleconnect', 'GoogleAdController@index');
+    Route::post('googleconnect', 'GoogleAdController@store');
+    Route::patch('googleconnect', 'GoogleAdController@toogleAdAccount');
+    Route::patch('googleconnectdelete', 'GoogleAdController@destroy');
 });
