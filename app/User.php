@@ -73,6 +73,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(SnapchatAdAccount::class, 'user_id')->where('isDeleted', false)->get();
     }
+    public function getGoogleAccounts()
+    {
+        return $this->hasMany(GoogleAd::class, 'user_id')->where('isDeleted', false)->get();
+    }
     public function getStripeAccountConnectIds()
     {
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
