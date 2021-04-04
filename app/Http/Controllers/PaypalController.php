@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Paypal;
 use Auth;
 use Carbon\Carbon as Time;
-
+use Illuminate\Http\Request;
 
 class PaypalController extends Controller
 {
@@ -39,15 +37,14 @@ class PaypalController extends Controller
         $response = json_decode($result, true);
 
         $access_token = $response['access_token'];
-        $refresh_token  = $response['refresh_token'];
+        $refresh_token = $response['refresh_token'];
         $expires_in = $response['expires_in'];
-
 
         $ppData = [];
         $ppData['user_id'] = Auth::user()->id;
-        $ppData['access_token']  = $access_token;
-        $ppData['refresh_token']  = $refresh_token;
-        $ppData['expires_at'] =  date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
+        $ppData['access_token'] = $access_token;
+        $ppData['refresh_token'] = $refresh_token;
+        $ppData['expires_at'] = date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
         $ppData['name'] = $this->getPaypalAccountInfo($access_token);
 
         Paypal::updateOrCreate(['user_id' => Auth::user()->id], $ppData);
@@ -149,7 +146,7 @@ class PaypalController extends Controller
             CURLOPT_POSTFIELDS => "grant_type=refresh_token&refresh_token=" . $account->refresh_token,
             CURLOPT_HTTPHEADER => array(
                 "authorization: Basic " . env('PAYPAL_BASE64_CODE'),
-                "content-type: application/x-www-form-urlencoded"
+                "content-type: application/x-www-form-urlencoded",
             ),
         ));
 
@@ -160,9 +157,9 @@ class PaypalController extends Controller
 
         $ppData = [];
         $ppData['user_id'] = Auth::user()->id;
-        $ppData['access_token']  = $access_token;
+        $ppData['access_token'] = $access_token;
 
-        $ppData['expires_at'] =  date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
+        $ppData['expires_at'] = date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
         Paypal::updateOrCreate(['user_id' => Auth::user()->id], $ppData);
 
         $err = curl_error($curl);
@@ -178,7 +175,6 @@ class PaypalController extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
-
         $headers = array();
         $headers[] = 'Content-Type: application/json';
         $headers[] = 'Authorization: Bearer ' . $access_token;
@@ -192,7 +188,7 @@ class PaypalController extends Controller
         $response = json_decode($result, true);
 
         if (count($response)) {
-            return  $response['name'];
+            return $response['name'];
         } else {
             return null;
         }
