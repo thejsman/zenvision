@@ -46,9 +46,9 @@ class TiktokAdController extends Controller
         if (sizeof($response['data']['advertiser_ids'])) {
 
             session([
-                // 'tiktok_access_token' => $response['data']['access_token'],
+                'tiktok_access_token' => $response['data']['access_token'],
                 //Zendrop Tiktok Token
-                'tiktok_access_token' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb",
+                // 'tiktok_access_token' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb",
 
             ]);
             return redirect()->route('home', ['listTiktokAccounts' => $response['data']['access_token']]);
@@ -58,13 +58,13 @@ class TiktokAdController extends Controller
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
-        // return redirect()->route('home', ['listTiktokAccounts' => 'noaccount']);
+        return redirect()->route('home', ['listTiktokAccounts' => 'noaccount']);
 
         //    Redirect with Zendrop Tiktok Access Token
-        session([
-            'tiktok_access_token' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb",
-        ]);
-        return redirect()->route('home', ['listTiktokAccounts' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb"]);
+        // session([
+        //     'tiktok_access_token' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb",
+        // ]);
+        // return redirect()->route('home', ['listTiktokAccounts' => "ed86881c96e3f73954f81e32f26a82e70b2d6cdb"]);
     }
 
     public function store(Request $request)
