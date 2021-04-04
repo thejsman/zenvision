@@ -53,7 +53,6 @@ export const updateAdData = (data, provider, value) => {
             d.iconName !== undefined &&
             d.iconName.includes(provider.toLowerCase())
         ) {
-            console.log(d.iconName !== undefined, d.iconName);
             d.value = `${value}`;
             d.loading = false;
         }

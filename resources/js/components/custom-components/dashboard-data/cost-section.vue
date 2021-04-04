@@ -480,10 +480,9 @@ export default {
             return total;
         },
         async getTiktokAdSpend(s_date, e_date) {
-            let tiktokTotal = 0;
             this.tiktokAdsSpend = 0;
             const dates = getDatesBetweenDates(s_date, e_date);
-
+            let tiktokTotal = 0;
             dates.forEach(async date => {
                 const tiktokResult = await axios.get("tiktokaccount-adspend", {
                     params: {
@@ -492,7 +491,7 @@ export default {
                     }
                 });
                 const tiktokTransactions = tiktokResult.data;
-                console.log({ tiktokTransactions });
+
                 if (tiktokTransactions.length > 0) {
                     tiktokTransactions.map(transaction => {
                         if (transaction.hasOwnProperty("stat_cost")) {
@@ -503,15 +502,15 @@ export default {
                                 new Date(orderDate) >= new Date(s_date) &&
                                 new Date(orderDate) <= new Date(e_date)
                             ) {
-                                tiktokTotal += Math.abs(
+                                this.tiktokAdsSpend += Math.abs(
                                     parseFloat(transaction.stat_cost)
                                 );
                             }
                         }
                     });
                 }
-                console.log({ tiktokTotal });
-                this.tiktokAdsSpend += tiktokTotal;
+
+                // this.tiktokAdsSpend += tiktokTotal;
                 updateAdData(
                     this.data,
                     "TIKTOK",
