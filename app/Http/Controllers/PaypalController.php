@@ -39,15 +39,17 @@ class PaypalController extends Controller
         $access_token = $response['access_token'];
         $refresh_token = $response['refresh_token'];
         $expires_in = $response['expires_in'];
-
+        $paypal_account_name = $this->getPaypalAccountInfo($access_token);
         $ppData = [];
         $ppData['user_id'] = Auth::user()->id;
         $ppData['access_token'] = $access_token;
         $ppData['refresh_token'] = $refresh_token;
         $ppData['expires_at'] = date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
-        $ppData['name'] = $this->getPaypalAccountInfo($access_token);
+        $ppData['name'] = $paypal_account_name;
+        $ppData['isDeleted'] = false;
+        $ppData['enabled_on_dashboard'] = true;
 
-        Paypal::updateOrCreate(['user_id' => Auth::user()->id], $ppData);
+        Paypal::updateOrCreate(['user_id' => Auth::user()->id, 'name' => $paypal_account_name], $ppData);
 
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);

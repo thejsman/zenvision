@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use App\ShopifyStore;
 use App\Http\CustomRequests;
 use App\Http\GetAllOrders;
 use App\Http\GetAllProducts;
 use App\ShopifyOrder;
+use App\ShopifyStore;
+use Auth;
+use Illuminate\Http\Request;
 
 class ShopifyStoreController extends Controller
-
 {
 
     protected $webhooks = [];
@@ -20,34 +19,34 @@ class ShopifyStoreController extends Controller
     {
         $this->webhooks = [
             [
-                'topic'        => 'orders/create',
-                'address'    => env('APP_URL', null) . '/api/webhooks/create-order',
-                'format'    => 'json'
+                'topic' => 'orders/create',
+                'address' => env('APP_URL', null) . '/api/webhooks/create-order',
+                'format' => 'json',
             ],
             [
-                'topic'        => 'orders/updated',
-                'address'    => env('APP_URL', null) . '/api/webhooks/orders-updated',
-                'format'    => 'json'
+                'topic' => 'orders/updated',
+                'address' => env('APP_URL', null) . '/api/webhooks/orders-updated',
+                'format' => 'json',
             ],
             [
-                'topic'        => 'orders/delete',
-                'address'    => env('APP_URL', null) . '/api/webhooks/orders-delete',
-                'format'    => 'json'
+                'topic' => 'orders/delete',
+                'address' => env('APP_URL', null) . '/api/webhooks/orders-delete',
+                'format' => 'json',
             ],
             [
-                'topic'        => 'products/create',
-                'address'    => env('APP_URL', null) . '/api/webhooks/product-create',
-                'format'    => 'json'
+                'topic' => 'products/create',
+                'address' => env('APP_URL', null) . '/api/webhooks/product-create',
+                'format' => 'json',
             ],
             [
-                'topic'        => 'products/update',
-                'address'    => env('APP_URL', null) . '/api/webhooks/product-update',
-                'format'    => 'json'
+                'topic' => 'products/update',
+                'address' => env('APP_URL', null) . '/api/webhooks/product-update',
+                'format' => 'json',
             ],
             [
-                'topic'        => 'app/uninstalled',
-                'address'    => env('APP_URL', null) . '/api/webhooks/app-uninstalled',
-                'format'    => 'json'
+                'topic' => 'app/uninstalled',
+                'address' => env('APP_URL', null) . '/api/webhooks/app-uninstalled',
+                'format' => 'json',
             ],
             // [
             //     'topic'        => 'inventory_items/create',
@@ -55,13 +54,12 @@ class ShopifyStoreController extends Controller
             //     'format'    => 'json'
             // ],
             [
-                'topic'        => 'inventory_items/update',
-                'address'    => env('APP_URL', null) . '/api/webhooks/inventory-update',
-                'format'    => 'json'
+                'topic' => 'inventory_items/update',
+                'address' => env('APP_URL', null) . '/api/webhooks/inventory-update',
+                'format' => 'json',
             ],
         ];
     }
-
 
     public function getStores()
     {
@@ -95,7 +93,6 @@ class ShopifyStoreController extends Controller
                 $created_at_min = 0;
                 $latest_order = ShopifyOrder::where('store_id', $shop_exists->id)->latest('created_on_shopify')->first();
 
-
                 if ($latest_order) {
                     $created_at_min = $latest_order;
                 }
@@ -107,10 +104,12 @@ class ShopifyStoreController extends Controller
                 return redirect('/');
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
-                    'user_id'    => Auth::user()->id,
+                    'user_id' => Auth::user()->id,
                     'store_name' => $shop_domain,
-                    'store_url'    => $shop_domain,
-                    'api_token'    => $access_token
+                    'store_url' => $shop_domain,
+                    'api_token' => $access_token,
+                    'isDeleted' => false,
+                    'enabled_on_dashboard' => true,
                 ]);
                 $this->registerWebhook($shop_domain, $access_token);
                 $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
@@ -124,7 +123,7 @@ class ShopifyStoreController extends Controller
         $query = array(
             "client_id" => config('shopify.api_key'), // Your API key
             "client_secret" => config('shopify.api_secret'), // Your app credentials (secret key)
-            "code" => $code // Grab the access key from the URL
+            "code" => $code, // Grab the access key from the URL
         );
 
         $access_token_url = "https://" . $shop_domain . "/admin/oauth/access_token";
@@ -147,14 +146,14 @@ class ShopifyStoreController extends Controller
     {
         $store = ShopifyStore::find($request->id);
         $access_token = $request->api_token;
-        $revoke_url   = "https://" . $request->store_url . "/admin/api_permissions/current.json";
+        $revoke_url = "https://" . $request->store_url . "/admin/api_permissions/current.json";
         $store->isDeleted = true;
         $store->save();
         $headers = array(
             "Content-Type: application/json",
             "Accept: application/json",
             "Content-Length: 0",
-            "X-Shopify-Access-Token: " . $access_token
+            "X-Shopify-Access-Token: " . $access_token,
         );
 
         $handler = curl_init($revoke_url);
@@ -162,7 +161,7 @@ class ShopifyStoreController extends Controller
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handler, CURLOPT_HTTPHEADER, $headers);
 
-        $result =  curl_exec($handler);
+        $result = curl_exec($handler);
         if (!curl_errno($handler)) {
             $info = curl_getinfo($handler);
         }
@@ -181,7 +180,7 @@ class ShopifyStoreController extends Controller
         }
     }
 
-    function getDisputes()
+    public function getDisputes()
     {
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
