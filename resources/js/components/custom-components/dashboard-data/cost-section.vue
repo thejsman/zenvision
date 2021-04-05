@@ -38,6 +38,7 @@ import moment from "moment";
 import {
     displayCurrency,
     updateData,
+    updateAdData,
     setLoading,
     getDatesBetweenDates
 } from "../../../utils";
@@ -63,6 +64,7 @@ export default {
             cogsTotal: 0,
             chargebackTotal: 0,
             merchantFees: 0,
+            tiktokAdsSpend: 0,
             data: [
                 {
                     id: 1,
@@ -144,7 +146,8 @@ export default {
                     this.totalDiscount +
                     this.subscriptionData +
                     this.cogsTotal +
-                    this.chargebackTotal
+                    this.chargebackTotal +
+                    this.tiktokAdsSpend
             );
 
             eventBus.$emit("totalCostValue", totalCost);
@@ -177,6 +180,7 @@ export default {
             setLoading(this.data);
             this.getChargebackTotal(s_date, e_date);
             this.getMerchantfeesTotal(s_date, e_date);
+            this.getTiktokAdSpend(s_date, e_date);
         });
     },
     methods: {
@@ -188,8 +192,9 @@ export default {
             this.totalDiscount = discounts;
             updateData(this.data, DISCOUNTS_TOTAL, displayCurrency(discounts));
             updateData(this.data, REFUNDS_TOTAL, displayCurrency(refundTotal));
-            updateData(this.data, AD_SPEND_FACEBOOK, displayCurrency(0));
-            updateData(this.data, AD_SPEND_GOOGLE, displayCurrency(0));
+            updateAdData(this.data, "FACEBOOK", displayCurrency(0));
+            updateAdData(this.data, "GOOGLE", displayCurrency(0));
+            updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
             //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
             this.getSubscriptionData();
             //   this.getChargebackTotal();
@@ -435,6 +440,7 @@ export default {
 
             this.merchantFees = total + paypalTotal;
             updateData(this.data, MERCHANT_FEE, displayCurrency(total));
+
             //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
@@ -472,6 +478,45 @@ export default {
                 }
             });
             return total;
+        },
+        async getTiktokAdSpend(s_date, e_date) {
+            this.tiktokAdsSpend = 0;
+            const dates = getDatesBetweenDates(s_date, e_date);
+            let tiktokTotal = 0;
+            dates.forEach(async date => {
+                const tiktokResult = await axios.get("tiktokaccount-adspend", {
+                    params: {
+                        s_date: date[0].substring(0, 10),
+                        e_date: date[1].substring(0, 10)
+                    }
+                });
+                const tiktokTransactions = tiktokResult.data;
+
+                if (tiktokTransactions.length > 0) {
+                    tiktokTransactions.map(transaction => {
+                        if (transaction.hasOwnProperty("stat_cost")) {
+                            const orderDate = moment(
+                                transaction.stat_datetime
+                            ).format("YYYY-MM-DD");
+                            if (
+                                new Date(orderDate) >= new Date(s_date) &&
+                                new Date(orderDate) <= new Date(e_date)
+                            ) {
+                                this.tiktokAdsSpend += Math.abs(
+                                    parseFloat(transaction.stat_cost)
+                                );
+                            }
+                        }
+                    });
+                }
+
+                // this.tiktokAdsSpend += tiktokTotal;
+                updateAdData(
+                    this.data,
+                    "TIKTOK",
+                    displayCurrency(this.tiktokAdsSpend)
+                );
+            });
         }
     }
 };

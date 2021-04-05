@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\CustomRequests;
 use App\Stripe;
 use Auth;
+use Illuminate\Http\Request;
 
 class StripeController extends Controller
 {
@@ -41,11 +40,13 @@ class StripeController extends Controller
             $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
             $stripeData = [];
             $stripeData['user_id'] = Auth::user()->id;
-            $stripeData['access_token']  =  $response['access_token'];
-            $stripeData['refresh_token']  = $response['refresh_token'];
-            $stripeData['stripe_publishable_key']  = $response['stripe_publishable_key'];
-            $stripeData['stripe_user_id']  = $response['stripe_user_id'];
+            $stripeData['access_token'] = $response['access_token'];
+            $stripeData['refresh_token'] = $response['refresh_token'];
+            $stripeData['stripe_publishable_key'] = $response['stripe_publishable_key'];
+            $stripeData['stripe_user_id'] = $response['stripe_user_id'];
             $stripeData['name'] = $account_name;
+            $stripeData['isDeleted'] = false;
+            $stripeData['enabled_on_dashboard'] = true;
 
             Stripe::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
         }
@@ -96,11 +97,11 @@ class StripeController extends Controller
                 curl_close($ch);
                 $response = json_decode($result, true);
 
-                array_push($availableBalance,  $response['available'][0]);
+                array_push($availableBalance, $response['available'][0]);
             }
             return $availableBalance;
         } else {
-            return   $availableBalance;
+            return $availableBalance;
         }
     }
 
@@ -215,6 +216,6 @@ class StripeController extends Controller
                 }
             }
         }
-        return  ['stripeChargebacks' => $stripe_chargebacks];
+        return ['stripeChargebacks' => $stripe_chargebacks];
     }
 }

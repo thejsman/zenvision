@@ -11,7 +11,7 @@
                         'border-primary': tiktokAccount.enabled_on_dashboard
                     }"
                     @click="disableFeature ? handleClick(tiktokAccount) : null"
-                    v-b-tooltip.hover="tiktokAccount.display_name"
+                    v-b-tooltip.hover="tiktokAccount.advertiser_name"
                 >
                     <img src="/images/icons/tiktok-icon.svg" alt height="21" />
                 </div>

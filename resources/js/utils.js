@@ -47,6 +47,18 @@ export const updateData = (data, title, value) => {
     });
 };
 
+export const updateAdData = (data, provider, value) => {
+    data.forEach(d => {
+        if (
+            d.iconName !== undefined &&
+            d.iconName.includes(provider.toLowerCase())
+        ) {
+            d.value = `${value}`;
+            d.loading = false;
+        }
+    });
+};
+
 export const updateGraphData = (data, title, value, graphData) => {
     data.forEach(d => {
         if (d.title === title) {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use App\Http\CustomRequests;
 use App\FacebookAd;
+use App\Http\CustomRequests;
+use Auth;
+use Illuminate\Http\Request;
 
 class FacebookController extends Controller
 {
@@ -20,18 +20,16 @@ class FacebookController extends Controller
         $query = array(
             "client_id" => $client_id, // Your API key
             "client_secret" => $client_secret, // Your app credentials (secret key)
-            "code" => $code // Grab the access key from the URL
+            "code" => $code, // Grab the access key from the URL
         );
 
         $url = "https://graph.facebook.com/v10.0/oauth/access_token?redirect_uri=" . $redirect_uri . "&client_id=" . $client_id . "&client_secret=" . $client_secret . "&code=" . $code;
-
 
         $result = CustomRequests::postRequest($url, $query);
 
         $access_token = $result['access_token'];
 
         $facebook_data = $this->getFacebookAds($access_token);
-
 
         return $facebook_data;
     }
@@ -47,11 +45,14 @@ class FacebookController extends Controller
 
         $fbdata = [];
         $fbdata['user_id'] = Auth::user()->id;
-        $fbdata['ad_account_id']  = $request->id;
-        $fbdata['ad_account_name']  = $request->name;
+        $fbdata['ad_account_id'] = $request->id;
+        $fbdata['ad_account_name'] = $request->name;
         $fbdata['access_token'] = $request->access_token;
         $fbdata['currency'] = $request->currency;
-        $result =  FacebookAd::updateOrCreate(['ad_account_id' => $fbdata['ad_account_id'], 'user_id' => Auth::user()->id], $fbdata);
+        $fbdata['isDeleted'] = false;
+        $fbdata['enabled_on_dashboard'] = true;
+
+        $result = FacebookAd::updateOrCreate(['ad_account_id' => $fbdata['ad_account_id'], 'user_id' => Auth::user()->id], $fbdata);
     }
 
     public function getFacebookAds($accessToken)
@@ -73,7 +74,6 @@ class FacebookController extends Controller
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
-
                 $headers = array();
                 $headers[] = 'Authorization: Bearer ' . $accessToken;
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -94,19 +94,18 @@ class FacebookController extends Controller
     {
         $fb_ads_data = [];
         $user = Auth::user();
-        $fb_ad_accounts =  $user->getFacebookAccounts();
+        $fb_ad_accounts = $user->getFacebookAccounts();
         foreach ($fb_ad_accounts as $fb_ad_account) {
 
             // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:' . $request->s_date . ',until:' . $request->e_date . '}&time_increment=1&access_token=' . $fb_ad_account->access_token;
             $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:2021-02-17,until:2021-03-17}&time_increment=1&access_token=' . $fb_ad_account->access_token;
-            $spend =  CustomRequests::getRequest($url, '', '');
+            $spend = CustomRequests::getRequest($url, '', '');
             if (count($spend['data']) > 0) {
                 array_push($fb_ads_data, $spend['data']);
             }
         }
-        return  $fb_ads_data;
+        return $fb_ads_data;
     }
-
 
     public function toogleAdAccount(Request $request)
     {

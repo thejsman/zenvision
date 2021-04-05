@@ -1,50 +1,48 @@
 <template>
     <div class="row">
-        <div v-if="!snapchatError" class="m-4 d-flex flex-column">
+        <div v-if="!tiktokError" class="m-4 d-flex flex-column">
             <div class="font-weight-bold font-size-14 text-white">
-                Snapchat Ad Accounts
+                TikTok Ad Accounts
             </div>
             <p class="mt-4 mb-4 text-white">Please select one Ad account</p>
 
             <b-card-group class="flex justify-content-center flex-row">
                 <div
-                    v-for="snapchatAdAccount of snapchatData"
-                    :key="snapchatAdAccount.id"
+                    v-for="tiktokAdAccount of tiktokData"
+                    :key="tiktokAdAccount.advertiser_id"
                     class="d-flex justify-content-between d-flex flex-row"
                 >
                     <b-card
                         bg-variant="light"
-                        :header="
-                            `Account Name: ` + snapchatAdAccount.adaccount.name
-                        "
+                        :header="`Tiktik Ad Account `"
                         class="m-2 fb-card"
                     >
+                        <b-card-body>
+                            <p class="fb-text">
+                                Advertiser Name:
+                                {{ tiktokAdAccount.advertiser_name }}
+                            </p>
+                            <p class="fb-text">
+                                Advertiser Id:
+                                {{ tiktokAdAccount.advertiser_id }}
+                            </p>
+                        </b-card-body>
                         <b-card-text>
-                            <p class="fb-text">
-                                Currency:
-                                {{ snapchatAdAccount.adaccount.currency }}
-                            </p>
-                            <p class="fb-text">
-                                Status: {{ snapchatAdAccount.adaccount.status }}
-                            </p>
-
                             <b-button
                                 block
                                 class="btn btn-primary"
                                 :class="{
                                     disabled: alreadyAdded(
-                                        snapchatAdAccount.adaccount.id
+                                        tiktokAdAccount.advertiser_id
                                     )
                                 }"
                                 :disabled="
-                                    alreadyAdded(snapchatAdAccount.adaccount.id)
+                                    alreadyAdded(tiktokAdAccount.advertiser_id)
                                 "
                                 variant="primary"
-                                @click="
-                                    handleClick(snapchatAdAccount.adaccount)
-                                "
+                                @click="handleClick(tiktokAdAccount)"
                                 >{{
-                                    alreadyAdded(snapchatAdAccount.adaccount.id)
+                                    alreadyAdded(tiktokAdAccount.advertiser_id)
                                         ? "Account alreay added"
                                         : "Select this account"
                                 }}</b-button
@@ -85,11 +83,11 @@ export default {
         };
     },
     props: {
-        snapchatData: {
+        tiktokData: {
             type: Array,
             default: () => []
         },
-        snapchatError: {
+        tiktokError: {
             type: Boolean,
             default: false
         },
@@ -102,20 +100,17 @@ export default {
     methods: {
         async handleClick(adaccount) {
             try {
-                const result = await axios.post(
-                    "/snapchatadaccount",
-                    adaccount
-                );
+                await axios.post("/tiktokaccount", adaccount);
                 this.showMessage = true;
                 this.updateVariant = "success";
-                this.updateResult = "Snapchat Ad account added successfully";
+                this.updateResult = "Tiktok Ad account added successfully";
                 setTimeout(() => {
                     this.showMessage = false;
                     this.updateVariant = "";
                     this.updateResult = "";
                     this.$emit("updateData");
                     this.$emit("handle-close");
-                    console.log(this.$router);
+
                     eventBus.$emit("toggleShopifyStore");
                     window.location.href = "/";
                 }, 2000);
@@ -134,7 +129,7 @@ export default {
         },
         alreadyAdded(id) {
             return this.adAccounts.some(
-                account => account.ad_account_id === id
+                account => account.advertiser_id === id
             );
         }
     }

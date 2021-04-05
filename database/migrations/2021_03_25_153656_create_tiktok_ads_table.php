@@ -16,10 +16,9 @@ class CreateTiktokAdsTable extends Migration
         Schema::create('tiktok_ads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('display_name')->nullable();
-            $table->string('tiktok_id')->nullable();
+            $table->string('advertiser_name')->nullable();
+            $table->string('advertiser_id')->nullable();
             $table->string('access_token');
-            $table->string('tiktok_email');
             $table->boolean('isDeleted')->default(false);
             $table->boolean('enabled_on_dashboard')->default(true);
             $table->timestamps();
