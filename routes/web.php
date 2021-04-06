@@ -62,6 +62,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
     Route::get('getstripechargbacks', 'StripeController@getStripeChargebacks');
+    Route::get('stripetemp', 'StripeController@getStripeTransactionsSdk');
 
     // COGS Data
     Route::get('cogs', 'CogsController@index');
@@ -71,9 +72,13 @@ Route::group(['middleware' => ['auth']], function () {
     //Facebook APIs
     Route::get('getfacebookaccounts', 'FacebookController@getAdAccounts');
     Route::get('getfacebookadsdata', 'FacebookController@getFacebookAdsData');
+
     Route::get('fbconnect', 'FacebookController@index');
 
-    Route::post('fbconnect', 'FacebookController@store');
+    Route::get('facebook-connect', 'FacebookController@facebookConnect');
+    Route::get('facebook-listadaccounts', 'FacebookController@listAdAccounts');
+    Route::post('facebook-addadaccounts', 'FacebookController@store');
+
     Route::patch('fbconnect', 'FacebookController@toogleAdAccount');
     Route::patch('fbconnectdelete', 'FacebookController@destroy');
 

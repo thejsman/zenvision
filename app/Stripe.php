@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Stripe extends Model
+class StripeAccount extends Model
 {
     protected $guarded = [];
     protected $table = "stripe";
