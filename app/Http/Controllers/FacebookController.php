@@ -9,13 +9,37 @@ use Illuminate\Http\Request;
 
 class FacebookController extends Controller
 {
+    public function facebookConnect(Request $request)
+    {
+
+        $code = $request->code;
+
+        $client_id = env('MIX_FACEBOOK_CLIENT_ID');
+        $client_secret = env('FACEBOOK_SECRET_KEY');
+        $redirect_uri = env('MIX_FACEBOOK_REDIRECT_URL');
+
+        $query = array(
+            "client_id" => $client_id,
+            "client_secret" => $client_secret,
+            "code" => $code,
+        );
+
+        $url = "https://graph.facebook.com/v10.0/oauth/access_token?redirect_uri=" . $redirect_uri . "&client_id=" . $client_id . "&client_secret=" . $client_secret . "&code=" . $code;
+
+        $result = CustomRequests::postRequest($url, $query);
+
+        $access_token = $result['access_token'];
+        session(['facebook_access_token' => $access_token]);
+        return redirect()->route('home', ['listFacebookAdAccounts' => $request->session()->get('facebook_access_token')]);
+    }
+
     public function index(Request $request)
     {
 
         $code = $request->code;
         $client_id = "253783359751006";
         $client_secret = "14f0d2caacdbbf7f60dd8954bc22d900";
-        $redirect_uri = "https%3A%2F%2Fstaging.zenvision.io%2F";
+        $redirect_uri = env('MIX_FACEBOOK_REDIRECT_URL');
 
         $query = array(
             "client_id" => $client_id, // Your API key
@@ -28,10 +52,8 @@ class FacebookController extends Controller
         $result = CustomRequests::postRequest($url, $query);
 
         $access_token = $result['access_token'];
+        return redirect()->route('home', ['listFacebookAdAccounts' => $access_token]);
 
-        $facebook_data = $this->getFacebookAds($access_token);
-
-        return $facebook_data;
     }
 
     public function getAdAccounts()
@@ -47,12 +69,69 @@ class FacebookController extends Controller
         $fbdata['user_id'] = Auth::user()->id;
         $fbdata['ad_account_id'] = $request->id;
         $fbdata['ad_account_name'] = $request->name;
-        $fbdata['access_token'] = $request->access_token;
+        $fbdata['access_token'] = session('facebook_access_token');
         $fbdata['currency'] = $request->currency;
         $fbdata['isDeleted'] = false;
         $fbdata['enabled_on_dashboard'] = true;
 
         $result = FacebookAd::updateOrCreate(['ad_account_id' => $fbdata['ad_account_id'], 'user_id' => Auth::user()->id], $fbdata);
+    }
+
+    public function listAdAccounts(Request $request)
+    {
+        $access_token = $request->access_token;
+
+        $url = "https://graph.facebook.com/v10.0/me/adaccounts?access_token=" . $access_token;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $result = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+            return [];
+        }
+        curl_close($ch);
+
+        $response = json_decode($result, true);
+        if (count($response['data'])) {
+            $facebook_accounts = [];
+            foreach ($response['data'] as $account) {
+                $account_id = $account['id'];
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://graph.facebook.com/v10.0/' . $account_id . '/?fields=currency,insights%7Bspend%7D,name',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_HTTPHEADER => array(
+                        'Authorization: Bearer ' . $access_token,
+                    ),
+                ));
+
+                $result = curl_exec($curl);
+
+                curl_close($curl);
+                $response = json_decode($result, true);
+
+                array_push($facebook_accounts, $response);
+            }
+
+            return $facebook_accounts;
+        } else {
+            return [];
+        }
     }
 
     public function getFacebookAds($accessToken)
@@ -100,6 +179,7 @@ class FacebookController extends Controller
             // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:' . $request->s_date . ',until:' . $request->e_date . '}&time_increment=1&access_token=' . $fb_ad_account->access_token;
             $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:2021-02-17,until:2021-03-17}&time_increment=1&access_token=' . $fb_ad_account->access_token;
             $spend = CustomRequests::getRequest($url, '', '');
+            dd($spend);
             if (count($spend['data']) > 0) {
                 array_push($fb_ads_data, $spend['data']);
             }

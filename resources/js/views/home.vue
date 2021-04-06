@@ -103,11 +103,6 @@ export default {
         ])
     },
     created() {
-        // this.fetchShopifyData();
-
-        if (new URL(location.href).searchParams.get("code")) {
-            this.getFacebookAds();
-        }
         if (new URL(location.href).searchParams.get("listSnapchatAccount")) {
             this.getSnapchatAdAccounts();
         }
@@ -117,6 +112,9 @@ export default {
         }
         if (new URL(location.href).searchParams.get("listTiktokAccounts")) {
             this.getTiktokAccounts();
+        }
+        if (new URL(location.href).searchParams.get("listFacebookAdAccounts")) {
+            this.getFacebookAdsAccounts();
         }
 
         this.getShopifyStoreData();
@@ -133,7 +131,6 @@ export default {
         ...mapActions(["fetchShopifyData"]),
 
         showModal() {
-            console.log("Check this modal");
             this.$bvModal.show("modal-1");
         },
         handleOk() {
@@ -160,11 +157,13 @@ export default {
                 console.log(error);
             }
         },
-        async getFacebookAds(code) {
+        async getFacebookAdsAccounts(code) {
             try {
-                const result = await axios.get("fbconnect", {
+                const result = await axios.get("facebook-listadaccounts", {
                     params: {
-                        code: new URL(location.href).searchParams.get("code")
+                        access_token: new URL(location.href).searchParams.get(
+                            "listFacebookAdAccounts"
+                        )
                     }
                 });
                 this.facebookData = result.data;
