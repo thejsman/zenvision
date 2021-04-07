@@ -31,7 +31,8 @@ class GoogleAdController extends Controller
         //     $fields_string .= $key . '=' . $value . '&';
         // }
         // rtrim($fields_string, '&');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields_string));
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
         $headers = array();
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
