@@ -42,7 +42,7 @@ class GoogleAdController extends Controller
         }
         curl_close($ch);
         $response = json_decode($result, true);
-
+        return $response;
         session([
             'google_access_token' => $response['access_token'],
             'google_refresh_token' => $response['refresh_token'],
