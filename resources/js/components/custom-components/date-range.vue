@@ -22,7 +22,7 @@ export default {
     data() {
         return {
             dateRange: {
-                startDate: moment().add(-3, "month"),
+                startDate: moment().add(-1, "month"),
                 endDate: moment()
             },
             opens: "left"

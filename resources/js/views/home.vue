@@ -150,7 +150,7 @@ export default {
 
                 let d = new Date();
                 this.handleDateChange({
-                    startDate: moment(d).add(-3, "months"),
+                    startDate: moment(d).add(-1, "months"),
                     endDate: moment(d)
                 });
             } catch (error) {
