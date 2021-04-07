@@ -81,8 +81,7 @@ export default {
         return {
             snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=https://zenvision.io&scope=snapchat-marketing-api`,
             tiktokUrl: `https://ads.tiktok.com/marketing_api/auth?app_id=${process.env.MIX_TIKTOK_APP_ID}&redirect_uri=${process.env.MIX_TIKTOK_REDIRECT_URL}`,
-            //   googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/adwords&response_type=code&redirect_uri=http://localhost:8000/google-connect&client_id=${process.env.MIX_GOOGLE_CLIENT_ID}`,
-            googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/adwords&response_type=token&redirect_uri=http://localhost:8000/&client_id=736720769834-eko04svp2029fgs0nt386ic87jakk154.apps.googleusercontent.com`,
+            googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/adwords&response_type=code&access_type=offline&redirect_uri=${process.env.MIX_GOOGLE_REDIRECT_URL}&client_id=${process.env.MIX_GOOGLE_CLIENT_ID}`,
             facebookUrl: `https://www.facebook.com/v6.0/dialog/oauth?client_id=${process.env.MIX_FACEBOOK_CLIENT_ID}&redirect_uri=${process.env.MIX_FACEBOOK_REDIRECT_URL}`
         };
     }

@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\GoogleAd;
-use App\Http\CustomRequests;
-use Edujugon\GoogleAds\GoogleAds;
-use Google\AdsApi\AdWords\v201809\cm\CampaignService;
-use Google\AdsApi\AdWords\v201809\mcm\ManagedCustomerService;
-use Carbon\Carbon as Time;
 use Auth;
-
+use Carbon\Carbon as Time;
+use Illuminate\Http\Request;
 use Session;
 
 class GoogleAdController extends Controller
@@ -23,13 +18,14 @@ class GoogleAdController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://accounts.google.com/o/oauth2/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $fields_string = "";
         $fields = array(
-            'client_id' => '736720769834-eko04svp2029fgs0nt386ic87jakk154.apps.googleusercontent.com',
-            'client_secret' => 'QQJhehLGIELpTcrV7t2MKij7',
-            'redirect_uri' => 'http://localhost:8000/google-connect',
+            'client_id' => env('MIX_GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_SECRET_KEY'),
+            'redirect_uri' => env('MIX_GOOGLE_REDIRECT_URL'),
             'grant_type' => 'authorization_code',
-            'code' => $code
+            'code' => $code,
         );
         foreach ($fields as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
@@ -46,10 +42,11 @@ class GoogleAdController extends Controller
         }
         curl_close($ch);
         $response = json_decode($result, true);
+
         session([
             'google_access_token' => $response['access_token'],
             'google_refresh_token' => $response['refresh_token'],
-            'google_expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in'])
+            'google_expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in']),
         ]);
         return redirect()->route('home', ['listGoogleAccounts' => $response['access_token']]);
     }
@@ -63,17 +60,17 @@ class GoogleAdController extends Controller
     public function store(Request $request)
     {
         $google_table_data = array(
-            'user_id' =>  Auth::user()->id,
+            'user_id' => Auth::user()->id,
             'ad_account_id' => str_replace('customers/', '', $request->ad_account_id),
             'access_token' => $request->session()->get('google_access_token'),
             'refresh_token' => $request->session()->get('google_refresh_token'),
             'expires_at' => $request->session()->get('google_expires_at'),
             'enabled_on_dashboard' => true,
-            'isDeleted' => false
+            'isDeleted' => false,
         );
 
         GoogleAd::updateOrCreate([
-            'user_id' =>  Auth::user()->id
+            'user_id' => Auth::user()->id,
         ], $google_table_data);
     }
 
@@ -98,11 +95,11 @@ class GoogleAdController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://googleads.googleapis.com/v6/customers:listAccessibleCustomers');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $headers = array();
         $headers[] = 'Authorization: Bearer ' . $request->access_token;
-        $headers[] = 'Developer-Token: d7bZvh9HH1hVLFn2kvR_Og';
+        $headers[] = 'Developer-Token:' . env('GOOGLE_DEVELOPER_TOKEN');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
