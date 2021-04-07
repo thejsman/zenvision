@@ -18,7 +18,7 @@ class GoogleAdController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://accounts.google.com/o/oauth2/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $fields_string = "";
         $fields = array(
             'client_id' => env('MIX_GOOGLE_CLIENT_ID'),
@@ -26,6 +26,7 @@ class GoogleAdController extends Controller
             'redirect_uri' => env('MIX_GOOGLE_REDIRECT_URL'),
             'grant_type' => 'authorization_code',
             'code' => $code,
+            'access_type' => 'offline',
         );
         // foreach ($fields as $key => $value) {
         //     $fields_string .= $key . '=' . $value . '&';
