@@ -28,10 +28,6 @@ class GoogleAdController extends Controller
             'code' => $code,
             'access_type' => 'offline',
         );
-        // foreach ($fields as $key => $value) {
-        //     $fields_string .= $key . '=' . $value . '&';
-        // }
-        // rtrim($fields_string, '&');
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
         $headers = array();
@@ -44,7 +40,6 @@ class GoogleAdController extends Controller
         }
         curl_close($ch);
         $response = json_decode($result, true);
-        return $response;
         session([
             'google_access_token' => $response['access_token'],
             'google_refresh_token' => $response['refresh_token'],
@@ -73,6 +68,7 @@ class GoogleAdController extends Controller
 
         GoogleAd::updateOrCreate([
             'user_id' => Auth::user()->id,
+            'ad_account_id' => str_replace('customers/', '', $request->ad_account_id),
         ], $google_table_data);
     }
 
