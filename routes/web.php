@@ -58,11 +58,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('getstripeaccounts', 'StripeController@index');
     Route::get('stripeconnect', 'StripeController@store');
     Route::get('getstripeaccountsbalance', 'StripeController@getAccountBalance');
-    Route::get('getStripeTransactions', 'StripeController@getStripeTransactions');
+    // Route::get('getStripeTransactions', 'StripeController@getStripeTransactions');
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
     Route::get('getstripechargbacks', 'StripeController@getStripeChargebacks');
-    Route::get('stripetemp', 'StripeController@getStripeTransactionsSdk');
+    Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
 
     // COGS Data
     Route::get('cogs', 'CogsController@index');

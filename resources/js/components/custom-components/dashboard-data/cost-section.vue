@@ -413,25 +413,6 @@ export default {
             this.merchantFees = 0;
             //Stripe
 
-            const result = await axios.get("getStripeTransactions");
-            let { stripeTransactions } = result.data;
-            if (stripeTransactions !== undefined) {
-                stripeTransactions.forEach(sTransaction => {
-                    sTransaction.forEach(st => {
-                        const orderDate = moment
-                            .unix(st.created)
-                            .format("MM-DD-YYYY");
-
-                        if (
-                            new Date(orderDate) >= new Date(s_date) &&
-                            new Date(orderDate) <= new Date(e_date)
-                        ) {
-                            total += parseFloat(st.fee / 100);
-                        }
-                    });
-                });
-            }
-
             //Paypal
             const paypalTotal = await this.getPaypalTransactionsTotal(
                 s_date,
@@ -439,9 +420,10 @@ export default {
             );
 
             this.merchantFees = total + paypalTotal;
-            updateData(this.data, MERCHANT_FEE, displayCurrency(total));
+            // updateData(this.data, MERCHANT_FEE, displayCurrency(total));
 
             //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
+            this.getStripeTransactions(s_date, e_date);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             let total = 0;
@@ -451,6 +433,7 @@ export default {
                     params: { s_date: date[0], e_date: date[1] }
                 });
                 const paypalTransactions = paypalResult.data;
+                console.log("Paypal Transactions: ", paypalTransactions);
                 if (paypalTransactions.length > 0) {
                     paypalTransactions.map(transaction => {
                         if (
@@ -517,6 +500,46 @@ export default {
                     displayCurrency(this.tiktokAdsSpend)
                 );
             });
+        },
+        async getStripeTransactions(s_date, e_date) {
+            alert("Hey");
+            try {
+                console.log({
+                    s_date: s_date.toString(),
+                    e_date: e_date.toString()
+                });
+                const result = await axios.get("getStripeTransactions", {
+                    params: {
+                        s_date: s_date.toString(),
+                        e_date: e_date.toString()
+                    }
+                });
+                const stripeTransactions = result.data;
+
+                if (stripeTransactions !== undefined) {
+                    stripeTransactions.forEach(sTransaction => {
+                        const orderDate = moment
+                            .unix(sTransaction.created)
+                            .format("MM-DD-YYYY");
+
+                        if (
+                            new Date(orderDate) >= new Date(s_date) &&
+                            new Date(orderDate) <= new Date(e_date)
+                        ) {
+                            this.merchantFees += parseFloat(
+                                sTransaction.fee / 100
+                            );
+                        }
+                    });
+                    updateData(
+                        this.data,
+                        MERCHANT_FEE,
+                        displayCurrency(this.merchantFees)
+                    );
+                }
+            } catch (err) {
+                return 0;
+            }
         }
     }
 };

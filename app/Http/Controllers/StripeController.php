@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Stripe;
+use App\StripeAccount;
 use Auth;
 use Illuminate\Http\Request;
+use Stripe;
 
 class StripeController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
+
         return $user->getStripeAccounts();
     }
 
@@ -48,7 +50,7 @@ class StripeController extends Controller
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
 
-            Stripe::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+            DB::table('stripe')->updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
         }
 
         if (curl_errno($ch)) {
@@ -60,13 +62,13 @@ class StripeController extends Controller
 
     public function toogleAccount(Request $request)
     {
-        $account = Stripe::find($request->id);
+        $account = StripeAccount::find($request->id);
         $account->enabled_on_dashboard = !$request->enabled_on_dashboard;
         $account->save();
     }
     public function destroy(Request $request)
     {
-        $account = Stripe::find($request->id);
+        $account = StripeAccount::find($request->id);
         $account->isDeleted = true;
         $account->save();
     }
@@ -103,6 +105,40 @@ class StripeController extends Controller
         } else {
             return $availableBalance;
         }
+    }
+
+    public function getStripeTransactionsSdk(Request $request)
+    {
+
+        $balance_transaction = [];
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripeTransactions = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                $stripe = new \Stripe\StripeClient(
+                    $account->access_token
+                );
+                $transactions = $stripe->balanceTransactions->all(['limit' => 100, 'created' => array(
+                    'gte' => strtotime(date_format(date_create($request->s_date), 'Y/d/m')),
+                    'lte' => strtotime(date_format(date_create($request->e_date), 'Y/d/m') . " +1 days"),
+                )]);
+
+                foreach ($transactions->autoPagingIterator() as $transaction) {
+                    if ($transaction->fee > 0) {
+                        array_push($balance_transaction, array('created' => $transaction->created, 'fee' => $transaction->fee));
+                    }
+
+                }
+            }
+
+            return $balance_transaction;
+        } else {
+
+            return $balance_transaction;
+        }
+
     }
 
     public function getStripeTransactions()
@@ -175,6 +211,31 @@ class StripeController extends Controller
             return $response['business_profile']['name'];
         } else {
             return null;
+        }
+    }
+
+    public function getStripeChargebacksSdk(Request $request)
+    {
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripe_chargebacks = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                $stripe = new \Stripe\StripeClient(
+                    $account->access_token
+                );
+                $disputes = $stripe->disputes->all(['limit' => 100, 'created' => array(
+                    'gte' => strtotime(date_format(date_create($request->s_date), 'Y/d/m')),
+                    'lte' => strtotime(date_format(date_create($request->e_date), 'Y/d/m') . " +1 days"),
+                )]);
+
+                foreach ($disputes->autoPagingIterator() as $dispute) {
+                    array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->fee, 'status' => $dispute->status, 'currency' => $dispute->currency));
+                }
+            }
+
+            return $stripe_chargebacks;
         }
     }
 
