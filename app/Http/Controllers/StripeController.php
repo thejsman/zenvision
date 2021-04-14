@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\StripeAccount;
+use App\StripeBalanceTransactionsReport;
 use Auth;
 use Illuminate\Http\Request;
-use Stripe;
 
 class StripeController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-
         return $user->getStripeAccounts();
     }
 
@@ -50,16 +49,35 @@ class StripeController extends Controller
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
 
-            DB::table('stripe')->updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+            StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
         }
 
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
+        // $this->createReportWebhook($response['access_token']);
+        $this->createReportRun($response['access_token']);
         return redirect('/');
     }
 
+    public function getMerchantFees(Request $request)
+    {
+
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripeTransactions = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+
+                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('created', [$request->e_date, $request->s_date])->get();
+                return $stripeTransactions;
+            }
+
+        }
+        return ['stripeTransactions' => $stripeTransactions];
+    }
     public function toogleAccount(Request $request)
     {
         $account = StripeAccount::find($request->id);
@@ -107,79 +125,37 @@ class StripeController extends Controller
         }
     }
 
-    public function getStripeTransactionsSdk(Request $request)
+    public function createReportRun($access_token)
     {
+        $interval_end = strtotime(date("Y/m/d"));
+        $interval_start = strtotime(date("Y-m-d", strtotime("-3 month", $interval_end)));
 
-        $balance_transaction = [];
-        $user = Auth::user();
-        $stripeAccounts = $user->getStripeAccountConnectIds();
-        $stripeTransactions = [];
-
-        if ($stripeAccounts->count()) {
-            foreach ($stripeAccounts as $account) {
-                $stripe = new \Stripe\StripeClient(
-                    $account->access_token
-                );
-                $transactions = $stripe->balanceTransactions->all(['limit' => 100, 'created' => array(
-                    'gte' => strtotime(date_format(date_create($request->s_date), 'Y/d/m')),
-                    'lte' => strtotime(date_format(date_create($request->e_date), 'Y/d/m') . " +1 days"),
-                )]);
-
-                foreach ($transactions->autoPagingIterator() as $transaction) {
-                    if ($transaction->fee > 0) {
-                        array_push($balance_transaction, array('created' => $transaction->created, 'fee' => $transaction->fee));
-                    }
-
-                }
-            }
-
-            return $balance_transaction;
-        } else {
-
-            return $balance_transaction;
-        }
-
+        $stripe = new \Stripe\StripeClient(
+            $access_token
+        );
+        $stripe->reporting->reportRuns->create([
+            'report_type' => 'balance_change_from_activity.itemized.3',
+            'parameters' => [
+                'interval_start' => $interval_start,
+                'interval_end' => $interval_end,
+            ],
+        ]);
     }
 
-    public function getStripeTransactions()
+    public function reportWebhookHandler(Request $request)
     {
-        $user = Auth::user();
-        $stripeAccounts = $user->getStripeAccountConnectIds();
-        $stripeTransactions = [];
+        $account_id = $request->account;
+        $data = $request->data;
+        $status = $data['object']['status'];
+        $url = $data['object']['result']['url'];
 
-        if ($stripeAccounts->count()) {
-            foreach ($stripeAccounts as $account) {
+        $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
+        $access_token = $stripe_account->access_token;
+        $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
 
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance_transactions');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-                curl_setopt($ch, CURLOPT_POSTFIELDS, "limit=100");
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-                $headers = array(
-                    'Stripe-Account:' . $account->stripe_user_id,
-                    'Authorization: Bearer ' . $account->access_token,
-                );
-
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-                $result = curl_exec($ch);
-
-                if (curl_errno($ch)) {
-                    echo 'Error:' . curl_error($ch);
-                    return [];
-                }
-                curl_close($ch);
-
-                $response = json_decode($result, true);
-
-                if (count($response['data'])) {
-                    array_push($stripeTransactions, $response['data']);
-                }
-            }
-            return ['stripeTransactions' => $stripeTransactions];
-        }
+        return response()->json([
+            'success',
+        ], 200);
     }
 
     public function getStripeAccountInfo($account_id, $access_token)
@@ -214,69 +190,49 @@ class StripeController extends Controller
         }
     }
 
-    public function getStripeChargebacksSdk(Request $request)
+    public function getReportContent($report_url, $access_token, $user_id, $stripe_user_id)
     {
-        $user = Auth::user();
-        $stripeAccounts = $user->getStripeAccountConnectIds();
-        $stripe_chargebacks = [];
 
-        if ($stripeAccounts->count()) {
-            foreach ($stripeAccounts as $account) {
-                $stripe = new \Stripe\StripeClient(
-                    $account->access_token
+        // $report_url = 'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents';
+        // $access_token = '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';
+
+        $options = array('http' => array(
+            'method' => 'GET',
+            'header' => 'Authorization: Bearer ' . $access_token,
+        ));
+        $context = stream_context_create($options);
+        $response = file_get_contents($report_url, false, $context);
+
+        $fp = fopen("php://temp", 'r+');
+        fputs($fp, $response);
+        rewind($fp);
+        $csv_data = [];
+        while (($data = fgetcsv($fp)) !== false) {
+            $csv_data[] = $data;
+        }
+        foreach ($csv_data as $key => $values) {
+            if ($key == 0) {
+                continue;
+            } else {
+                $transaction = array(
+                    'user_id' => $user_id,
+                    'stripe_user_id' => $stripe_user_id,
+                    'balance_transaction_id' => $values[0],
+                    'created' => $values[1],
+                    'available_on' => $values[2],
+                    'currency' => $values[3],
+                    'gross' => $values[4],
+                    'fee' => $values[5],
+                    'net' => $values[6],
+                    'reporting_category' => $values[7],
+                    'description' => $values[8],
                 );
-                $disputes = $stripe->disputes->all(['limit' => 100, 'created' => array(
-                    'gte' => strtotime(date_format(date_create($request->s_date), 'Y/d/m')),
-                    'lte' => strtotime(date_format(date_create($request->e_date), 'Y/d/m') . " +1 days"),
-                )]);
-
-                foreach ($disputes->autoPagingIterator() as $dispute) {
-                    array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->fee, 'status' => $dispute->status, 'currency' => $dispute->currency));
-                }
+                //Save the transacion in the table
+                StripeBalanceTransactionsReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id, 'balance_transaction_id' => $transaction['balance_transaction_id']], $transaction);
             }
 
-            return $stripe_chargebacks;
         }
+
     }
 
-    public function getStripeChargebacks()
-    {
-        $user = Auth::user();
-        $stripeAccounts = $user->getStripeAccountConnectIds();
-        $stripe_chargebacks = [];
-
-        if ($stripeAccounts->count()) {
-            foreach ($stripeAccounts as $account) {
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/disputes');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-                curl_setopt($ch, CURLOPT_POSTFIELDS, "limit=100");
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-                $headers = array(
-                    'Stripe-Account:' . $account->stripe_user_id,
-                    'Authorization: Bearer ' . $account->access_token,
-                );
-
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-                $result = curl_exec($ch);
-
-                if (curl_errno($ch)) {
-                    echo 'Error:' . curl_error($ch);
-                    return [];
-                }
-                curl_close($ch);
-
-                $response = json_decode($result, true);
-
-                if (count($response['data'])) {
-                    array_push($stripe_chargebacks, $response['data']);
-                }
-            }
-        }
-        return ['stripeChargebacks' => $stripe_chargebacks];
-    }
 }
