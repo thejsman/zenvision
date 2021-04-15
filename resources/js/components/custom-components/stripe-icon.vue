@@ -1,89 +1,105 @@
 <template>
-  <div class="flex-start pl-1">
-    <div class="d-flex flex-row dropdown">
-      <div v-for="stripeAccount in stripeAccounts" :key="stripeAccount.id">
-        <div
-          class="border rounded p-2 ml-2 dropbtn"
-          :class="{ 'border-primary': stripeAccount.enabled_on_dashboard }"
-          @click="disableFeature ? handleClick(stripeAccount) : null"
-          v-b-tooltip.hover="stripeAccount.name"
-        >
-          <img src="/images/icons/stripe-icon.svg" alt height="21" />
-        </div>
+    <div class="flex-start pl-1">
+        <div class="d-flex flex-row dropdown">
+            <div
+                v-for="stripeAccount in stripeAccounts"
+                :key="stripeAccount.id"
+            >
+                <div
+                    class="border rounded p-2 ml-2 dropbtn"
+                    :class="{
+                        'border-primary': stripeAccount.enabled_on_dashboard
+                    }"
+                    @click="disableFeature ? handleClick(stripeAccount) : null"
+                    v-b-tooltip.hover="stripeAccount.name"
+                >
+                    <img src="/images/icons/stripe-icon.svg" alt height="21" />
+                </div>
 
-        <div class="dropdown-content">
-          <a href="#" @click="handleClick(stripeAccount)" v-if="disableFeature">
-            {{ stripeAccount.enabled_on_dashboard ? "Disable" : "Enable" }}</a
-          >
-          <a href="#" @click="showMsgBoxOne(stripeAccount, $event)">Remove</a>
+                <div class="dropdown-content">
+                    <a
+                        href="#"
+                        @click="handleClick(stripeAccount)"
+                        v-if="disableFeature"
+                    >
+                        {{
+                            stripeAccount.enabled_on_dashboard
+                                ? "Disable"
+                                : "Enable"
+                        }}</a
+                    >
+                    <a href="#" @click="showMsgBoxOne(stripeAccount, $event)"
+                        >Remove</a
+                    >
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 <script>
 import axios from "axios";
 export default {
-  name: "StripeAccount",
-  data() {
-    return {
-      stripeAccounts: [],
-    };
-  },
-  props: {
-    disableFeature: {
-      type: Boolean,
-      default: true,
+    name: "StripeAccount",
+    data() {
+        return {
+            stripeAccounts: []
+        };
     },
-  },
-  created() {
-    this.getStripeAccounts();
-  },
-  methods: {
-    async getStripeAccounts() {
-      try {
-        const result = await axios.get("getstripeaccounts");
-        this.stripeAccounts = result.data;
-      } catch (err) {
-        console.log(err);
-        this.stripeAccounts = [];
-      }
+    props: {
+        disableFeature: {
+            type: Boolean,
+            default: true
+        }
     },
-    showMsgBoxOne(account) {
-      this.boxOne = "";
-      this.$bvModal
-        .msgBoxConfirm("Are you sure you want to remove the Stripe account?")
-        .then((value) => {
-          this.boxOne = value;
-          console.log("Yes", value);
-          if (value) {
-            this.removeChannel(account);
-          }
-        })
-        .catch((err) => {
-          // An error occurred
-        });
+    created() {
+        this.getStripeAccounts();
     },
-    async handleClick(account) {
-      try {
-        await axios.patch("stripeconnect", account);
-        await this.getStripeAccounts();
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    methods: {
+        async getStripeAccounts() {
+            try {
+                const result = await axios.get("getstripeaccounts");
+                this.stripeAccounts = result.data;
+            } catch (err) {
+                console.log(err);
+                this.stripeAccounts = [];
+            }
+        },
+        showMsgBoxOne(account) {
+            this.boxOne = "";
+            this.$bvModal
+                .msgBoxConfirm(
+                    "Are you sure you want to remove the Stripe account?"
+                )
+                .then(value => {
+                    this.boxOne = value;
+                    console.log("Yes", value);
+                    if (value) {
+                        this.removeChannel(account);
+                    }
+                })
+                .catch(err => {
+                    // An error occurred
+                });
+        },
+        async handleClick(account) {
+            try {
+                await axios.patch("stripeconnect", account);
+                //  await this.getStripeAccounts();
+            } catch (error) {
+                console.log(error);
+            }
+        },
 
-    async removeChannel(account, event) {
-      try {
-        await axios.patch("stripeconnectdelete", account);
-        await this.getStripeAccounts();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-  },
+        async removeChannel(account, event) {
+            try {
+                await axios.patch("stripeconnectdelete", account);
+                await this.getStripeAccounts();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
 };
 </script>
 
-<style>
-</style>
+<style></style>

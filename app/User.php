@@ -57,7 +57,7 @@ class User extends Authenticatable
 
     public function getStripeAccounts()
     {
-        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
     }
 
     public function getTiktokAccounts()
@@ -79,7 +79,7 @@ class User extends Authenticatable
     }
     public function getStripeAccountConnectIds()
     {
-        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
+        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'user_id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
     }
     public function getPaypalAccountConnectIds()
     {

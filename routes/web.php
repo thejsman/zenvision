@@ -57,12 +57,19 @@ Route::group(['middleware' => ['auth']], function () {
     //Stripe
     Route::get('getstripeaccounts', 'StripeController@index');
     Route::get('stripeconnect', 'StripeController@store');
+
+    Route::get('stripeconnect/chargeback', 'StripeController@getStripeChargebacks');
+    Route::get('stripeconnect-merchantfee', 'StripeController@getMerchantFees');
+
     Route::get('getstripeaccountsbalance', 'StripeController@getAccountBalance');
-    Route::get('getStripeTransactions', 'StripeController@getStripeTransactions');
+    // Route::get('getStripeTransactions', 'StripeController@getStripeTransactions');
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
-    Route::get('getstripechargbacks', 'StripeController@getStripeChargebacks');
-    Route::get('stripetemp', 'StripeController@getStripeTransactionsSdk');
+
+    Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
+
+    Route::get('stripe-report-balancetransaction', 'StripeController@createBalanceTransactionReport');
+    Route::get('stripe-report-report', 'StripeController@getReport');
 
     // COGS Data
     Route::get('cogs', 'CogsController@index');
@@ -113,3 +120,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('google-connect-getaccounts', 'GoogleAdController@getGoogleAdAccounts');
 
 });
+
+//Stripe Webhooks
+Route::post('stripe/webhook/report', 'StripeController@reportWebhookHandler');
+
+Route::post('stripe/webhook/charge', 'StripeController@chargeWebookHandler');
+
+Route::get('stripe-reportrun', 'StripeController@createReportRun');
+Route::get('stripe-report-content', 'StripeController@getReportContent');
