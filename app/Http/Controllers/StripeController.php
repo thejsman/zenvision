@@ -127,7 +127,8 @@ class StripeController extends Controller
 
     public function createReportRun($access_token)
     {
-        $interval_end = strtotime(date("Y/m/d"));
+        $today = strtotime(date("Y/m/d"));
+        $interval_end = strtotime('-1 days', $today);
         $interval_start = strtotime(date("Y-m-d", strtotime("-3 month", $interval_end)));
 
         $stripe = new \Stripe\StripeClient(
@@ -152,6 +153,35 @@ class StripeController extends Controller
         $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
         $access_token = $stripe_account->access_token;
         $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
+
+        return response()->json([
+            'success',
+        ], 200);
+    }
+
+    public function chargeWebookHandler(Request $request)
+    {
+        $stripe_user_id = $request->account;
+        $stripe_account = StripeAccount::where('stripe_user_id', $stripe_user_id)->first();
+        if ($stripe_account) {
+            $balance_transaction_id = $request->data['object']['balance_transaction'];
+            $balance_transaction = $this->getBalanceTransaction($balance_transaction_id, $stripe_account->access_token);
+
+            $data = array(
+                'user_id' => $stripe_account->user_id,
+                'stripe_user_id' => $stripe_account->stripe_user_id,
+                'balance_transaction_id' => $balance_transaction->id,
+                'created' => "'" . date("Y/m/d  H:i:s", $balance_transaction->created) . "'",
+                'available_on' => "'" . date("Y/m/d  H:i:s", $balance_transaction->available_on) . "'",
+                'currency' => $balance_transaction->currency,
+                'gross' => $balance_transaction->amount,
+                'fee' => $balance_transaction->fee,
+                'net' => $balance_transaction->net,
+                'reporting_category' => $balance_transaction->reporting_category,
+                'description' => $balance_transaction->description,
+            );
+            StripeBalanceTransactionsReport::updateOrCreate(['user_id' => $stripe_account->user_id, 'stripe_user_id' => $stripe_account->stripe_user_id, 'balance_transaction_id' => $balance_transaction->id], $data);
+        }
 
         return response()->json([
             'success',
@@ -233,6 +263,19 @@ class StripeController extends Controller
 
         }
 
+    }
+
+    public function getBalanceTransaction($transaction_id, $access_token)
+    {
+        $stripe = new \Stripe\StripeClient(
+            $access_token
+        );
+        $balance_obj = $stripe->balanceTransactions->retrieve(
+            $transaction_id,
+            []
+        );
+        // $data = json_decode($balance_obj, true);
+        return $balance_obj;
     }
 
 }
