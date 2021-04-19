@@ -99,7 +99,7 @@ export default {
                     title: MERCHANT_FEE,
                     value: `0`,
                     loading: true,
-                    iconName: "data-warning.svg",
+                    // iconName: "data-warning.svg",
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -178,13 +178,10 @@ export default {
         eventBus.$on("updateSubscription", async () => {
             await this.getSubscriptionData();
         });
-        // eventBus.$on("merchantFeeUpdated", (fees) => {
-        //   updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
-        // });
-        updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
+
         eventBus.$on("dateChanged", ({ s_date, e_date }) => {
             setLoading(this.data);
-            // this.getChargebackTotal(s_date, e_date);
+
             this.getMerchantfeesTotal(s_date, e_date);
             this.getTiktokAdSpend(s_date, e_date);
         });
@@ -203,7 +200,7 @@ export default {
             updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
             //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
             this.getSubscriptionData();
-            //   this.getChargebackTotal();
+            this.getChargebackTotal();
         },
 
         handleSubscriptionClick() {
@@ -428,15 +425,15 @@ export default {
             );
 
             this.merchantFees = total + paypalTotal;
-            updateData(this.data, MERCHANT_FEE, displayCurrency(total));
+            // updateData(this.data, MERCHANT_FEE, displayCurrency(total));
+
+            //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
+            await this.getStripeTransactions(s_date, e_date);
             updateData(
                 this.data,
                 MERCHANT_FEE,
                 displayCurrency(this.merchantFees)
             );
-
-            //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
-            // this.getStripeTransactions(s_date, e_date);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             let total = 0;
@@ -539,11 +536,11 @@ export default {
                         }
                     });
 
-                    updateDataMerchantFee(
-                        this.data,
-                        MERCHANT_FEE,
-                        displayCurrency(this.merchantFees)
-                    );
+                    // updateDataMerchantFee(
+                    //     this.data,
+                    //     MERCHANT_FEE,
+                    //     displayCurrency(this.merchantFees)
+                    // );
                 }
             } catch (err) {
                 return 0;
