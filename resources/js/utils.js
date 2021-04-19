@@ -59,6 +59,15 @@ export const updateAdData = (data, provider, value) => {
     });
 };
 
+export const updateDataMerchantFee = (data, title, value) => {
+    data.forEach(d => {
+        if (d.title === title) {
+            d.value = `${value}`;
+            d.loading = false;
+            d.iconName = "";
+        }
+    });
+};
 export const updateGraphData = (data, title, value, graphData) => {
     data.forEach(d => {
         if (d.title === title) {

@@ -70,8 +70,7 @@ class StripeController extends Controller
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
-
-                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('created', [$request->e_date, $request->s_date])->get();
+                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('available_on', [$request->s_date, $request->e_date])->select('available_on', 'fee')->get();
                 return $stripeTransactions;
             }
 
@@ -276,6 +275,29 @@ class StripeController extends Controller
         );
         // $data = json_decode($balance_obj, true);
         return $balance_obj;
+    }
+
+    public function getStripeChargebacks(Request $request)
+    {
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripe_chargebacks = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                $stripe = new \Stripe\StripeClient(
+                    $account->access_token
+                );
+                $disputes = $stripe->disputes->all(['limit' => 100]);
+                // return $disputes;
+                foreach ($disputes->autoPagingIterator() as $dispute) {
+                    array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
+                }
+            }
+
+            return $stripe_chargebacks;
+        }
+
     }
 
 }
