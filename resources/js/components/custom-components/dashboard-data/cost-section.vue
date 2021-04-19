@@ -41,7 +41,8 @@ import {
     updateData,
     updateAdData,
     setLoading,
-    getDatesBetweenDates
+    getDatesBetweenDates,
+    updateDataMerchantFee
 } from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
 import axios from "axios";
@@ -180,9 +181,10 @@ export default {
         // eventBus.$on("merchantFeeUpdated", (fees) => {
         //   updateData(this.data, MERCHANT_FEE, displayCurrency(fees));
         // });
+        updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
         eventBus.$on("dateChanged", ({ s_date, e_date }) => {
             setLoading(this.data);
-            this.getChargebackTotal(s_date, e_date);
+            // this.getChargebackTotal(s_date, e_date);
             this.getMerchantfeesTotal(s_date, e_date);
             this.getTiktokAdSpend(s_date, e_date);
         });
@@ -381,28 +383,28 @@ export default {
                 }
 
                 const stripeResult = await axios.get(
-                    "stripeconnect/chargeback"
+                    "stripeconnect-chargeback"
                 );
 
-                let { stripeChargebacks } = stripeResult.data;
+                let stripeChargebacks = stripeResult.data;
+                console.log({ stripeChargebacks });
+                stripeChargebacks.forEach(sc => {
+                    const oDate = new Date(sc.created * 1000);
 
-                for (let key in stripeChargebacks) {
-                    stripeChargebacks[key].forEach(sc => {
-                        const oDate = new Date(sc.created * 1000);
-
+                    if (
+                        new Date(oDate) >= new Date(s_date) &&
+                        new Date(oDate) <= new Date(e_date)
+                    ) {
+                        console.log(oDate);
                         if (
-                            new Date(oDate) >= new Date(s_date) &&
-                            new Date(oDate) <= new Date(e_date)
+                            sc.status === "charge_refunded" ||
+                            sc.status === "lost"
                         ) {
-                            if (
-                                sc.status === "charge_refunded" ||
-                                sc.status === "lost"
-                            ) {
-                                totalChargeback += parseFloat(sc.amount / 100);
-                            }
+                            totalChargeback += parseFloat(sc.amount / 100);
                         }
-                    });
-                }
+                    }
+                });
+
                 this.chargebackTotal = totalChargeback;
                 updateData(
                     this.data,
@@ -426,15 +428,15 @@ export default {
             );
 
             this.merchantFees = total + paypalTotal;
-            // updateData(this.data, MERCHANT_FEE, displayCurrency(total));
-
-            //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
-            this.getStripeTransactions(s_date, e_date);
+            updateData(this.data, MERCHANT_FEE, displayCurrency(total));
             updateData(
                 this.data,
                 MERCHANT_FEE,
                 displayCurrency(this.merchantFees)
             );
+
+            //   eventBus.$emit("merchantFeeUpdated", this.merchantFeesTotal);
+            // this.getStripeTransactions(s_date, e_date);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             let total = 0;
@@ -516,29 +518,28 @@ export default {
             try {
                 const result = await axios.get("stripeconnect-merchantfee", {
                     params: {
-                        s_date,
-                        e_date
+                        s_date: moment(s_date).format("YYYY-MM-DD"),
+                        e_date: moment(e_date).format("YYYY-MM-DD")
                     }
                 });
-                console.log("Result from stripe is ", result.data);
+
                 const stripeTransactions = result.data;
 
                 if (stripeTransactions !== undefined) {
                     stripeTransactions.forEach(sTransaction => {
-                        const orderDate = moment
-                            .unix(sTransaction.created)
-                            .format("MM-DD-YYYY");
+                        const orderDate = moment(
+                            sTransaction.available_on
+                        ).format("MM-DD-YYYY");
 
                         if (
                             new Date(orderDate) >= new Date(s_date) &&
                             new Date(orderDate) <= new Date(e_date)
                         ) {
-                            this.merchantFees += parseFloat(
-                                sTransaction.fee / 100
-                            );
+                            this.merchantFees += parseFloat(sTransaction.fee);
                         }
                     });
-                    updateData(
+
+                    updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
                         displayCurrency(this.merchantFees)

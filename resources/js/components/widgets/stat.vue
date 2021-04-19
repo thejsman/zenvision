@@ -55,8 +55,8 @@ export default {
         class="card mini-stats-wid"
         :class="{ cogscard: title === 'COGS' || title === 'Subscriptions' }"
     >
-        <PlaceholderLoader v-if="loading" />
-        <div class="card-body" v-else @click="onClick">
+        <!-- <PlaceholderLoader v-if="loading" /> -->
+        <div class="card-body" @click="onClick">
             <div class="media">
                 <div class="media-body">
                     <div
@@ -84,7 +84,18 @@ export default {
                         ></i>
                     </div>
 
-                    <h4 class="mb-0">{{ value }}</h4>
+                    <div class="mb-0 mt-1" v-if="loading">
+                        <b-skeleton animation="wave" width="40%"></b-skeleton>
+                        <!-- <b-spinner
+                            small
+                            label="Loading..."
+                            variant="dark"
+                        ></b-spinner> -->
+                        <!-- <b-spinner type="grow" small variant="dark"></b-spinner> -->
+                    </div>
+                    <h4 class="mb-0" v-else>
+                        {{ value }}
+                    </h4>
                 </div>
             </div>
             <div v-for="data of channelData" :key="data.title" class="block">
@@ -96,4 +107,8 @@ export default {
         </div>
     </div>
 </template>
-<style></style>
+<style>
+.b-skeleton-text {
+    height: 1rem;
+}
+</style>
