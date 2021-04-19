@@ -107,7 +107,7 @@ export default {
                 {
                     id: 6,
                     title: AD_SPEND_FACEBOOK,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
                     iconName: "facebook-icon.svg",
                     showIcon: true
@@ -115,7 +115,7 @@ export default {
                 {
                     id: 7,
                     title: AD_SPEND_GOOGLE,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
                     iconName: "google-icon.svg",
                     showIcon: true
@@ -123,7 +123,7 @@ export default {
                 {
                     id: 8,
                     title: AD_SPEND_SNAPCHAT,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
                     iconName: "snapchat-icon.svg",
                     showIcon: true
@@ -131,7 +131,7 @@ export default {
                 {
                     id: 9,
                     title: AD_SPEND_TIKTOK,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
                     iconName: "tiktok-icon.svg",
                     showIcon: true
@@ -193,9 +193,9 @@ export default {
     },
     methods: {
         assignData(refundTotal, orders) {
-            updateAdData(this.data, "FACEBOOK", displayCurrency(0));
-            updateAdData(this.data, "GOOGLE", displayCurrency(0));
-            updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+            updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
+            updateAdData(this.data, "GOOGLE", displayCurrency("-"));
+            updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
 
             this.getCogsData(orders);
             const discounts = _.sumBy(orders, order =>

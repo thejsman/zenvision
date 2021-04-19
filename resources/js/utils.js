@@ -13,6 +13,9 @@ import moment from "moment";
 
 //fucntion to display numbers in currency on the dashboard
 export const displayCurrency = value => {
+    if (value === "-") {
+        return value;
+    }
     if (isNaN(value) || !isFinite(value)) {
         value = 0;
     }
