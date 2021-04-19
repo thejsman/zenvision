@@ -4,10 +4,15 @@
         <date-range-picker
             ref="picker"
             :opens="opens"
+            :minDate="minDate"
+            :maxDate="maxDate"
+            :singleDatePicker="false"
             v-model="dateRange"
-            :date-format="dateFormat"
             @update="selectDate"
-        ></date-range-picker>
+            :dateFormat="dateFormat"
+            :ranges="false"
+        >
+        </date-range-picker>
     </div>
 </template>
 <script>
@@ -22,10 +27,44 @@ export default {
     data() {
         return {
             dateRange: {
-                startDate: moment().add(-1, "month"),
+                startDate: moment().subtract(1, "month"),
                 endDate: moment()
             },
-            opens: "left"
+            opens: "left",
+            minDate: moment()
+                .subtract(3, "month")
+                .toString(),
+            maxDate: moment().toString(),
+            singleDatePicker: "range",
+            ranges: {
+                Today: [moment(), moment()],
+                Yesterday: [
+                    moment().subtract(1, "days"),
+                    moment().subtract(1, "days")
+                ],
+                "Last week": [
+                    moment()
+                        .subtract(1, "week")
+                        .startOf("week"),
+                    moment()
+                        .subtract(1, "week")
+                        .endOf("week")
+                ],
+                "This month": [
+                    moment().startOf("month"),
+                    moment().endOf("month")
+                ],
+
+                "Last month": [
+                    moment()
+                        .subtract(1, "month")
+                        .startOf("month"),
+                    moment()
+                        .subtract(1, "month")
+                        .endOf("month")
+                ],
+                "Last 3 months": [moment(), moment().subtract(3, "month")]
+            }
         };
     },
     created() {},
@@ -37,6 +76,7 @@ export default {
             return classes;
         },
         selectDate() {
+            console.log("Check this event", this.dateRange);
             const { startDate, endDate } = this.dateRange;
             //   this.$emit("changeDateRange", this.dateRange);
             eventBus.$emit("changeDateRange", this.dateRange);

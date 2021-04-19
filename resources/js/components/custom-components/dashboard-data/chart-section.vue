@@ -11,7 +11,6 @@
                     <i class="loss-circle"></i
                     ><span class="mr-3 pr-3">Loss</span>
                 </div>
-
                 <highcharts :options="chartOptions"></highcharts>
             </div>
         </div>
@@ -28,10 +27,6 @@ export default {
     components: { highcharts: Chart },
     data() {
         return {
-            compiledOrders: [],
-            dateDifference: 0,
-            subscriptionArray: [],
-            dateRangeType: "Date Range",
             chartOptions: {
                 chart: {
                     backgroundColor: "#2a3042",
@@ -58,7 +53,6 @@ export default {
 
                 yAxis: {
                     gridLineColor: "#32394e",
-
                     min: 0,
                     minPadding: 0,
                     startOnTick: true,
@@ -111,164 +105,37 @@ export default {
     },
     methods: {
         assignData(orders) {
-            if (this.ChartdateRange.length > 0) {
-                const dateDiff = this.ChartdateRange[1].diff(
-                    this.ChartdateRange[0],
-                    "days"
-                );
-                this.dateDifference = dateDiff;
-                if (dateDiff <= 90) {
-                    const dates = [...Array(dateDiff + 1)].map((_, i) => {
-                        const d = new Date(this.ChartdateRange[0]);
-                        d.setDate(d.getDate() + i);
-                        return moment(d).format("M/D/YY");
-                    });
-                    //   this.polarBarChart.data.labels = dates;
-                    // this.chartOptions.xAxis.categories = dates;
-                    let dayArray = [];
-                    const data_per_day = dates.map(day => {
-                        const sum = _.sumBy(this.chartData, order => {
-                            if (
-                                moment(order.created_on_shopify).format(
-                                    "M/D/YY"
-                                ) === day
-                            ) {
-                                return parseFloat(
-                                    order.total_price - order.total_cost
-                                );
-                            } else {
-                                return 0;
-                            }
-                        });
-                        dayArray.push(sum);
-                    });
-                    const final = dayArray.map(day =>
-                        parseFloat(day).toFixed(2)
-                    );
-                    let newCombinedArray = [];
-                    for (let i = 0; i < 32; i++) {
-                        newCombinedArray.push([
-                            Date.parse(dates[i]),
-                            parseFloat(final[i])
-                        ]);
-                    }
-                    console.log({ newCombinedArray });
-                    // this.polarBarChart.data.series = [final];
-                    // console.log({ dates });
-                    // this.chartOptions.series[0].data = final.map(e =>
-                    //     parseFloat(e)
-                    // );
-                    this.chartOptions.series[0].data = newCombinedArray;
-                } else if (dateDiff <= 120 && dateDiff >= 8) {
-                    var result = [];
-                    if (
-                        this.ChartdateRange[1].isBefore(this.ChartdateRange[0])
-                    ) {
-                        console.log(
-                            "End date must be greated than start date."
-                        );
-                    }
-                    let temp = this.ChartdateRange[0];
-                    while (
-                        moment(this.ChartdateRange[0]) <=
-                        moment(this.ChartdateRange[1])
-                    ) {
-                        result.push(this.ChartdateRange[0].format("M/D/YY"));
-
-                        this.ChartdateRange[0] = this.ChartdateRange[0].add(
-                            1,
-                            "weeks"
-                        );
-                    }
-                    this.ChartdateRange[0] = temp;
-                    //Week wise dates
-                    //   this.polarBarChart.data.labels = result;
-                    // this.chartOptions.xAxis.categories = result;
-
-                    let weekArray = [];
-
-                    for (let [index, val] of result.entries()) {
-                        const sum = _.sumBy(this.chartData, order => {
-                            const orderDate = moment(
-                                order.created_on_shopify
-                            ).format("M/D/YY");
-
-                            if (
-                                moment(orderDate).isBetween(
-                                    result[index],
-                                    result[index + 1],
-                                    undefined,
-                                    "[]"
-                                )
-                            ) {
-                                return parseFloat(
-                                    order.total_price - order.total_cost
-                                );
-                            } else {
-                                return 0;
-                            }
-                        });
-                        weekArray.push(sum);
-                    }
-
-                    const final = weekArray.map(day =>
-                        parseFloat(day).toFixed(2)
-                    );
-                    // this.polarBarChart.data.series = [final];
-                    // this.chartOptions.series[0].data = final.map(e =>
-                    //     parseFloat(e)
-                    // );
-                    let newCombinedArray = [];
-                    for (let i = 0; i < 32; i++) {
-                        newCombinedArray.push([dates[i], final[i]]);
-                    }
-                    console.log({ newCombinedArray });
-                } else {
-                    const months = this.getMonths();
-                    let monthDataArray = [];
-                    const data_per_month = months.map(month => {
-                        const sum = _.sumBy(this.chartData, order => {
-                            let googleSum = 0;
-
-                            if (
-                                moment(order.created_on_shopify).format(
-                                    "MMM YYYY"
-                                ) === month
-                            ) {
-                                return parseFloat(
-                                    order.total_price - order.total_cost
-                                );
-                            } else {
-                                return 0;
-                            }
-                        });
-                        monthDataArray.push(sum);
-                    });
-                    const final = monthDataArray.map(month =>
-                        parseFloat(month).toFixed(2)
-                    );
-                    // this.polarBarChart.data.series = [final];
-
-                    this.chartOptions.series[0].data = final.map(e =>
-                        parseFloat(e)
-                    );
-                }
-            }
-        },
-        getMonths() {
-            const months = [...Array(Math.round(this.dateDifference / 30))].map(
-                (_, i) => {
-                    const d = new Date(
-                        moment(this.ChartdateRange[0]).format("MM-DD-YYYY")
-                    );
-
-                    d.setMonth(d.getMonth() + i);
-                    return moment(d).format("MMM YYYY");
-                }
+            const dates = this.getDaysBetweenDates(
+                this.ChartdateRange[0],
+                this.ChartdateRange[1]
             );
-            //   this.polarBarChart.data.labels = months;
-            // this.chartOptions.xAxis.categories = months;
-            return months;
+            let dayArray = [];
+            dates.map(day => {
+                const sum = _.sumBy(this.chartData, order => {
+                    if (
+                        moment(order.created_on_shopify).format("M/D/YY") ===
+                        day
+                    ) {
+                        return parseFloat(order.total_price - order.total_cost);
+                    } else {
+                        return 0;
+                    }
+                });
+                dayArray.push([Date.parse(day), sum]);
+            });
+            console.log({ dayArray });
+            this.chartOptions.series[0].data = dayArray;
+        },
+
+        getDaysBetweenDates(startDate, endDate) {
+            let now = startDate.clone(),
+                dates = [];
+
+            while (now.isSameOrBefore(endDate)) {
+                dates.push(now.format("M/D/YY"));
+                now.add(1, "days");
+            }
+            return dates;
         }
     },
     mounted() {},
