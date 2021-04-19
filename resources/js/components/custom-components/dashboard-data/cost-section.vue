@@ -11,7 +11,7 @@
                 :loading="cost.loading"
                 :onClick="cost.onClick"
                 :totalSubscriptionCount="cost.totalSubscriptionCount"
-                :showCogsWarning="cost.showCogsWarning"
+                :showIcon="cost.showIcon"
                 :iconName="cost.iconName"
                 :toolTip="cost.toolTip"
             />
@@ -74,7 +74,8 @@ export default {
                     value: `0`,
                     loading: true,
                     onClick: this.handleCogsClick,
-                    showCogsWarning: true
+                    iconName: "exclamation-icon.svg",
+                    showIcon: true
                 },
                 {
                     id: 2,
@@ -106,30 +107,34 @@ export default {
                 {
                     id: 6,
                     title: AD_SPEND_FACEBOOK,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
-                    iconName: "facebook-icon.svg"
+                    iconName: "facebook-icon.svg",
+                    showIcon: true
                 },
                 {
                     id: 7,
                     title: AD_SPEND_GOOGLE,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
-                    iconName: "google-icon.svg"
+                    iconName: "google-icon.svg",
+                    showIcon: true
                 },
                 {
                     id: 8,
                     title: AD_SPEND_SNAPCHAT,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
-                    iconName: "snapchat-icon.svg"
+                    iconName: "snapchat-icon.svg",
+                    showIcon: true
                 },
                 {
                     id: 9,
                     title: AD_SPEND_TIKTOK,
-                    value: `0`,
+                    value: `-`,
                     loading: true,
-                    iconName: "tiktok-icon.svg"
+                    iconName: "tiktok-icon.svg",
+                    showIcon: true
                 },
                 {
                     id: 10,
@@ -188,6 +193,10 @@ export default {
     },
     methods: {
         assignData(refundTotal, orders) {
+            updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
+            updateAdData(this.data, "GOOGLE", displayCurrency("-"));
+            updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
+
             this.getCogsData(orders);
             const discounts = _.sumBy(orders, order =>
                 parseFloat(order.total_discounts)
@@ -195,9 +204,7 @@ export default {
             this.totalDiscount = discounts;
             updateData(this.data, DISCOUNTS_TOTAL, displayCurrency(discounts));
             updateData(this.data, REFUNDS_TOTAL, displayCurrency(refundTotal));
-            updateAdData(this.data, "FACEBOOK", displayCurrency(0));
-            updateAdData(this.data, "GOOGLE", displayCurrency(0));
-            updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+
             //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
             this.getSubscriptionData();
             this.getChargebackTotal();
@@ -286,7 +293,7 @@ export default {
                 if (d.title === title) {
                     d.value = `${value}`;
                     d.loading = false;
-                    d.showCogsWarning = showicon;
+                    d.showIcon = showicon;
                 }
             });
         },

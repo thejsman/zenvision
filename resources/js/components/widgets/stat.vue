@@ -34,7 +34,7 @@ export default {
             type: Number,
             default: null
         },
-        showCogsWarning: {
+        showIcon: {
             type: Boolean,
             default: null
         },
@@ -69,7 +69,7 @@ export default {
                             v-if="totalSubscriptionCount"
                             >{{ totalSubscriptionCount }}</b-badge
                         >
-                        <div v-if="iconName" v-b-tooltip.hover :title="toolTip">
+                        <div v-if="showIcon" v-b-tooltip.hover :title="toolTip">
                             <img
                                 :src="`/images/icons/${this.iconName}`"
                                 alt
@@ -78,10 +78,10 @@ export default {
                             />
                         </div>
 
-                        <i
+                        <!-- <i
                             class="fas fa-exclamation-circle text-warning"
-                            v-if="showCogsWarning"
-                        ></i>
+                            v-if="showIcon"
+                        ></i> -->
                     </div>
 
                     <div class="mb-0 mt-1" v-if="loading">
