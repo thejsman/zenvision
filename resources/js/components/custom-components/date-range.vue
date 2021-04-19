@@ -13,15 +13,6 @@
             :ranges="false"
         >
         </date-range-picker>
-        <!-- <date-range-picker
-            :opens="opens"
-            :singleDatePicker="range"
-            :minDate="minDate"
-            :maxDate="maxDate"
-            :ranges="ranges"
-            v-model="dateRange"
-            @update="selectDate"
-        ></date-range-picker> -->
     </div>
 </template>
 <script>
