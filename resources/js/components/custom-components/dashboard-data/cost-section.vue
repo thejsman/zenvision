@@ -145,7 +145,13 @@ export default {
                     totalSubscriptionCount: 0
                 }
             ],
-            totalDiscount: 0
+            totalDiscount: 0,
+            hasTiktokAccount: false,
+            hasSnapchatAccount: false,
+            hasFacebookAccount: false,
+            hasGoogleAccount: false,
+            startDate: moment().subtract(1, "month"),
+            endDate: moment()
         };
     },
     computed: {
@@ -185,18 +191,55 @@ export default {
         });
 
         eventBus.$on("dateChanged", ({ s_date, e_date }) => {
+            this.startDate = s_date;
+            this.endDate = e_date;
+
             setLoading(this.data);
 
             this.getMerchantfeesTotal(s_date, e_date);
-            this.getTiktokAdSpend(s_date, e_date);
+            this.checkAndShowAdAccountsData(s_date, e_date);
+        });
+        eventBus.$on("hasTiktokAccount", status => {
+            this.hasTiktokAccount = status;
+
+            if (status) {
+                return this.getTiktokAdSpend(this.startDate, this.endDate);
+            }
+            updateAdData(this.data, "TIKTOK", "-");
+        });
+
+        eventBus.$on("hasSnapchatAccount", status => {
+            this.hasSnapchatAccount = status;
+
+            if (status) {
+                return this.getSnapchatAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
+            }
+        });
+
+        eventBus.$on("hasFacebookAccount", status => {
+            this.hasFacebookAccount = status;
+
+            if (status) {
+                return this.getFacebookAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
+            }
+        });
+
+        eventBus.$on("hasGoogleAccount", status => {
+            this.hasGoogleAccount = status;
+
+            if (status) {
+                return this.getGoogleAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "GOOGLE", displayCurrency("-"));
+            }
         });
     },
     methods: {
         assignData(refundTotal, orders) {
-            updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
-            updateAdData(this.data, "GOOGLE", displayCurrency("-"));
-            updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
-
             this.getCogsData(orders);
             const discounts = _.sumBy(orders, order =>
                 parseFloat(order.total_discounts)
@@ -391,7 +434,7 @@ export default {
                 );
 
                 let stripeChargebacks = stripeResult.data;
-                console.log({ stripeChargebacks });
+
                 stripeChargebacks.forEach(sc => {
                     const oDate = new Date(sc.created * 1000);
 
@@ -399,7 +442,6 @@ export default {
                         new Date(oDate) >= new Date(s_date) &&
                         new Date(oDate) <= new Date(e_date)
                     ) {
-                        console.log(oDate);
                         if (
                             sc.status === "charge_refunded" ||
                             sc.status === "lost"
@@ -483,40 +525,51 @@ export default {
             this.tiktokAdsSpend = 0;
             const dates = getDatesBetweenDates(s_date, e_date);
             let tiktokTotal = 0;
-            dates.forEach(async date => {
-                const tiktokResult = await axios.get("tiktokaccount-adspend", {
-                    params: {
-                        s_date: date[0].substring(0, 10),
-                        e_date: date[1].substring(0, 10)
+            try {
+                dates.forEach(async date => {
+                    try {
+                        const tiktokResult = await axios.get(
+                            "tiktokaccount-adspend",
+                            {
+                                params: {
+                                    s_date: date[0].substring(0, 10),
+                                    e_date: date[1].substring(0, 10)
+                                }
+                            }
+                        );
+                        const tiktokTransactions = tiktokResult.data;
+
+                        if (tiktokTransactions.length > 0) {
+                            tiktokTransactions.map(transaction => {
+                                if (transaction.hasOwnProperty("stat_cost")) {
+                                    const orderDate = moment(
+                                        transaction.stat_datetime
+                                    ).format("YYYY-MM-DD");
+                                    if (
+                                        new Date(orderDate) >=
+                                            new Date(s_date) &&
+                                        new Date(orderDate) <= new Date(e_date)
+                                    ) {
+                                        this.tiktokAdsSpend += Math.abs(
+                                            parseFloat(transaction.stat_cost)
+                                        );
+                                    }
+                                }
+                            });
+                        }
+
+                        updateAdData(
+                            this.data,
+                            "TIKTOK",
+                            displayCurrency(this.tiktokAdsSpend)
+                        );
+                    } catch (err) {
+                        updateAdData(this.data, "TIKTOK", displayCurrency(0));
                     }
                 });
-                const tiktokTransactions = tiktokResult.data;
-
-                if (tiktokTransactions.length > 0) {
-                    tiktokTransactions.map(transaction => {
-                        if (transaction.hasOwnProperty("stat_cost")) {
-                            const orderDate = moment(
-                                transaction.stat_datetime
-                            ).format("YYYY-MM-DD");
-                            if (
-                                new Date(orderDate) >= new Date(s_date) &&
-                                new Date(orderDate) <= new Date(e_date)
-                            ) {
-                                this.tiktokAdsSpend += Math.abs(
-                                    parseFloat(transaction.stat_cost)
-                                );
-                            }
-                        }
-                    });
-                }
-
-                // this.tiktokAdsSpend += tiktokTotal;
-                updateAdData(
-                    this.data,
-                    "TIKTOK",
-                    displayCurrency(this.tiktokAdsSpend)
-                );
-            });
+            } catch (err) {
+                updateAdData(this.data, "TIKTOK", displayCurrency(0));
+            }
         },
         async getStripeTransactions(s_date, e_date) {
             try {
@@ -552,6 +605,31 @@ export default {
             } catch (err) {
                 return 0;
             }
+        },
+
+        async getSnapchatAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+        },
+        async getFacebookAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "FACEBOOK", displayCurrency(0));
+        },
+
+        async getGoogleAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "GOOGLE", displayCurrency(0));
+        },
+        checkAndShowAdAccountsData(s_date, e_date) {
+            this.hasTiktokAccount
+                ? this.getTiktokAdSpend(s_date, e_date)
+                : updateAdData(this.data, "TIKTOK", "-");
+            this.hasSnapchatAccount
+                ? this.getSnapchatAdSpend(s_date, e_date)
+                : updateAdData(this.data, "SNAPCHAT", "-");
+            this.hasFacebookAccount
+                ? this.getFacebookAdSpend(s_date, e_date)
+                : updateAdData(this.data, "FACEBOOK", "-");
+            this.hasGoogleAccount
+                ? this.getGoogleAdSpend(s_date, e_date)
+                : updateAdData(this.data, "GOOGLE", "-");
         }
     }
 };

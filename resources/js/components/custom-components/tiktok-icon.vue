@@ -38,6 +38,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "../../app";
 export default {
     name: "TiktokAccount",
     data() {
@@ -59,10 +60,20 @@ export default {
             try {
                 const result = await axios.get("tiktokaccount");
                 this.tiktokAccounts = result.data;
+
+                result.data.length
+                    ? this.checkEnabledStatus(result.data)
+                    : eventBus.$emit("hasTiktokAccount", false);
             } catch (err) {
-                console.log(err);
+                eventBus.$emit("hasTiktokAccount", false);
                 this.tiktokAccounts = [];
             }
+        },
+        checkEnabledStatus(data) {
+            const status = data.map(element => element.enabled_on_dashboard);
+            status.includes(true)
+                ? eventBus.$emit("hasTiktokAccount", true)
+                : eventBus.$emit("hasTiktokAccount", false);
         },
         showMsgBoxOne(account) {
             this.boxOne = "";
@@ -72,7 +83,7 @@ export default {
                 )
                 .then(value => {
                     this.boxOne = value;
-                    console.log("Yes", value);
+
                     if (value) {
                         this.removeChannel(account);
                     }
