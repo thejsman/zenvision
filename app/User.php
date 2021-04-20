@@ -71,7 +71,7 @@ class User extends Authenticatable
     }
     public function getSnapchatAccounts()
     {
-        return $this->hasMany(SnapchatAdAccount::class, 'user_id')->get();
+        return $this->hasMany(SnapchatAdAccount::class, 'user_id')->where('isDeleted', false)->get();
     }
     public function getGoogleAccounts()
     {

@@ -147,6 +147,7 @@ export default {
             ],
             totalDiscount: 0,
             hasTiktokAccount: false,
+            hasSnapchatAccount: false,
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -206,12 +207,21 @@ export default {
             }
             updateAdData(this.data, "TIKTOK", "-");
         });
+
+        eventBus.$on("hasSnapchatAccount", status => {
+            this.hasSnapchatAccount = status;
+
+            if (status) {
+                return this.getSnapchatAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
+            }
+        });
     },
     methods: {
         assignData(refundTotal, orders) {
             updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
             updateAdData(this.data, "GOOGLE", displayCurrency("-"));
-            updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
 
             this.getCogsData(orders);
             const discounts = _.sumBy(orders, order =>
@@ -578,6 +588,10 @@ export default {
             } catch (err) {
                 return 0;
             }
+        },
+
+        async getSnapchatAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
         }
     }
 };

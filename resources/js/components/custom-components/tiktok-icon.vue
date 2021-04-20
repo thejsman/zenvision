@@ -70,12 +70,10 @@ export default {
             }
         },
         checkEnabledStatus(data) {
-            data.forEach(element => {
-                if (element.enabled_on_dashboard) {
-                    return eventBus.$emit("hasTiktokAccount", true);
-                }
-            });
-            eventBus.$emit("hasTiktokAccount", false);
+            const status = data.map(element => element.enabled_on_dashboard);
+            status.includes(true)
+                ? eventBus.$emit("hasTiktokAccount", true)
+                : eventBus.$emit("hasTiktokAccount", false);
         },
         showMsgBoxOne(account) {
             this.boxOne = "";
@@ -85,7 +83,7 @@ export default {
                 )
                 .then(value => {
                     this.boxOne = value;
-                    console.log("Yes", value);
+
                     if (value) {
                         this.removeChannel(account);
                     }
