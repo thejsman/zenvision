@@ -76,7 +76,6 @@ export default {
             return classes;
         },
         selectDate() {
-            console.log("Check this event", this.dateRange);
             const { startDate, endDate } = this.dateRange;
             //   this.$emit("changeDateRange", this.dateRange);
             eventBus.$emit("changeDateRange", this.dateRange);
