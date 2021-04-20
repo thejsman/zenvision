@@ -148,6 +148,8 @@ export default {
             totalDiscount: 0,
             hasTiktokAccount: false,
             hasSnapchatAccount: false,
+            hasFacebookAccount: false,
+            hasGoogleAccount: false,
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -195,9 +197,7 @@ export default {
             setLoading(this.data);
 
             this.getMerchantfeesTotal(s_date, e_date);
-            this.hasTiktokAccount
-                ? this.getTiktokAdSpend(s_date, e_date)
-                : null;
+            this.checkAndShowAdAccountsData(s_date, e_date);
         });
         eventBus.$on("hasTiktokAccount", status => {
             this.hasTiktokAccount = status;
@@ -217,12 +217,29 @@ export default {
                 updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
             }
         });
+
+        eventBus.$on("hasFacebookAccount", status => {
+            this.hasFacebookAccount = status;
+
+            if (status) {
+                return this.getFacebookAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
+            }
+        });
+
+        eventBus.$on("hasGoogleAccount", status => {
+            this.hasGoogleAccount = status;
+
+            if (status) {
+                return this.getGoogleAdSpend(this.startDate, this.endDate);
+            } else {
+                updateAdData(this.data, "GOOGLE", displayCurrency("-"));
+            }
+        });
     },
     methods: {
         assignData(refundTotal, orders) {
-            updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
-            updateAdData(this.data, "GOOGLE", displayCurrency("-"));
-
             this.getCogsData(orders);
             const discounts = _.sumBy(orders, order =>
                 parseFloat(order.total_discounts)
@@ -592,6 +609,27 @@ export default {
 
         async getSnapchatAdSpend(s_date, e_date) {
             return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+        },
+        async getFacebookAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "FACEBOOK", displayCurrency(0));
+        },
+
+        async getGoogleAdSpend(s_date, e_date) {
+            return updateAdData(this.data, "GOOGLE", displayCurrency(0));
+        },
+        checkAndShowAdAccountsData(s_date, e_date) {
+            this.hasTiktokAccount
+                ? this.getTiktokAdSpend(s_date, e_date)
+                : updateAdData(this.data, "TIKTOK", "-");
+            this.hasSnapchatAccount
+                ? this.getSnapchatAdSpend(s_date, e_date)
+                : updateAdData(this.data, "SNAPCHAT", "-");
+            this.hasFacebookAccount
+                ? this.getFacebookAdSpend(s_date, e_date)
+                : updateAdData(this.data, "FACEBOOK", "-");
+            this.hasGoogleAccount
+                ? this.getGoogleAdSpend(s_date, e_date)
+                : updateAdData(this.data, "GOOGLE", "-");
         }
     }
 };
