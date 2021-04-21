@@ -4,7 +4,6 @@
         <date-range-picker
             ref="picker"
             :opens="opens"
-            :minDate="minDate"
             :maxDate="maxDate"
             :singleDatePicker="false"
             v-model="dateRange"

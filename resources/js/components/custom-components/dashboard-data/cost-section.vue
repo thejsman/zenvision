@@ -150,6 +150,7 @@ export default {
             hasSnapchatAccount: false,
             hasFacebookAccount: false,
             hasGoogleAccount: false,
+            hasStripeAccount: false,
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -236,6 +237,16 @@ export default {
             } else {
                 updateAdData(this.data, "GOOGLE", displayCurrency("-"));
             }
+        });
+
+        eventBus.$on("hasStripeAccount", status => {
+            this.hasStripeAccount = status;
+
+            // if (status) {
+            //     return this.getGoogleAdSpend(this.startDate, this.endDate);
+            // } else {
+            //     updateAdData(this.data, "GOOGLE", displayCurrency("-"));
+            // }
         });
     },
     methods: {
@@ -428,28 +439,30 @@ export default {
                         totalChargeback += parseFloat(dispute.amount);
                     });
                 }
+                if (this.hasStripeAccount) {
+                    console.log("I did not got exe'ted");
+                    const stripeResult = await axios.get(
+                        "stripeconnect-chargeback"
+                    );
 
-                const stripeResult = await axios.get(
-                    "stripeconnect-chargeback"
-                );
+                    let stripeChargebacks = stripeResult.data;
 
-                let stripeChargebacks = stripeResult.data;
+                    stripeChargebacks.forEach(sc => {
+                        const oDate = new Date(sc.created * 1000);
 
-                stripeChargebacks.forEach(sc => {
-                    const oDate = new Date(sc.created * 1000);
-
-                    if (
-                        new Date(oDate) >= new Date(s_date) &&
-                        new Date(oDate) <= new Date(e_date)
-                    ) {
                         if (
-                            sc.status === "charge_refunded" ||
-                            sc.status === "lost"
+                            new Date(oDate) >= new Date(s_date) &&
+                            new Date(oDate) <= new Date(e_date)
                         ) {
-                            totalChargeback += parseFloat(sc.amount / 100);
+                            if (
+                                sc.status === "charge_refunded" ||
+                                sc.status === "lost"
+                            ) {
+                                totalChargeback += parseFloat(sc.amount / 100);
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 this.chargebackTotal = totalChargeback;
                 updateData(

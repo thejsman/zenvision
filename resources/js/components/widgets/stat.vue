@@ -86,12 +86,6 @@ export default {
 
                     <div class="mb-0 mt-1" v-if="loading">
                         <b-skeleton animation="wave" width="40%"></b-skeleton>
-                        <!-- <b-spinner
-                            small
-                            label="Loading..."
-                            variant="dark"
-                        ></b-spinner> -->
-                        <!-- <b-spinner type="grow" small variant="dark"></b-spinner> -->
                     </div>
                     <h4 class="mb-0" v-else>
                         {{ value }}

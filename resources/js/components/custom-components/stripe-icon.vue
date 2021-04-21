@@ -38,6 +38,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "../../app";
 export default {
     name: "StripeAccount",
     data() {
@@ -59,10 +60,19 @@ export default {
             try {
                 const result = await axios.get("getstripeaccounts");
                 this.stripeAccounts = result.data;
+                result.data.length
+                    ? this.checkEnabledStatus(result.data)
+                    : eventBus.$emit("hasStripeAccount", false);
             } catch (err) {
                 console.log(err);
                 this.stripeAccounts = [];
             }
+        },
+        checkEnabledStatus(data) {
+            const status = data.map(element => element.enabled_on_dashboard);
+            status.includes(true)
+                ? eventBus.$emit("hasStripeAccount", true)
+                : eventBus.$emit("hasStripeAccount", false);
         },
         showMsgBoxOne(account) {
             this.boxOne = "";
