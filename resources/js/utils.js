@@ -50,6 +50,13 @@ export const updateData = (data, title, value) => {
     });
 };
 
+export const updateNoData = data => {
+    data.forEach(d => {
+        d.value = `-`;
+        d.loading = false;
+    });
+};
+
 export const updateAdData = (data, provider, value) => {
     data.forEach(d => {
         if (

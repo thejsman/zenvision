@@ -151,6 +151,7 @@ export default {
             hasFacebookAccount: false,
             hasGoogleAccount: false,
             hasStripeAccount: false,
+
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -200,6 +201,7 @@ export default {
             this.getMerchantfeesTotal(s_date, e_date);
             this.checkAndShowAdAccountsData(s_date, e_date);
         });
+
         eventBus.$on("hasTiktokAccount", status => {
             this.hasTiktokAccount = status;
 
