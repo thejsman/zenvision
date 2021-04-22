@@ -1,17 +1,18 @@
 <template>
     <div class="ml-auto d-inline-flex">
         <p class="mt-2 mr-2">Date Range:</p>
-        <date-range-picker
+
+        <DateRangePicker
             ref="picker"
             :opens="opens"
             :maxDate="maxDate"
-            :singleDatePicker="false"
+            :locale-data="{ firstDay: 1, format: 'mm-dd-yyyy' }"
             v-model="dateRange"
             @update="selectDate"
             :dateFormat="dateFormat"
             :ranges="false"
         >
-        </date-range-picker>
+        </DateRangePicker>
     </div>
 </template>
 <script>
@@ -30,45 +31,22 @@ export default {
                 endDate: moment()
             },
             opens: "left",
-            minDate: moment()
-                .subtract(3, "month")
-                .toString(),
-            maxDate: moment().toString(),
-            singleDatePicker: "range",
-            ranges: {
-                Today: [moment(), moment()],
-                Yesterday: [
-                    moment().subtract(1, "days"),
-                    moment().subtract(1, "days")
-                ],
-                "Last week": [
-                    moment()
-                        .subtract(1, "week")
-                        .startOf("week"),
-                    moment()
-                        .subtract(1, "week")
-                        .endOf("week")
-                ],
-                "This month": [
-                    moment().startOf("month"),
-                    moment().endOf("month")
-                ],
-
-                "Last month": [
-                    moment()
-                        .subtract(1, "month")
-                        .startOf("month"),
-                    moment()
-                        .subtract(1, "month")
-                        .endOf("month")
-                ],
-                "Last 3 months": [moment(), moment().subtract(3, "month")]
-            }
+            startDateSelected: moment().subtract(1, "month")
         };
     },
     created() {},
+    computed: {
+        maxDate() {
+            return moment(this.startDateSelected)
+                .add("3", "months")
+                .toString();
+        }
+    },
     methods: {
         dateFormat(classes, date) {
+            if (classes["start-date"]) {
+                this.startDateSelected = date;
+            }
             if (!classes.disabled) {
                 classes.disabled = date.getTime() > new Date();
             }
