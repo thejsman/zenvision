@@ -263,11 +263,14 @@ export default {
     },
     methods: {
         assignData(refundTotal, orders) {
-            this.getCogsData(orders, refundTotal);
+            setTimeout(() => {
+                this.getCogsData(orders, refundTotal);
 
-            //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
-            this.getSubscriptionData();
-            this.getChargebackTotal();
+                //   updateData(this.data, MERCHANT_FEE, displayCurrency(this.merchantFees));
+                this.getSubscriptionData();
+                this.getChargebackTotal();
+            }, 1000);
+
             // this.getMerchantfeesTotal(s_date, e_date);
         },
 
@@ -457,10 +460,6 @@ export default {
             }
         },
         async getChargebackTotal(s_date, e_date) {
-            if (this.anyActiveAccount) {
-                updateData(this.data, CHARGEBACKS_TOTAL, "-");
-                return;
-            }
             try {
                 const result = await axios.get("getshopifydisputes");
                 const { disputes } = result.data;
@@ -533,12 +532,15 @@ export default {
             if (this.hasStripeAccount) {
                 await this.getStripeTransactions(s_date, e_date);
             }
-
-            updateData(
-                this.data,
-                MERCHANT_FEE,
-                this.anyActiveAccount ? displayCurrency(this.merchantFees) : "-"
-            );
+            setTimeout(() => {
+                updateData(
+                    this.data,
+                    MERCHANT_FEE,
+                    this.anyActiveAccount
+                        ? displayCurrency(this.merchantFees)
+                        : "-"
+                );
+            }, 1000);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             let total = 0;
