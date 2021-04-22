@@ -123,7 +123,7 @@ export default {
                 });
                 dayArray.push([Date.parse(day), sum]);
             });
-            console.log({ dayArray });
+
             this.chartOptions.series[0].data = dayArray;
         },
 
