@@ -69,6 +69,7 @@ export default {
             merchantFees: 0,
             tiktokAdsSpend: 0,
             snapchatAdsSpend: 0,
+            facebookAdsSpend: 0,
             data: [
                 {
                     id: 1,
@@ -170,7 +171,8 @@ export default {
                     this.cogsTotal +
                     this.chargebackTotal +
                     this.tiktokAdsSpend +
-                    this.snapchatAdsSpend
+                    this.snapchatAdsSpend +
+                    this.facebookAdsSpend
             );
 
             eventBus.$emit("totalCostValue", totalCost);
@@ -711,7 +713,25 @@ export default {
             // return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
         },
         async getFacebookAdSpend(s_date, e_date) {
-            return updateAdData(this.data, "FACEBOOK", displayCurrency(0));
+            try {
+                this.facebookAdsSpend = 0;
+                const result = await axios.get("getfacebookadsdata", {
+                    params: {
+                        s_date: moment(s_date).format("YYYY-MM-DD"),
+                        e_date: moment(e_date).format("YYYY-MM-DD")
+                    }
+                });
+                const facebookStats = result.data;
+                this.facebookAdsSpend = facebookStats;
+                console.log({ facebookStats });
+                updateAdData(
+                    this.data,
+                    "FACEBOOK",
+                    displayCurrency(facebookStats)
+                );
+            } catch (err) {
+                console.log(err);
+            }
         },
 
         async getGoogleAdSpend(s_date, e_date) {
