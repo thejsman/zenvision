@@ -722,12 +722,14 @@ export default {
                     }
                 });
                 const facebookStats = result.data;
-                this.facebookAdsSpend = facebookStats;
-                console.log({ facebookStats });
+
+                facebookStats.forEach(stats => {
+                    this.facebookAdsSpend += parseFloat(stats.spend);
+                });
                 updateAdData(
                     this.data,
                     "FACEBOOK",
-                    displayCurrency(facebookStats)
+                    displayCurrency(this.facebookAdsSpend)
                 );
             } catch (err) {
                 console.log(err);
