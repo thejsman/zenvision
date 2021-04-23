@@ -98,6 +98,7 @@ class FacebookController extends Controller
         curl_close($ch);
 
         $response = json_decode($result, true);
+
         if (count($response['data'])) {
             $facebook_accounts = [];
             foreach ($response['data'] as $account) {
@@ -171,20 +172,22 @@ class FacebookController extends Controller
     }
     public function getFacebookAdsData(Request $request)
     {
-        $fb_ads_data = [];
+        $fb_ads_total = 0;
         $user = Auth::user();
         $fb_ad_accounts = $user->getFacebookAccounts();
         foreach ($fb_ad_accounts as $fb_ad_account) {
 
             // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:' . $request->s_date . ',until:' . $request->e_date . '}&time_increment=1&access_token=' . $fb_ad_account->access_token;
-            $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:2021-02-17,until:2021-03-17}&time_increment=1&access_token=' . $fb_ad_account->access_token;
+            // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:2021-02-17,until:2021-03-17}&time_increment=1&access_token=' . $fb_ad_account->access_token;
+            $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '?fields=insights.time_range({"since":"' . urlencode($request->s_date) . '","until":"' . urlencode($request->e_date) . '"}){account_id,spend,impressions}&access_token=' . $fb_ad_account->access_token;
+
             $spend = CustomRequests::getRequest($url, '', '');
-            dd($spend);
-            if (count($spend['data']) > 0) {
-                array_push($fb_ads_data, $spend['data']);
+
+            if (array_key_exists('insights', $spend)) {
+                $fb_ads_total += $spend['insights']['data'][0]['spend'];
             }
         }
-        return $fb_ads_data;
+        return $fb_ads_total;
     }
 
     public function toogleAdAccount(Request $request)
