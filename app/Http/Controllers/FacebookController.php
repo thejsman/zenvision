@@ -172,22 +172,22 @@ class FacebookController extends Controller
     }
     public function getFacebookAdsData(Request $request)
     {
-        $fb_ads_total = 0;
+        $fb_ads_data = [];
         $user = Auth::user();
         $fb_ad_accounts = $user->getFacebookAccounts();
         foreach ($fb_ad_accounts as $fb_ad_account) {
+            if ($fb_ad_account->enabled_on_dashboard) {
 
-            // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:' . $request->s_date . ',until:' . $request->e_date . '}&time_increment=1&access_token=' . $fb_ad_account->access_token;
-            // $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?&time_interval={since:2021-02-17,until:2021-03-17}&time_increment=1&access_token=' . $fb_ad_account->access_token;
-            $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '?fields=insights.time_range({"since":"' . urlencode($request->s_date) . '","until":"' . urlencode($request->e_date) . '"}){account_id,spend,impressions}&access_token=' . $fb_ad_account->access_token;
+                $url = 'https://graph.facebook.com/v10.0/' . $fb_ad_account->ad_account_id . '/insights?level=account&fields=spend&limit=200&time_increment=1&time_range={"since":"' . $request->s_date . '","until":"' . $request->e_date . '"}&access_token=' . $fb_ad_account->access_token;
 
-            $spend = CustomRequests::getRequest($url, '', '');
+                $spend = CustomRequests::getRequest($url, '', '');
 
-            if (array_key_exists('insights', $spend)) {
-                $fb_ads_total += $spend['insights']['data'][0]['spend'];
+                if (array_key_exists('data', $spend) && count($spend['data']) > 0) {
+                    $fb_ads_data = array_merge($fb_ads_data, $spend['data']);
+                }
             }
         }
-        return $fb_ads_total;
+        return $fb_ads_data;
     }
 
     public function toogleAdAccount(Request $request)
