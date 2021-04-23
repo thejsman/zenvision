@@ -42,6 +42,7 @@ import {
     updateAdData,
     setLoading,
     getDatesBetweenDates,
+    getDatesBetweenDatesStandard,
     updateDataMerchantFee
 } from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
@@ -67,6 +68,7 @@ export default {
             chargebackTotal: 0,
             merchantFees: 0,
             tiktokAdsSpend: 0,
+            snapchatAdsSpend: 0,
             data: [
                 {
                     id: 1,
@@ -153,6 +155,7 @@ export default {
             hasStripeAccount: false,
             hasPaypalAccount: false,
             hasShopifyAccount: false,
+
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -166,7 +169,8 @@ export default {
                     this.subscriptionData +
                     this.cogsTotal +
                     this.chargebackTotal +
-                    this.tiktokAdsSpend
+                    this.tiktokAdsSpend +
+                    this.snapchatAdsSpend
             );
 
             eventBus.$emit("totalCostValue", totalCost);
@@ -225,6 +229,7 @@ export default {
             if (status) {
                 return this.getSnapchatAdSpend(this.startDate, this.endDate);
             } else {
+                this.snapchatAdsSpend = 0;
                 updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
             }
         });
@@ -666,7 +671,44 @@ export default {
         },
 
         async getSnapchatAdSpend(s_date, e_date) {
-            return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+            try {
+                this.snapchatAdsSpend = 0;
+                const dates = getDatesBetweenDatesStandard(s_date, e_date);
+
+                dates.forEach(async date => {
+                    const result = await axios.get("snapchat=adspend", {
+                        params: {
+                            s_date: date[0],
+                            e_date: date[1]
+                        }
+                    });
+                    const snapchatStats = result.data;
+
+                    snapchatStats.forEach(stats => {
+                        const orderDate = moment(stats.start_time).format(
+                            "MM-DD-YYYY"
+                        );
+
+                        if (
+                            new Date(orderDate) >= new Date(s_date) &&
+                            new Date(orderDate) <= new Date(e_date)
+                        ) {
+                            this.snapchatAdsSpend += parseFloat(
+                                stats.stats.spend / 100000
+                            );
+                        }
+                    });
+                    updateAdData(
+                        this.data,
+                        "SNAPCHAT",
+                        displayCurrency(this.snapchatAdsSpend)
+                    );
+                });
+            } catch (err) {
+                console.log(err);
+                updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+            }
+            // return updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
         },
         async getFacebookAdSpend(s_date, e_date) {
             return updateAdData(this.data, "FACEBOOK", displayCurrency(0));

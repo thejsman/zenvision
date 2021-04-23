@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Carbon\Carbon as Time;
 use App\Snapchat;
 use Auth;
-use App\Providers\RouteServiceProvider;
+use Carbon\Carbon as Time;
+use Illuminate\Http\Request;
 
 class SnapchatController extends Controller
 {
@@ -15,6 +14,7 @@ class SnapchatController extends Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://accounts.snapchat.com/login/oauth2/access_token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&client_id=" . env('MIX_SNAPCHAT_CLIENT_ID') . "&client_secret=" . env('SNAPCHAT_SECRET_KEY') . "&code=" . $request->code . "&redirect_uri=" . env('MIX_SNAPCHAT_REDIRECT_URL'));
         $headers = array();
@@ -31,7 +31,7 @@ class SnapchatController extends Controller
         $user_info = $this->getSnapchatUserInfo($response['access_token']);
 
         $snapchat_table_data = array(
-            'user_id' =>  Auth::user()->id,
+            'user_id' => Auth::user()->id,
             'access_token' => $response['access_token'],
             'refresh_token' => $response['refresh_token'],
             'expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in']),
@@ -41,11 +41,11 @@ class SnapchatController extends Controller
             'display_name' => $user_info['me']['display_name'],
             'member_status' => $user_info['me']['member_status'],
             'enabled_on_dashboard' => true,
-            'isDeleted' => false
+            'isDeleted' => false,
         );
 
         Snapchat::updateOrCreate([
-            'user_id' =>  Auth::user()->id, 'snapchat_user_id' => $user_info['me']['id'], 'organization_id' => $user_info['me']['organization_id'],
+            'user_id' => Auth::user()->id, 'snapchat_user_id' => $user_info['me']['id'], 'organization_id' => $user_info['me']['organization_id'],
         ], $snapchat_table_data);
 
         return redirect()->route('home', ['listSnapchatAccount' => $user_info['me']['organization_id']]);
@@ -58,8 +58,7 @@ class SnapchatController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://adsapi.snapchat.com/v1/me');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Authorization: Bearer ' . $access_token;
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -80,8 +79,7 @@ class SnapchatController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://adsapi.snapchat.com/v1/organizations/' . $organization_id . '/adaccounts');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Authorization: Bearer ' . $access_token;
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -110,8 +108,7 @@ class SnapchatController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://adsapi.snapchat.com/v1/organizations/' . $organization_id . '/adaccounts');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Authorization: Bearer ' . $snapchatAccount->access_token;
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -124,4 +121,5 @@ class SnapchatController extends Controller
         curl_close($ch);
         return $response['adaccounts'];
     }
+
 }

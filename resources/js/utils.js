@@ -99,7 +99,7 @@ export const getDatesBetweenDates = (startDate, endDate) => {
     let e_date = moment(endDate);
 
     while (s_date < e_date) {
-        const temp_e_date = s_date.clone().add(30, "days");
+        const temp_e_date = s_date.clone().add(1, "months");
         const new_e_date = temp_e_date > e_date ? e_date : temp_e_date;
 
         dates = [
@@ -107,6 +107,26 @@ export const getDatesBetweenDates = (startDate, endDate) => {
             [
                 moment(s_date).format("YYYY-MM-DDT00:00:00.000") + "Z",
                 moment(new_e_date).format("YYYY-MM-DDT23:59:59.000") + "Z"
+            ]
+        ];
+        s_date.add(31, "days");
+    }
+    return dates;
+};
+export const getDatesBetweenDatesStandard = (startDate, endDate) => {
+    let dates = [];
+    let s_date = moment(startDate);
+    let e_date = moment(endDate);
+
+    while (s_date < e_date) {
+        const temp_e_date = s_date.clone().add(1, "months");
+        const new_e_date = temp_e_date > e_date ? e_date : temp_e_date;
+
+        dates = [
+            ...dates,
+            [
+                moment(s_date).format("YYYY-MM-DD"),
+                moment(new_e_date).format("YYYY-MM-DD")
             ]
         ];
         s_date.add(31, "days");

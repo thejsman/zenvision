@@ -100,6 +100,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('snapchatadaccount', 'SnapchatAdAccountController@toogleAdAccount');
     Route::patch('snapchatadaccount-delete', 'SnapchatAdAccountController@destroy');
 
+    Route::get('snapchat=adspend', 'SnapchatAdAccountController@getAdSpend');
+
     //TikTok Ad account
 
     Route::get('tiktok-connect', 'TiktokAdController@tiktokConnect');
