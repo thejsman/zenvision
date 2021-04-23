@@ -694,7 +694,7 @@ export default {
                             new Date(orderDate) <= new Date(e_date)
                         ) {
                             this.snapchatAdsSpend += parseFloat(
-                                stats.stats.spend / 100000
+                                stats.stats.spend / 1000000
                             );
                         }
                     });
