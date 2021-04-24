@@ -108,4 +108,32 @@ class GoogleAdController extends Controller
         $response = json_decode($result, true);
         return $response['resourceNames'];
     }
+
+    public function updateAccessToken($refresh_token)
+    {
+        $data = json_encode(array(
+            'client_id' => env('MIX_GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_SECRET_KEY'),
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token,
+        ));
+        $PATH = "https://www.googleapis.com/oauth2/v4/token";
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $PATH);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+
+        $response = json_decode($result, true);
+        return $response;
+    }
 }
