@@ -98,7 +98,7 @@ class SnapchatAdAccountController extends Controller
 
                     } else {
                         $stats = $this->fetchAdStats($account->access_token, $account->ad_account_id, $start_date, $end_date);
-                        return $stats;
+                        array_push($snapchatStats, $stats);
                     }
                 } else {
                     echo "I will not get executed";
