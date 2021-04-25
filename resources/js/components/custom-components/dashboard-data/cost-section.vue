@@ -59,6 +59,7 @@ import {
     AD_SPEND_TIKTOK,
     SUBSCRIPTION_COST
 } from "../../../constants";
+import _ from "lodash";
 export default {
     components: { Stat, SubscriptionCost, CogsModal },
     data() {
@@ -70,6 +71,7 @@ export default {
             tiktokAdsSpend: 0,
             snapchatAdsSpend: 0,
             facebookAdsSpend: 0,
+            googleAdsSpend: 0,
             data: [
                 {
                     id: 1,
@@ -172,7 +174,8 @@ export default {
                     this.chargebackTotal +
                     this.tiktokAdsSpend +
                     this.snapchatAdsSpend +
-                    this.facebookAdsSpend
+                    this.facebookAdsSpend +
+                    this.googleAdsSpend
             );
 
             eventBus.$emit("totalCostValue", totalCost);
@@ -678,7 +681,7 @@ export default {
                 const dates = getDatesBetweenDatesStandard(s_date, e_date);
 
                 dates.forEach(async date => {
-                    const result = await axios.get("snapchat=adspend", {
+                    const result = await axios.get("snapchat-adspend", {
                         params: {
                             s_date: date[0],
                             e_date: date[1]
@@ -737,7 +740,30 @@ export default {
         },
 
         async getGoogleAdSpend(s_date, e_date) {
-            return updateAdData(this.data, "GOOGLE", displayCurrency(0));
+            try {
+                this.googleAdsSpend = 0;
+                const result = await axios.get("google-adspend", {
+                    params: {
+                        s_date: moment(s_date).format("YYYY-MM-DD"),
+                        e_date: moment(e_date).format("YYYY-MM-DD")
+                    }
+                });
+                const googleStats = result.data;
+                const flatGoogleStats = _.flatten(googleStats);
+
+                flatGoogleStats.forEach(stats => {
+                    this.googleAdsSpend += parseFloat(
+                        stats.metrics.costMicros / 1000000
+                    );
+                });
+                updateAdData(
+                    this.data,
+                    "GOOGLE",
+                    displayCurrency(this.googleAdsSpend)
+                );
+            } catch (err) {
+                console.log(err);
+            }
         },
         checkAndShowAdAccountsData(s_date, e_date) {
             this.hasTiktokAccount

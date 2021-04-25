@@ -100,7 +100,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('snapchatadaccount', 'SnapchatAdAccountController@toogleAdAccount');
     Route::patch('snapchatadaccount-delete', 'SnapchatAdAccountController@destroy');
 
-    Route::get('snapchat=adspend', 'SnapchatAdAccountController@getAdSpend');
+    Route::get('snapchat-adspend', 'SnapchatAdAccountController@getAdSpend');
 
     //TikTok Ad account
 
@@ -120,6 +120,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('google-connect-listaccounts', 'GoogleAdController@listAdAccounts');
     Route::get('google-connect-test', 'GoogleAdController@store');
     Route::get('google-connect-getaccounts', 'GoogleAdController@getGoogleAdAccounts');
+    Route::get('google-adspend', 'GoogleAdController@getAdSpends');
 
 });
 
