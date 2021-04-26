@@ -272,7 +272,7 @@ export default {
         });
         eventBus.$on("hasShopifyAccount", status => {
             this.hasShopifyAccount = status;
-            this.assignData(this.refundTotal, this.costData);
+            // this.assignData(this.refundTotal, this.costData);
         });
     },
     methods: {
@@ -483,6 +483,7 @@ export default {
                         totalChargeback += parseFloat(dispute.amount);
                     });
                 }
+                console.log("Stripe: ", this.hasStripeAccount);
                 if (this.hasStripeAccount) {
                     const stripeResult = await axios.get(
                         "stripeconnect-chargeback"
@@ -694,7 +695,6 @@ export default {
                     const snapchatStats = _.flatten(result.data);
 
                     snapchatStats.forEach(stats => {
-                        console.log(stats.stats.spend);
                         this.snapchatAdsSpend += parseFloat(
                             stats.stats.spend / 1000000
                         );

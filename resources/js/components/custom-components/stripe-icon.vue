@@ -60,6 +60,7 @@ export default {
             try {
                 const result = await axios.get("getstripeaccounts");
                 this.stripeAccounts = result.data;
+
                 result.data.length
                     ? this.checkEnabledStatus(result.data)
                     : eventBus.$emit("hasStripeAccount", false);
@@ -94,7 +95,7 @@ export default {
         async handleClick(account) {
             try {
                 await axios.patch("stripeconnect", account);
-                //  await this.getStripeAccounts();
+                await this.getStripeAccounts();
             } catch (error) {
                 console.log(error);
             }
