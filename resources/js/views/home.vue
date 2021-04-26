@@ -130,8 +130,8 @@ export default {
     methods: {
         ...mapActions(["fetchShopifyData"]),
 
-        showModal() {
-            this.$bvModal.show("modal-1");
+        showModal(modalId) {
+            this.$bvModal.show(modalId);
         },
         handleOk() {
             window.location.href = "/";
@@ -177,6 +177,16 @@ export default {
 
         async getSnapchatAdAccounts() {
             try {
+                if (
+                    new URL(location.href).searchParams.get(
+                        "listSnapchatAccount"
+                    ) === "noaccount"
+                ) {
+                    setTimeout(() => {
+                        this.showModal("snapchat-noaccount");
+                    }, 100);
+                    return;
+                }
                 const result = await axios.get("snapchat-listadaccounts", {
                     params: {
                         organization_id: new URL(
@@ -197,10 +207,10 @@ export default {
                 const accessToken = new URL(location.href).searchParams.get(
                     "listTiktokAccounts"
                 );
-                this.$bvModal.show("modal-1");
+
                 if (accessToken === "noaccount") {
                     setTimeout(() => {
-                        this.showModal();
+                        this.showModal("tiktok-noaccount");
                     }, 100);
 
                     // window.location.href = "/";
@@ -370,9 +380,9 @@ export default {
                 @handle-close="$bvModal.hide('tiktok-connect')"
             />
         </b-modal>
-
+        <!-- Tiktok No ad account -->
         <b-modal
-            id="modal-1"
+            id="tiktok-noaccount"
             title="TikTok Ad Account"
             ok-only
             ok-variant="primary"
@@ -380,6 +390,18 @@ export default {
             @hide="handleOk"
         >
             <p class="my-2">No TikTok Ad Account found!</p>
+        </b-modal>
+
+        <!-- Snapchat No Organization -->
+        <b-modal
+            id="snapchat-noaccount"
+            title="Snapchat Ad Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">No Snapchat Ad Account found!</p>
         </b-modal>
     </Layout>
 </template>
