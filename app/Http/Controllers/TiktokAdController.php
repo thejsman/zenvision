@@ -158,7 +158,8 @@ class TiktokAdController extends Controller
 
                 curl_close($curl);
                 $response = json_decode($result, true);
-                if ($response) {
+
+                if (isset($response['data']['list'])) {
                     return $response['data']['list'];
                 } else {
                     return [];
