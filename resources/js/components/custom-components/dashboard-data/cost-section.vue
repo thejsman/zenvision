@@ -43,6 +43,8 @@ import {
     setLoading,
     getDatesBetweenDates,
     getDatesBetweenDatesStandard,
+    setLoadingSingle,
+    setLoadingAdSingle,
     updateDataMerchantFee
 } from "../../../utils";
 import CogsModal from "../modals/CogsDetails-modal";
@@ -229,8 +231,8 @@ export default {
         });
 
         eventBus.$on("hasSnapchatAccount", status => {
+            setLoadingAdSingle(this.data, "SNAPCHAT");
             this.hasSnapchatAccount = status;
-
             if (status) {
                 return this.getSnapchatAdSpend(this.startDate, this.endDate);
             } else {
@@ -240,6 +242,7 @@ export default {
         });
 
         eventBus.$on("hasFacebookAccount", status => {
+            setLoadingAdSingle(this.data, "FACEBOOK");
             this.hasFacebookAccount = status;
 
             if (status) {
@@ -250,6 +253,7 @@ export default {
         });
 
         eventBus.$on("hasGoogleAccount", status => {
+            setLoadingAdSingle(this.data, "GOOGLE");
             this.hasGoogleAccount = status;
 
             if (status) {
@@ -687,21 +691,13 @@ export default {
                             e_date: date[1]
                         }
                     });
-                    const snapchatStats = result.data;
+                    const snapchatStats = _.flatten(result.data);
 
                     snapchatStats.forEach(stats => {
-                        const orderDate = moment(stats.start_time).format(
-                            "MM-DD-YYYY"
+                        console.log(stats.stats.spend);
+                        this.snapchatAdsSpend += parseFloat(
+                            stats.stats.spend / 1000000
                         );
-
-                        if (
-                            new Date(orderDate) >= new Date(s_date) &&
-                            new Date(orderDate) <= new Date(e_date)
-                        ) {
-                            this.snapchatAdsSpend += parseFloat(
-                                stats.stats.spend / 1000000
-                            );
-                        }
                     });
                     updateAdData(
                         this.data,

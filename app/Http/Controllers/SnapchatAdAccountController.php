@@ -88,6 +88,7 @@ class SnapchatAdAccountController extends Controller
                     if (Time::now() > $account->expires_at) {
                         // generate new access token from refresh token
                         $updated_tokens = $this->updateAccessToken($account->refresh_token);
+
                         $account->access_token = $updated_tokens['access_token'];
                         $account->refresh_token = $updated_tokens['refresh_token'];
                         $account->expires_at = date('Y/m/d H:i:s', Time::now()->timestamp + $updated_tokens['expires_in']);
@@ -100,8 +101,6 @@ class SnapchatAdAccountController extends Controller
                         $stats = $this->fetchAdStats($account->access_token, $account->ad_account_id, $start_date, $end_date);
                         array_push($snapchatStats, $stats);
                     }
-                } else {
-                    echo "I will not get executed";
                 }
             }
         }
