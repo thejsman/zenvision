@@ -29,26 +29,30 @@ class SnapchatController extends Controller
         }
         curl_close($ch);
         $user_info = $this->getSnapchatUserInfo($response['access_token']);
-        dd($user_info);
-        $snapchat_table_data = array(
-            'user_id' => Auth::user()->id,
-            'access_token' => $response['access_token'],
-            'refresh_token' => $response['refresh_token'],
-            'expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in']),
-            'snapchat_user_id' => $user_info['me']['id'],
-            'snapchat_email' => $user_info['me']['email'],
-            'organization_id' => $user_info['me']['organization_id'],
-            'display_name' => $user_info['me']['display_name'],
-            'member_status' => $user_info['me']['member_status'],
-            'enabled_on_dashboard' => true,
-            'isDeleted' => false,
-        );
+        if (isset($user_info['me'])) {
+            $snapchat_table_data = array(
+                'user_id' => Auth::user()->id,
+                'access_token' => $response['access_token'],
+                'refresh_token' => $response['refresh_token'],
+                'expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in']),
+                'snapchat_user_id' => $user_info['me']['id'],
+                'snapchat_email' => $user_info['me']['email'],
+                'organization_id' => $user_info['me']['organization_id'],
+                'display_name' => $user_info['me']['display_name'],
+                'member_status' => $user_info['me']['member_status'],
+                'enabled_on_dashboard' => true,
+                'isDeleted' => false,
+            );
 
-        Snapchat::updateOrCreate([
-            'user_id' => Auth::user()->id, 'snapchat_user_id' => $user_info['me']['id'], 'organization_id' => $user_info['me']['organization_id'],
-        ], $snapchat_table_data);
+            Snapchat::updateOrCreate([
+                'user_id' => Auth::user()->id, 'snapchat_user_id' => $user_info['me']['id'], 'organization_id' => $user_info['me']['organization_id'],
+            ], $snapchat_table_data);
 
-        return redirect()->route('home', ['listSnapchatAccount' => $user_info['me']['organization_id']]);
+            return redirect()->route('home', ['listSnapchatAccount' => $user_info['me']['organization_id']]);
+        } else {
+            return redirect()->route('home', ['listSnapchatAccount' => 'noaccount']);
+        }
+
     }
 
     protected function getSnapchatUserInfo($access_token)
