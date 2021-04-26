@@ -29,7 +29,7 @@ class SnapchatController extends Controller
         }
         curl_close($ch);
         $user_info = $this->getSnapchatUserInfo($response['access_token']);
-
+        dd($user_info);
         $snapchat_table_data = array(
             'user_id' => Auth::user()->id,
             'access_token' => $response['access_token'],
