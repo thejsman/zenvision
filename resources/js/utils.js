@@ -92,6 +92,25 @@ export const setLoading = data => {
     data.forEach(d => (d.loading = true));
 };
 
+export const setLoadingSingle = (data, title) => {
+    data.forEach(d => {
+        if (d.title === title) {
+            d.loading = true;
+        }
+    });
+};
+
+export const setLoadingAdSingle = (data, provider) => {
+    data.forEach(d => {
+        if (
+            d.iconName !== undefined &&
+            d.iconName.includes(provider.toLowerCase())
+        ) {
+            d.loading = true;
+        }
+    });
+};
+
 // Function to calculate dates rage of 30days for  paypal transactions api call
 export const getDatesBetweenDates = (startDate, endDate) => {
     let dates = [];
