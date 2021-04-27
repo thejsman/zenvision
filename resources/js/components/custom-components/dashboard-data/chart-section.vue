@@ -12,13 +12,16 @@
                     ><span class="mr-3 pr-3">Loss</span>
                 </div>
                 <b-skeleton
-                    v-if="showGraph"
+                    v-if="!showGraph"
                     animation="wave"
                     width="100%"
                     height="297px"
                 ></b-skeleton>
                 <div v-else>
-                    <highcharts :options="chartOptions"></highcharts>
+                    <highcharts
+                        :options="chartOptions"
+                        :updateArgs="[true, false]"
+                    ></highcharts>
                 </div>
             </div>
         </div>
@@ -26,7 +29,7 @@
 </template>
 <script>
 import { Chart } from "highcharts-vue";
-
+import _ from "lodash";
 import moment from "moment";
 import { eventBus } from "../../../app";
 import { displayCurrency } from "../../../utils";
@@ -61,11 +64,11 @@ export default {
 
                 yAxis: {
                     gridLineColor: "#32394e",
-                    min: 0,
+
                     minPadding: 0,
                     startOnTick: true,
                     minRange: 100,
-                    min: 0,
+
                     title: {
                         text: "Profit"
                     },
@@ -109,24 +112,40 @@ export default {
                     borderWidth: 1
                 }
             },
-            showGraph: true
+            updateArgs: [true, true, true],
+            showGraph: false,
+            stripeTransactionArray: [],
+            stripeTransationStatus: false,
+            chartSeries: []
         };
+    },
+    created() {
+        eventBus.$on("stripeTransactionEvent", async stripeData => {
+            if (stripeData.length > 0) {
+                this.stripeTransationStatus = true;
+                this.stripeTransactionArray = stripeData;
+                this.assignData();
+            } else {
+                this.stripeTransationStatus = false;
+                this.assignData();
+            }
+        });
     },
     methods: {
         assignData(orders) {
+            this.showGraph = false;
             const dates = this.getDaysBetweenDates(
                 this.ChartdateRange[0],
                 this.ChartdateRange[1]
             );
-            setTimeout(() => {
-                this.showGraph = false;
-            }, 3000);
+
             let dayArray = [];
             dates.map(day => {
                 const sum = _.sumBy(this.chartData, order => {
                     if (
-                        moment(order.created_on_shopify).format("M/D/YY") ===
-                        day
+                        moment(order.created_on_shopify).format(
+                            "YYYY-MM-DD"
+                        ) === day
                     ) {
                         return parseFloat(order.total_price - order.total_cost);
                     } else {
@@ -134,9 +153,13 @@ export default {
                     }
                 });
                 dayArray.push([Date.parse(day), sum]);
+                // dayArray.push([day, sum]);
             });
-
-            this.chartOptions.series[0].data = dayArray;
+            this.chartSeries = dayArray;
+            if (this.stripeTransationStatus) {
+                this.renderStripeData();
+            }
+            this.updateSeries();
         },
 
         getDaysBetweenDates(startDate, endDate) {
@@ -144,10 +167,29 @@ export default {
                 dates = [];
 
             while (now.isSameOrBefore(endDate)) {
-                dates.push(now.format("M/D/YY"));
+                dates.push(now.format("YYYY-MM-DD"));
                 now.add(1, "days");
             }
             return dates;
+        },
+        renderStripeData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.stripeTransactionArray, stripeTrans =>
+                    moment(stripeTrans.available_on).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(stripeTrans.fee)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+        updateSeries() {
+            this.showGraph = false;
+            setTimeout(() => {
+                this.chartOptions.series[0].data = this.chartSeries;
+                this.showGraph = true;
+            }, 3000);
         }
     },
     mounted() {},
