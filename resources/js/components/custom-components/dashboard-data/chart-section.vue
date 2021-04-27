@@ -11,7 +11,15 @@
                     <i class="loss-circle"></i
                     ><span class="mr-3 pr-3">Loss</span>
                 </div>
-                <highcharts :options="chartOptions"></highcharts>
+                <b-skeleton
+                    v-if="showGraph"
+                    animation="wave"
+                    width="100%"
+                    height="297px"
+                ></b-skeleton>
+                <div v-else>
+                    <highcharts :options="chartOptions"></highcharts>
+                </div>
             </div>
         </div>
     </div>
@@ -100,7 +108,8 @@ export default {
                     opacity: 0.7,
                     borderWidth: 1
                 }
-            }
+            },
+            showGraph: true
         };
     },
     methods: {
@@ -109,6 +118,9 @@ export default {
                 this.ChartdateRange[0],
                 this.ChartdateRange[1]
             );
+            setTimeout(() => {
+                this.showGraph = false;
+            }, 3000);
             let dayArray = [];
             dates.map(day => {
                 const sum = _.sumBy(this.chartData, order => {
