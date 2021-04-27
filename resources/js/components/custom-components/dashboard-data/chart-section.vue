@@ -20,7 +20,7 @@
                 <div v-else>
                     <highcharts
                         :options="chartOptions"
-                        :updateArgs="[true, false]"
+                        ref="lineCharts"
                     ></highcharts>
                 </div>
             </div>
@@ -112,14 +112,25 @@ export default {
                     borderWidth: 1
                 }
             },
-            updateArgs: [true, true, true],
+
             showGraph: false,
             stripeTransactionArray: [],
-            stripeTransationStatus: false,
+            stripeTransactionStatus: false,
+
+            facebookTransactionArray: [],
+            facebookTransationStatus: false,
+
+            snapchatTransactionArray: [],
+            snapchatTransationStatus: false,
+
+            googleTransactionArray: [],
+            googleTransationStatus: false,
+
             chartSeries: []
         };
     },
     created() {
+        //Stripe
         eventBus.$on("stripeTransactionEvent", async stripeData => {
             if (stripeData.length > 0) {
                 this.stripeTransationStatus = true;
@@ -127,6 +138,40 @@ export default {
                 this.assignData();
             } else {
                 this.stripeTransationStatus = false;
+                this.assignData();
+            }
+        });
+        //Facebook
+        eventBus.$on("facebookTransactionEvent", facebookData => {
+            if (facebookData.length > 0) {
+                this.facebookTransationStatus = true;
+                this.facebookTransactionArray = facebookData;
+                this.assignData();
+            } else {
+                this.facebookTransationStatus = false;
+                this.assignData();
+            }
+        });
+        //Snapchat
+        eventBus.$on("snapchatTransactionEvent", snapchatData => {
+            if (snapchatData.length > 0) {
+                this.snapchatTransationStatus = true;
+                this.snapchatTransactionArray = snapchatData;
+                this.assignData();
+            } else {
+                this.snapchatTransationStatus = false;
+                this.assignData();
+            }
+        });
+
+        //Google
+        eventBus.$on("googleTransactionEvent", googleData => {
+            if (googleData.length > 0) {
+                this.googleTransationStatus = true;
+                this.googleTransactionArray = googleData;
+                this.assignData();
+            } else {
+                this.googleTransationStatus = false;
                 this.assignData();
             }
         });
@@ -159,6 +204,21 @@ export default {
             if (this.stripeTransationStatus) {
                 this.renderStripeData();
             }
+
+            if (this.facebookTransationStatus) {
+                this.renderFacebookData();
+            }
+            if (this.snapchatTransationStatus) {
+                this.renderSnapchatData();
+            }
+            if (this.googleTransationStatus) {
+                this.renderGoogleData();
+            }
+            const profitSeries = this.chartSeries.map(cs =>
+                parseFloat(cs[1]).toFixed(2)
+            );
+
+            eventBus.$emit("profitSeriesData", profitSeries);
             this.updateSeries();
         },
 
@@ -178,6 +238,42 @@ export default {
                     moment(stripeTrans.available_on).format("YYYY-MM-DD") ===
                     moment(cs[0]).format("YYYY-MM-DD")
                         ? parseFloat(stripeTrans.fee)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+        renderFacebookData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.facebookTransactionArray, facebookTrans =>
+                    moment(facebookTrans.date_start).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(facebookTrans.spend)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+        renderSnapchatData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.snapchatTransactionArray, snapchatTrans =>
+                    moment(snapchatTrans.start_time).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(snapchatTrans.stats.spend / 1000000)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+        renderGoogleData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.googleTransactionArray, googleTrans =>
+                    moment(googleTrans.segments.date).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(googleTrans.metrics.costMicros / 1000000)
                         : 0
                 );
             });
