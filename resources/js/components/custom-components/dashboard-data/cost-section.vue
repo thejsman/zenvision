@@ -241,8 +241,10 @@ export default {
 
             if (status) {
                 return this.getTiktokAdSpend(this.startDate, this.endDate);
+            } else {
+                eventBus.$emit("snapchatTransactionEvent", []);
+                updateAdData(this.data, "TIKTOK", "-");
             }
-            updateAdData(this.data, "TIKTOK", "-");
         });
 
         eventBus.$on("hasSnapchatAccount", status => {
@@ -252,6 +254,7 @@ export default {
                 return this.getSnapchatAdSpend(this.startDate, this.endDate);
             } else {
                 this.snapchatAdsSpend = 0;
+                eventBus.$emit("snapchatTransactionEvent", []);
                 updateAdData(this.data, "SNAPCHAT", displayCurrency("-"));
             }
         });
@@ -263,6 +266,7 @@ export default {
             if (status) {
                 return this.getFacebookAdSpend(this.startDate, this.endDate);
             } else {
+                eventBus.$emit("facebookTransactionEvent", []);
                 updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
             }
         });
@@ -274,6 +278,7 @@ export default {
             if (status) {
                 return this.getGoogleAdSpend(this.startDate, this.endDate);
             } else {
+                eventBus.$emit("googleTransactionEvent", []);
                 updateAdData(this.data, "GOOGLE", displayCurrency("-"));
             }
         });
@@ -313,11 +318,6 @@ export default {
     methods: {
         assignData(refundTotal, orders) {
             setTimeout(() => {
-                console.log(
-                    "in assign data",
-                    this.hasShopifyAccount,
-                    this.totalChargeback
-                );
                 this.getCogsData(orders, refundTotal);
 
                 this.getSubscriptionData();
@@ -752,7 +752,7 @@ export default {
                         }
                     });
                     const snapchatStats = _.flatten(result.data);
-
+                    eventBus.$emit("snapchatTransactionEvent", snapchatStats);
                     snapchatStats.forEach(stats => {
                         this.snapchatAdsSpend += parseFloat(
                             stats.stats.spend / 1000000
@@ -781,6 +781,7 @@ export default {
                 });
                 const facebookStats = result.data;
 
+                eventBus.$emit("facebookTransactionEvent", facebookStats);
                 facebookStats.forEach(stats => {
                     this.facebookAdsSpend += parseFloat(stats.spend);
                 });
@@ -805,7 +806,7 @@ export default {
                 });
                 const googleStats = result.data;
                 const flatGoogleStats = _.flatten(googleStats);
-
+                eventBus.$emit("googleTransactionEvent", flatGoogleStats);
                 flatGoogleStats.forEach(stats => {
                     this.googleAdsSpend += parseFloat(
                         stats.metrics.costMicros / 1000000
