@@ -293,7 +293,7 @@ export default {
                     MERCHANT_FEE,
                     displayCurrency(this.totalMerchantFees)
                 );
-                console.log(this.totalChargeback);
+                eventBus.$emit("stripeTransactionEvent", []);
                 updateDataMerchantFee(
                     this.data,
                     CHARGEBACKS_TOTAL,
@@ -708,6 +708,10 @@ export default {
                     const stripeTransactions = result.data;
 
                     if (stripeTransactions !== undefined) {
+                        eventBus.$emit(
+                            "stripeTransactionEvent",
+                            stripeTransactions
+                        );
                         stripeTransactions.forEach(sTransaction => {
                             this.stripeFeeTotal += parseFloat(sTransaction.fee);
                         });
