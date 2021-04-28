@@ -646,6 +646,7 @@ export default {
         async getTiktokAdSpend(s_date, e_date) {
             this.tiktokAdsSpend = 0;
             const dates = getDatesBetweenDates(s_date, e_date);
+
             let tiktokTotal = 0;
             try {
                 dates.forEach(async date => {
@@ -654,8 +655,10 @@ export default {
                             "tiktokaccount-adspend",
                             {
                                 params: {
-                                    s_date: date[0].substring(0, 10),
-                                    e_date: date[1].substring(0, 10)
+                                    s_date: moment(date[0]).format(
+                                        "YYYY-MM-DD"
+                                    ),
+                                    e_date: moment(date[1]).format("YYYY-MM-DD")
                                 }
                             }
                         );
