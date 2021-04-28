@@ -94,18 +94,24 @@ export default {
         },
         async handleClick(account) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("tiktokaccount", account);
                 await this.getTiktokAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },
 
         async removeChannel(account, event) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("tiktokaccount-delete", account);
                 await this.getTiktokAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         }
