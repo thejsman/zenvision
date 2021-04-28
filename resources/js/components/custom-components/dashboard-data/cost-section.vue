@@ -244,6 +244,7 @@ export default {
             if (status) {
                 return this.getTiktokAdSpend(this.startDate, this.endDate);
             } else {
+                this.tiktokAdsSpend = 0;
                 eventBus.$emit("tiktokTransactionEvent", []);
                 updateAdData(this.data, "TIKTOK", "-");
             }
@@ -268,6 +269,7 @@ export default {
             if (status) {
                 return this.getFacebookAdSpend(this.startDate, this.endDate);
             } else {
+                this.facebookAdsSpend = 0;
                 eventBus.$emit("facebookTransactionEvent", []);
                 updateAdData(this.data, "FACEBOOK", displayCurrency("-"));
             }
@@ -280,6 +282,7 @@ export default {
             if (status) {
                 return this.getGoogleAdSpend(this.startDate, this.endDate);
             } else {
+                this.googleAdsSpend = 0;
                 eventBus.$emit("googleTransactionEvent", []);
                 updateAdData(this.data, "GOOGLE", displayCurrency("-"));
             }
