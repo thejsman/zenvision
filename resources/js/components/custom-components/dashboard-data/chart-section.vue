@@ -126,6 +126,12 @@ export default {
             googleTransactionArray: [],
             googleTransationStatus: false,
 
+            tiktokTransactionArray: [],
+            tiktokTransationStatus: false,
+
+            stripeChargebackArray: [],
+            stripeChargebackStatus: false,
+
             chartSeries: []
         };
     },
@@ -175,6 +181,30 @@ export default {
                 this.assignData();
             }
         });
+
+        //Tiktok
+        eventBus.$on("tiktokTransactionEvent", tiktokData => {
+            if (tiktokData.length > 0) {
+                this.tiktokTransationStatus = true;
+                this.tiktokTransactionArray = tiktokData;
+                this.assignData();
+            } else {
+                this.tiktokTransationStatus = false;
+                this.assignData();
+            }
+        });
+
+        //StripeChargeback
+        eventBus.$on("stripeChargebackEvent", stripeChargeback => {
+            if (stripeChargeback.length > 0) {
+                this.stripeChargebackStatus = true;
+                this.stripeChargebackArray = stripeChargeback;
+                this.assignData();
+            } else {
+                this.stripeChargebackStatus = false;
+                this.assignData();
+            }
+        });
     },
     methods: {
         assignData(orders) {
@@ -214,6 +244,14 @@ export default {
             if (this.googleTransationStatus) {
                 this.renderGoogleData();
             }
+            if (this.tiktokTransationStatus) {
+                this.renderTiktokData();
+            }
+
+            if (this.stripeChargebackStatus) {
+                this.renderStripeChargeback();
+            }
+
             const profitSeries = this.chartSeries.map(cs =>
                 parseFloat(cs[1]).toFixed(2)
             );
@@ -275,6 +313,37 @@ export default {
                     moment(cs[0]).format("YYYY-MM-DD")
                         ? parseFloat(googleTrans.metrics.costMicros / 1000000)
                         : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+
+        renderTiktokData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.tiktokTransactionArray, tiktokTrans => {
+                    return moment(tiktokTrans.stat_datetime).format(
+                        "YYYY-MM-DD"
+                    ) === moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(tiktokTrans.stat_cost)
+                        : 0;
+                });
+            });
+
+            this.updateSeries();
+        },
+
+        renderStripeChargeback() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(
+                    this.stripeChargebackArray,
+                    stripeChargeback => {
+                        return moment(stripeChargeback.created * 1000).format(
+                            "YYYY-MM-DD"
+                        ) === moment(cs[0]).format("YYYY-MM-DD")
+                            ? parseFloat(stripeChargeback.amount / 100)
+                            : 0;
+                    }
                 );
             });
 
