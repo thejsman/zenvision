@@ -68,20 +68,25 @@ export default {
         },
         async handleClick(store) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("shopifystore", store);
                 eventBus.$emit("toggleShopifyStore");
+                eventBus.$emit("setLoadingFalse");
                 this.getStores();
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },
         async removeChannel(store, event) {
             try {
-                // eventBus.$emit("removeShopifyStore", store.id);
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("shopifystoredelete", store);
                 eventBus.$emit("toggleShopifyStore");
+                eventBus.$emit("setLoadingFalse");
                 this.getStores();
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },

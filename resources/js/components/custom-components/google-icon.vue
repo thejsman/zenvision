@@ -93,18 +93,24 @@ export default {
         },
         async handleClick(account) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("google-connect", account);
                 await this.getgoogleAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },
 
         async removeChannel(account, event) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("google-connect-delete", account);
                 await this.getgoogleAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         }

@@ -77,17 +77,23 @@ export default {
         async handleClick(account) {
             this.$emit("togglePaypalAccount", account.id);
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("paypal", account);
                 await this.getPaypalAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
                 console.log(error);
+                eventBus.$emit("setLoadingFalse");
             }
         },
         async removeChannel(account, event) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("paypaldelete", account);
                 await this.getPaypalAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
                 this.ppAccounts = [];
             }

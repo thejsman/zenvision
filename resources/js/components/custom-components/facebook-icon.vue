@@ -100,18 +100,24 @@ export default {
         },
         async handleClick(account) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("fbconnect", account);
                 await this.getfacebookAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },
 
         async removeChannel(account, event) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("fbconnectdelete", account);
                 await this.getfacebookAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         }

@@ -32,6 +32,10 @@ import { mapState, mapGetters, mapActions } from "vuex";
 
 import { eventBus } from "../app";
 
+import Loading from "vue-loading-overlay";
+// Import stylesheet
+import "vue-loading-overlay/dist/vue-loading.css";
+
 export default {
     components: {
         Layout,
@@ -54,7 +58,8 @@ export default {
         TiktokAccount,
         GoogleConnect,
         GoogleAccount,
-        TiktokConnect
+        TiktokConnect,
+        Loading
     },
     data() {
         return {
@@ -88,7 +93,8 @@ export default {
             paypalAccounts: [],
             stripeAccounts: [],
             stripeTransactions: [],
-            paypalTransactions: []
+            paypalTransactions: [],
+            isLoading: false
         };
     },
 
@@ -125,6 +131,13 @@ export default {
         });
         eventBus.$on("cogs-updated", async () => {
             this.getShopifyStoreData();
+        });
+
+        eventBus.$on("setLoadingTrue", () => {
+            this.isLoading = true;
+        });
+        eventBus.$on("setLoadingFalse", () => {
+            this.isLoading = false;
         });
     },
     methods: {
@@ -297,7 +310,12 @@ export default {
                 </div>
             </div>
         </div>
-
+        <loading
+            :active.sync="isLoading"
+            :can-cancel="false"
+            :is-full-page="true"
+            :background-color="'#2F3863'"
+        ></loading>
         <div class="row">
             <div class="col-xl-5">
                 <Profit

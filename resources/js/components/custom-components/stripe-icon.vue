@@ -94,17 +94,22 @@ export default {
         },
         async handleClick(account) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("stripeconnect", account);
                 await this.getStripeAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
+                eventBus.$emit("setLoadingFalse");
                 console.log(error);
             }
         },
 
         async removeChannel(account, event) {
             try {
+                eventBus.$emit("setLoadingTrue");
                 await axios.patch("stripeconnectdelete", account);
                 await this.getStripeAccounts();
+                eventBus.$emit("setLoadingFalse");
             } catch (error) {
                 console.log(error);
             }
