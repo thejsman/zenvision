@@ -237,12 +237,13 @@ export default {
         });
 
         eventBus.$on("hasTiktokAccount", status => {
+            setLoadingAdSingle(this.data, "TIKTOK");
             this.hasTiktokAccount = status;
 
             if (status) {
                 return this.getTiktokAdSpend(this.startDate, this.endDate);
             } else {
-                eventBus.$emit("snapchatTransactionEvent", []);
+                eventBus.$emit("tiktokTransactionEvent", []);
                 updateAdData(this.data, "TIKTOK", "-");
             }
         });
@@ -290,6 +291,7 @@ export default {
 
             if (status) {
                 this.getStripeTransactions();
+                // this.getChargebackTotal();
             } else {
                 this.stripeFeeTotal = 0;
                 this.stripeChargebackTotal = 0;
@@ -299,6 +301,7 @@ export default {
                     displayCurrency(this.totalMerchantFees)
                 );
                 eventBus.$emit("stripeTransactionEvent", []);
+                eventBus.$emit("stripeChargebackEvent", []);
                 updateDataMerchantFee(
                     this.data,
                     CHARGEBACKS_TOTAL,
@@ -537,34 +540,43 @@ export default {
                         "stripeconnect-chargeback"
                     );
 
-                    let stripeChargebacks = stripeResult.data;
-
-                    stripeChargebacks.forEach(sc => {
-                        const oDate = new Date(sc.created * 1000);
-
-                        if (
-                            new Date(oDate) >= new Date(this.startDate) &&
-                            new Date(oDate) <= new Date(this.endDate)
-                        ) {
-                            if (
+                    let stripeChargebacks = stripeResult.data
+                        .filter(
+                            sc =>
                                 sc.status === "charge_refunded" ||
                                 sc.status === "lost"
-                            ) {
-                                this.stripeChargebackTotal += parseFloat(
-                                    sc.amount / 100
-                                );
-                            }
-                        }
-                    });
+                        )
+                        .filter(
+                            sc =>
+                                new Date(sc.created * 1000) >=
+                                    new Date(this.startDate) &&
+                                new Date(sc.created * 1000) <=
+                                    new Date(this.endDate)
+                        );
+                    if (stripeChargebacks.length > 0) {
+                        eventBus.$emit(
+                            "stripeChargebackEvent",
+                            stripeChargebacks
+                        );
+                        stripeChargebacks.forEach(sc => {
+                            this.stripeChargebackTotal += parseFloat(
+                                sc.amount / 100
+                            );
+                        });
+                    }
                 }
 
-                updateData(
-                    this.data,
-                    CHARGEBACKS_TOTAL,
-                    this.anyActiveAccount
-                        ? displayCurrency(this.totalChargeback)
-                        : "-"
-                );
+                setTimeout(() => {
+                    updateData(
+                        this.data,
+                        CHARGEBACKS_TOTAL,
+                        this.hasStripeAccount ||
+                            this.hasShopifyAccount ||
+                            this.hasPaypalAccount
+                            ? displayCurrency(this.totalChargeback)
+                            : "-"
+                    );
+                }, 500);
             } catch (err) {
                 this.totalChargeback = 0;
                 updateData(this.data, CHARGEBACKS_TOTAL, "-");
@@ -582,7 +594,9 @@ export default {
                 updateData(
                     this.data,
                     MERCHANT_FEE,
-                    this.anyActiveAccount
+                    this.hasStripeAccount ||
+                        this.hasShopifyAccount ||
+                        this.hasPaypalAccount
                         ? displayCurrency(this.totalMerchantFees)
                         : "-"
                 );
@@ -648,6 +662,10 @@ export default {
                         const tiktokTransactions = tiktokResult.data;
 
                         if (tiktokTransactions.length > 0) {
+                            eventBus.$emit(
+                                "tiktokTransactionEvent",
+                                tiktokTransactions
+                            );
                             tiktokTransactions.map(transaction => {
                                 if (transaction.hasOwnProperty("stat_cost")) {
                                     const orderDate = moment(
@@ -754,17 +772,24 @@ export default {
                         }
                     });
                     const snapchatStats = _.flatten(result.data);
-                    eventBus.$emit("snapchatTransactionEvent", snapchatStats);
-                    snapchatStats.forEach(stats => {
-                        this.snapchatAdsSpend += parseFloat(
-                            stats.stats.spend / 1000000
+                    if (snapchatStats.length > 0) {
+                        eventBus.$emit(
+                            "snapchatTransactionEvent",
+                            snapchatStats
                         );
-                    });
-                    updateAdData(
-                        this.data,
-                        "SNAPCHAT",
-                        displayCurrency(this.snapchatAdsSpend)
-                    );
+                        snapchatStats.forEach(stats => {
+                            this.snapchatAdsSpend += parseFloat(
+                                stats.stats.spend / 1000000
+                            );
+                        });
+                        updateAdData(
+                            this.data,
+                            "SNAPCHAT",
+                            displayCurrency(this.snapchatAdsSpend)
+                        );
+                    } else {
+                        updateAdData(this.data, "SNAPCHAT", displayCurrency(0));
+                    }
                 });
             } catch (err) {
                 console.log(err);
@@ -808,17 +833,21 @@ export default {
                 });
                 const googleStats = result.data;
                 const flatGoogleStats = _.flatten(googleStats);
-                eventBus.$emit("googleTransactionEvent", flatGoogleStats);
-                flatGoogleStats.forEach(stats => {
-                    this.googleAdsSpend += parseFloat(
-                        stats.metrics.costMicros / 1000000
+                if (flatGoogleStats.length > 0) {
+                    eventBus.$emit("googleTransactionEvent", flatGoogleStats);
+                    flatGoogleStats.forEach(stats => {
+                        this.googleAdsSpend += parseFloat(
+                            stats.metrics.costMicros / 1000000
+                        );
+                    });
+                    updateAdData(
+                        this.data,
+                        "GOOGLE",
+                        displayCurrency(this.googleAdsSpend)
                     );
-                });
-                updateAdData(
-                    this.data,
-                    "GOOGLE",
-                    displayCurrency(this.googleAdsSpend)
-                );
+                } else {
+                    updateAdData(this.data, "GOOGLE", displayCurrency(0));
+                }
             } catch (err) {
                 console.log(err);
             }
