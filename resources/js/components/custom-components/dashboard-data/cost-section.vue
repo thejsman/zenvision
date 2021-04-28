@@ -231,7 +231,7 @@ export default {
             this.startDate = s_date;
             this.endDate = e_date;
 
-            setLoading(this.data);
+            // setLoading(this.data);
 
             this.getMerchantfeesTotal(s_date, e_date);
             this.checkAndShowAdAccountsData(s_date, e_date);
