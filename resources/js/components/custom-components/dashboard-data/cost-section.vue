@@ -748,7 +748,9 @@ export default {
                     const result = await axios.get("snapchat-adspend", {
                         params: {
                             s_date: date[0],
-                            e_date: date[1]
+                            e_date: moment(date[1])
+                                .add("1", "days")
+                                .format("YYYY-MM-DD")
                         }
                     });
                     const snapchatStats = _.flatten(result.data);
