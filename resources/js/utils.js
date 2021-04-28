@@ -152,3 +152,22 @@ export const getDatesBetweenDatesStandard = (startDate, endDate) => {
     }
     return dates;
 };
+
+export const getDatesBetweenDatesTiktok = (startDate, endDate) => {
+    let now = moment(startDate).clone(),
+        dates = [];
+
+    while (now.isBefore(endDate)) {
+        const tempEndDate = now.clone();
+        tempEndDate.add(1, "months");
+
+        dates.push([
+            now.format("YYYY-MM-DD"),
+            tempEndDate.isSameOrBefore(endDate)
+                ? tempEndDate.format("YYYY-MM-DD")
+                : moment(endDate).format("YYYY-MM-DD")
+        ]);
+        now.add(1, "months").add(1, "days");
+    }
+    return dates;
+};
