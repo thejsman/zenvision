@@ -167,6 +167,7 @@ export default {
             hasShopifyAccount: false,
             stripeFeeTotal: 0,
             stripeLoadingStatus: false,
+            subscriptionDateArray: [],
             startDate: moment().subtract(1, "month"),
             endDate: moment()
         };
@@ -443,10 +444,16 @@ export default {
         },
         getSubscriptionTotal(subscriptions) {
             let subTotal = 0;
+            this.subscriptionDateArray = [];
             subscriptions.forEach(sub => {
                 subTotal += this.calculateSubscription(sub);
             });
-
+            if (this.subscriptionDateArray.length > 0) {
+                eventBus.$emit(
+                    "subscriptionDataEvent",
+                    this.subscriptionDateArray
+                );
+            }
             return subTotal;
         },
         calculateSubscription(sub) {
@@ -457,6 +464,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setDate(startDate.getDate() + 1)
                     );
@@ -468,6 +479,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setDate(startDate.getDate() + 7)
                     );
@@ -479,6 +494,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setMonth(startDate.getMonth() + 1)
                     );
@@ -490,6 +509,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setMonth(startDate.getMonth() + 3)
                     );
@@ -501,6 +524,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setMonth(startDate.getMonth() + 6)
                     );
@@ -512,6 +539,10 @@ export default {
                     sub.end_date === null ? new Date() : new Date(sub.end_date);
                 while (startDate <= endDate) {
                     total += parseFloat(sub.subscription_price);
+                    this.subscriptionDateArray.push({
+                        sub_date: moment(startDate).format("YYYY-MM-DD"),
+                        amount: sub.subscription_price
+                    });
                     startDate = new Date(
                         startDate.setFullYear(startDate.getFullYear() + 1)
                     );

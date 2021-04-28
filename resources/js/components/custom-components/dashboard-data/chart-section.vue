@@ -132,6 +132,9 @@ export default {
             stripeChargebackArray: [],
             stripeChargebackStatus: false,
 
+            subscriptionDataStatus: false,
+            subscriptionDataArray: [],
+
             chartSeries: []
         };
     },
@@ -205,6 +208,18 @@ export default {
                 this.assignData();
             }
         });
+
+        //Subscription
+        eventBus.$on("subscriptionDataEvent", subscriptionData => {
+            if (subscriptionData.length > 0) {
+                this.subscriptionDataStatus = true;
+                this.subscriptionDataArray = subscriptionData;
+                this.assignData();
+            } else {
+                this.subscriptionDataStatus = false;
+                this.assignData();
+            }
+        });
     },
     methods: {
         assignData(orders) {
@@ -250,6 +265,10 @@ export default {
 
             if (this.stripeChargebackStatus) {
                 this.renderStripeChargeback();
+            }
+
+            if (this.subscriptionDataStatus) {
+                this.renderSubscriptionData();
             }
 
             const profitSeries = this.chartSeries.map(cs =>
@@ -349,6 +368,20 @@ export default {
 
             this.updateSeries();
         },
+
+        renderSubscriptionData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.subscriptionDataArray, sub => {
+                    return moment(sub.sub_date).format("YYYY-MM-DD") ===
+                        moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(sub.amount)
+                        : 0;
+                });
+            });
+
+            this.updateSeries();
+        },
+
         updateSeries() {
             this.showGraph = false;
             setTimeout(() => {
