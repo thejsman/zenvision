@@ -13,7 +13,7 @@
                                 <h4 class="mb-0">{{ totalProfit }}</h4>
                             </div>
                         </div>
-                        <div class="align-self-center ml-3 mr-1">
+                        <!-- <div class="align-self-center ml-3 mr-1">
                             <apexchart
                                 class="apex-charts"
                                 :height="50"
@@ -21,7 +21,7 @@
                                 :options="ProfitlineChart.chartOptions"
                                 :series="ProfitlineChart.series"
                             />
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -107,10 +107,7 @@ export default {
     created() {
         eventBus.$on("totalCostValue", value => (this.totalCost = value));
         eventBus.$on("totalRevenueValue", value => (this.totalRevenue = value));
-        eventBus.$on("profitSeriesData", data => {
-            console.log("Profit section ", this.profitSeries);
-            this.profitSeries = [...data];
-        });
+        // eventBus.$on("profitSeriesData", data => (this.profitSeries = data));
     },
     props: {
         profitData: {
