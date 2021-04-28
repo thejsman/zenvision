@@ -43,6 +43,7 @@ import {
     setLoading,
     getDatesBetweenDates,
     getDatesBetweenDatesStandard,
+    getDatesBetweenDatesTiktok,
     setLoadingSingle,
     setLoadingAdSingle,
     updateDataMerchantFee
@@ -645,7 +646,7 @@ export default {
         },
         async getTiktokAdSpend(s_date, e_date) {
             this.tiktokAdsSpend = 0;
-            const dates = getDatesBetweenDates(s_date, e_date);
+            const dates = getDatesBetweenDatesTiktok(s_date, e_date);
 
             let tiktokTotal = 0;
             try {
@@ -655,10 +656,8 @@ export default {
                             "tiktokaccount-adspend",
                             {
                                 params: {
-                                    s_date: moment(date[0]).format(
-                                        "YYYY-MM-DD"
-                                    ),
-                                    e_date: moment(date[1]).format("YYYY-MM-DD")
+                                    s_date: date[0],
+                                    e_date: date[1]
                                 }
                             }
                         );
