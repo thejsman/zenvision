@@ -33,7 +33,7 @@ class TiktokAdController extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
         $headers = array();
         $headers[] = 'Content-Type: application/json';
 
@@ -88,7 +88,7 @@ class TiktokAdController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://ads.tiktok.com/open_api/v1.2/oauth2/advertiser/get/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $fields = array(
             'access_token' => $request->access_token,
@@ -143,7 +143,7 @@ class TiktokAdController extends Controller
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_MAXREDIRS => 10,
                     CURLOPT_TIMEOUT => 0,
-                    CURLOPT_SSL_VERIFYPEER => false,
+
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
