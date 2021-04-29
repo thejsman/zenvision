@@ -293,7 +293,7 @@ export default {
             this.hasStripeAccount = status;
             this.stripeChargebacks = 0;
             this.stripeFeeTotal = 0;
-
+            setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
             if (status) {
                 this.getStripeTransactions();
                 // this.getChargebackTotal();
@@ -330,7 +330,7 @@ export default {
 
                 this.getSubscriptionData();
                 this.getChargebackTotal();
-            }, 1000);
+            }, 500);
 
             // this.getMerchantfeesTotal(s_date, e_date);
         },
@@ -351,6 +351,8 @@ export default {
 
         async getCogsData(orders, refundTotal) {
             if (this.hasShopifyAccount) {
+                setLoadingSingle(this.data, DISCOUNTS_TOTAL);
+                setLoadingSingle(this.data, REFUNDS_TOTAL);
                 const discounts = _.sumBy(orders, order =>
                     parseFloat(order.total_discounts)
                 );
@@ -365,7 +367,10 @@ export default {
                     REFUNDS_TOTAL,
                     displayCurrency(refundTotal)
                 );
+
                 try {
+                    setLoadingSingle(this.data, COGS_TOTAL);
+
                     const result = await axios.get("/cogsicon");
                     const showIcon = result.data === 0 ? false : true;
                     const cogs = _.sumBy(orders, order =>
@@ -388,9 +393,14 @@ export default {
                     );
                 }
             } else {
-                this.updateCogsData(this.data, COGS_TOTAL, "-", false);
-                updateData(this.data, DISCOUNTS_TOTAL, "-");
-                updateData(this.data, REFUNDS_TOTAL, "-");
+                setLoadingSingle(this.data, DISCOUNTS_TOTAL);
+                setLoadingSingle(this.data, REFUNDS_TOTAL);
+                setLoadingSingle(this.data, COGS_TOTAL);
+                setTimeout(() => {
+                    this.updateCogsData(this.data, COGS_TOTAL, "-", false);
+                    updateData(this.data, DISCOUNTS_TOTAL, "-");
+                    updateData(this.data, REFUNDS_TOTAL, "-");
+                }, 500);
             }
         },
         async getSubscriptionData() {
@@ -554,6 +564,7 @@ export default {
             try {
                 //Shopify Chargebacks
                 if (this.hasShopifyAccount) {
+                    setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                     this.shopifyChargebackTotal = 0;
                     const result = await axios.get("getshopifydisputes");
                     const { disputes } = result.data;
@@ -569,6 +580,7 @@ export default {
                 //Stripe Chargebacks
 
                 if (this.hasStripeAccount) {
+                    setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                     this.stripeChargebackTotal = 0;
 
                     const stripeResult = await axios.get(
@@ -614,10 +626,18 @@ export default {
                 }, 500);
             } catch (err) {
                 this.totalChargeback = 0;
-                updateData(this.data, CHARGEBACKS_TOTAL, "-");
+                setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
+                setTimeout(() => {
+                    updateData(this.data, CHARGEBACKS_TOTAL, "-");
+                }, 500);
             }
         },
         async getMerchantfeesTotal(s_date, e_date) {
+            this.data.forEach(d => {
+                if (d.id === 5) {
+                    d.loading = true;
+                }
+            });
             if (this.hasPaypalAccount) {
                 await this.getPaypalTransactionsTotal(s_date, e_date);
             }
@@ -635,7 +655,7 @@ export default {
                         ? displayCurrency(this.totalMerchantFees)
                         : "-"
                 );
-            }, 1000);
+            }, 500);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             paypalFeeTotal = 0;
