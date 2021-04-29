@@ -77,4 +77,7 @@ export default {
 .daterangepicker td.in-range {
     background-color: #ebf4f82b;
 }
+.daterangepicker td.off {
+    visibility: hidden;
+}
 </style>
