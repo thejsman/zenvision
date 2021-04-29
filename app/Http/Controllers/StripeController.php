@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-ini_set('max_execution_time', '300');
+// ini_set('max_execution_time', '300');
 
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
@@ -153,11 +153,14 @@ class StripeController extends Controller
 
         $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
         $access_token = $stripe_account->access_token;
-        $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
 
-        return response()->json([
-            'success',
-        ], 200);
+        try {
+            return response()->json([
+                'success',
+            ], 200);
+        } finally {
+            $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
+        }
     }
 
     public function chargeWebookHandler(Request $request)
