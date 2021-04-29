@@ -159,6 +159,7 @@ class StripeController extends Controller
                 'success',
             ], 200);
         } finally {
+            ini_set('max_execution_time', 500);
             $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
         }
     }
