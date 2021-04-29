@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+ini_set('max_execution_time', '300');
+
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
 use Auth;
@@ -128,7 +130,7 @@ class StripeController extends Controller
     {
         $today = strtotime(date("Y/m/d"));
         $interval_end = strtotime('-1 days', $today);
-        $interval_start = strtotime(date("Y-m-d", strtotime("-3 month", $interval_end)));
+        $interval_start = strtotime(date("Y/m/d", strtotime("-3 month", $interval_end)));
 
         $stripe = new \Stripe\StripeClient(
             $access_token
@@ -221,6 +223,7 @@ class StripeController extends Controller
 
     public function getReportContent($report_url, $access_token, $user_id, $stripe_user_id)
     {
+        // $url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id
 
         // $report_url = 'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents';
         // $access_token = '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';
