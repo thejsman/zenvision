@@ -98,7 +98,7 @@ class TiktokAdController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
 
         $result = curl_exec($ch);
-
+        // return $result;
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
             return [];
@@ -107,8 +107,13 @@ class TiktokAdController extends Controller
 
         $response = json_decode($result, true);
 
-        if ($response) {
-            return $response['data']['list'];
+        $castedArray = [];
+
+        if (isset($response['data']['list'])) {
+            foreach ($response['data']['list'] as $data) {
+                array_push($castedArray, ['advertiser_id' => (string) $data['advertiser_id'], 'advertiser_name' => $data['advertiser_name']]);
+            }
+            return $castedArray;
         } else {
             return null;
         }
