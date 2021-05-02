@@ -1,29 +1,26 @@
-import dayjs from "dayjs";
+import moment from "moment";
 
 const state = {
-    startDate: "",
-    endDate: ""
+    startDateS: moment()
+        .subtract(1, "months")
+        .format("YYYY-MM-DD"),
+    endDateS: moment().format("YYYY-MM-DD")
 };
 const getters = {
-    startDate: state => state.startDate,
-    endDate: state => state.endDate
+    startDateS: state => state.startDateS,
+    endDateS: state => state.endDateS
 };
 const actions = {
-    fetchDateRange({ commit }) {
-        commit("setDateRange");
-    },
     updateDateRange({ commit }, payload) {
+        console.log("We are done now");
+        console.log({ payload });
         commit("updateDateRange", payload);
     }
 };
 const mutations = {
-    setDateRange: state => {
-        state.startDate = dayjs().subtract(3, "month");
-        state.endDate = dayjs();
-    },
     updateDateRange: (state, payload) => {
-        state.startDate = dayjs(payload.startDate).format("MM/DD/YYYY");
-        state.endDate = dayjs(payload.endDate).format("MM/DD/YYYY");
+        state.startDateS = moment(payload.startDate).format("YYYY-MM-DD");
+        state.endDateS = moment(payload.endDate).format("YYYY-MM-DD");
     }
 };
 

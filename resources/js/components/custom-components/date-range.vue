@@ -1,7 +1,7 @@
 <template>
     <div class="ml-auto d-inline-flex">
         <p class="mt-2 mr-2">Date Range:</p>
-
+        {{ dateRange }}
         <DateRangePicker
             ref="picker"
             :opens="opens"
@@ -20,29 +20,36 @@ import DateRangePicker from "vue2-daterange-picker";
 import moment from "moment";
 import { eventBus } from "../../app";
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     components: { DateRangePicker },
 
     data() {
         return {
-            dateRange: {
-                startDate: moment().subtract(1, "month"),
-                endDate: moment()
-            },
             opens: "left",
             startDateSelected: moment().subtract(1, "month")
         };
     },
-    created() {},
+    created() {
+        console.log("Date from state is", this.startDateS, this.endDateS);
+    },
     computed: {
+        ...mapGetters(["startDateS", "endDateS"]),
         maxDate() {
             return moment(this.startDateSelected)
                 .add("3", "months")
                 .toString();
+        },
+        dateRange() {
+            return {
+                startDate: this.startDateS,
+                endDate: this.endDateS
+            };
         }
     },
     methods: {
+        ...mapActions(["updateDateRange"]),
         dateFormat(classes, date) {
             if (classes["start-date"]) {
                 this.startDateSelected = date;
@@ -52,9 +59,9 @@ export default {
             }
             return classes;
         },
-        selectDate() {
-            const { startDate, endDate } = this.dateRange;
-            //   this.$emit("changeDateRange", this.dateRange);
+        selectDate(date) {
+            this.updateDateRange(date);
+
             eventBus.$emit("changeDateRange", this.dateRange);
         }
     }
