@@ -36,6 +36,7 @@ import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import moment from "moment";
+import { mapGetters } from "vuex";
 import {
     displayCurrency,
     updateData,
@@ -85,25 +86,33 @@ export default {
                     loading: true,
                     onClick: this.handleCogsClick,
                     iconName: "exclamation-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 2,
                     title: DISCOUNTS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 3,
                     title: REFUNDS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 4,
                     title: CHARGEBACKS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 5,
@@ -121,7 +130,9 @@ export default {
                     value: `-`,
                     loading: true,
                     iconName: "facebook-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 7,
@@ -129,7 +140,9 @@ export default {
                     value: `-`,
                     loading: true,
                     iconName: "google-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 8,
@@ -137,7 +150,9 @@ export default {
                     value: `-`,
                     loading: true,
                     iconName: "snapchat-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 9,
@@ -145,7 +160,9 @@ export default {
                     value: `-`,
                     loading: true,
                     iconName: "tiktok-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 10,
@@ -153,7 +170,9 @@ export default {
                     value: `0`,
                     loading: true,
                     onClick: this.handleSubscriptionClick,
-                    totalSubscriptionCount: 0
+                    totalSubscriptionCount: 0,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 }
             ],
             totalDiscount: 0,
@@ -173,6 +192,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(["startDateS", "endDateS"]),
         totalCost() {
             const totalCost = parseFloat(
                 this.totalMerchantFees +
