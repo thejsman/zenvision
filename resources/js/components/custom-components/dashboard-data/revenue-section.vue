@@ -9,6 +9,7 @@
                 :title="stat.title"
                 :value="stat.value"
                 :loading="stat.loading"
+                :toolTip="stat.toolTip"
             />
         </div>
     </div>
@@ -41,25 +42,33 @@ export default {
                     id: 1,
                     title: NUMBER_OF_ORDERS,
                     value: "0",
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 2,
                     title: ORDER_REVENUE,
                     value: "0",
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 3,
                     title: SHIPPING_REVENUE,
                     value: "0",
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 4,
                     title: TAXES_REVENUE,
                     value: "0",
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 }
             ],
             totalRevenue: 0,
@@ -90,7 +99,9 @@ export default {
     },
     methods: {
         assignData(orders) {
+            //Start Loading
             setLoading(this.data);
+
             if (this.hasShopifyAccount) {
                 const number_of_orders = _.size(orders);
                 const revenue = getSumBy(orders, "total_price");
