@@ -12,8 +12,6 @@ const getters = {
 };
 const actions = {
     updateDateRange({ commit }, payload) {
-        console.log("We are done now");
-        console.log({ payload });
         commit("updateDateRange", payload);
     }
 };

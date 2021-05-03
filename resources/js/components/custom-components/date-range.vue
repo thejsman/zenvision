@@ -1,7 +1,6 @@
 <template>
     <div class="ml-auto d-inline-flex">
         <p class="mt-2 mr-2">Date Range:</p>
-        {{ dateRange }}
         <DateRangePicker
             ref="picker"
             :opens="opens"
@@ -31,9 +30,7 @@ export default {
             startDateSelected: moment().subtract(1, "month")
         };
     },
-    created() {
-        console.log("Date from state is", this.startDateS, this.endDateS);
-    },
+
     computed: {
         ...mapGetters(["startDateS", "endDateS"]),
         maxDate() {
@@ -41,11 +38,14 @@ export default {
                 .add("3", "months")
                 .toString();
         },
-        dateRange() {
-            return {
-                startDate: this.startDateS,
-                endDate: this.endDateS
-            };
+        dateRange: {
+            get() {
+                return {
+                    startDate: this.startDateS,
+                    endDate: this.endDateS
+                };
+            },
+            set() {}
         }
     },
     methods: {

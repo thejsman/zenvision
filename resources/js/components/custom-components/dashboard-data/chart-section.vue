@@ -33,6 +33,7 @@ import _ from "lodash";
 import moment from "moment";
 import { eventBus } from "../../../app";
 import { displayCurrency } from "../../../utils";
+import { mapGetters } from "vuex";
 
 export default {
     components: { highcharts: Chart },
@@ -138,6 +139,9 @@ export default {
             chartSeries: []
         };
     },
+    computed: {
+        ...mapGetters(["startDateS", "endDateS"])
+    },
     created() {
         //Stripe
         eventBus.$on("stripeTransactionEvent", async stripeData => {
@@ -225,8 +229,8 @@ export default {
         assignData(orders) {
             this.showGraph = false;
             const dates = this.getDaysBetweenDates(
-                this.ChartdateRange[0],
-                this.ChartdateRange[1]
+                moment(this.startDateS),
+                moment(this.endDateS)
             );
 
             let dayArray = [];
@@ -243,7 +247,6 @@ export default {
                     }
                 });
                 dayArray.push([Date.parse(day), sum]);
-                // dayArray.push([day, sum]);
             });
             this.chartSeries = dayArray;
             if (this.stripeTransationStatus) {
@@ -393,18 +396,6 @@ export default {
     mounted() {},
     props: {
         chartData: {
-            type: Array,
-            default: () => []
-        },
-        ChartdateRange: {
-            type: Array,
-            default: () => []
-        },
-        fbSpend: {
-            type: Array,
-            default: () => []
-        },
-        googleData: {
             type: Array,
             default: () => []
         }

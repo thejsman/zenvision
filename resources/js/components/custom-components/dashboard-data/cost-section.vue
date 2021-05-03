@@ -200,12 +200,15 @@ export default {
         totalMerchantFees() {
             return this.stripeFeeTotal + this.paypalFeeTotal;
         },
-        totalChargeback() {
-            return (
-                this.stripeChargebackTotal +
-                this.paypalChargebackTotal +
-                this.shopifyChargebackTotal
-            );
+        totalChargeback: {
+            get() {
+                return (
+                    this.stripeChargebackTotal +
+                    this.paypalChargebackTotal +
+                    this.shopifyChargebackTotal
+                );
+            },
+            set() {}
         }
     },
     props: {
