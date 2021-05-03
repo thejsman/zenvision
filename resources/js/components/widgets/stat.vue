@@ -6,20 +6,6 @@ import PlaceholderLoader from "../../components/custom-components/placeholder-lo
 
 export default {
     components: { PlaceholderLoader },
-    data() {
-        return { showWarning: false };
-    },
-    computed: {},
-    mounted() {
-        setTimeout(() => {
-            if (this.loading) {
-                this.showWarning = true;
-            }
-        }, 1500);
-        // this.$nextTick(() => {
-        //     console.log("inside nextTick callback:", this.$el.textContent); // => 'not updated'
-        // });
-    },
     props: {
         title: {
             type: String,
@@ -83,18 +69,19 @@ export default {
                             v-if="totalSubscriptionCount"
                             >{{ totalSubscriptionCount }}</b-badge
                         >
-                        <div
-                            v-if="showWarning"
-                            v-b-tooltip.hover
-                            :title="toolTip"
-                        >
+                        <div v-if="showIcon" v-b-tooltip.hover :title="toolTip">
                             <img
-                                :src="`/images/icons/data-warning.svg`"
+                                :src="`/images/icons/${this.iconName}`"
                                 alt
                                 height="19"
                                 class="channel-icons"
                             />
                         </div>
+
+                        <!-- <i
+                            class="fas fa-exclamation-circle text-warning"
+                            v-if="showIcon"
+                        ></i> -->
                     </div>
 
                     <div class="mb-0 mt-1" v-if="loading">
