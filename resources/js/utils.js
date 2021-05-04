@@ -60,8 +60,8 @@ export const updateNoData = data => {
 export const updateAdData = (data, provider, value) => {
     data.forEach(d => {
         if (
-            d.iconName !== undefined &&
-            d.iconName.includes(provider.toLowerCase())
+            d.channelIcon !== undefined &&
+            d.channelIcon.includes(provider.toLowerCase())
         ) {
             d.value = `${value}`;
             d.loading = false;

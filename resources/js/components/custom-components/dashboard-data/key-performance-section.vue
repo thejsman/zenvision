@@ -12,6 +12,7 @@
                 :title="performance.title"
                 :value="performance.value"
                 :loading="performance.loading"
+                :toolTip="performance.toolTip"
             />
         </div>
     </div>
@@ -57,32 +58,42 @@ export default {
                     id: 1,
                     title: ABANDONED_CART,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
 
                 {
                     id: 2,
                     title: AVERAGE_ORDER_VALUE,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 3,
                     title: AVERAGE_UNITS_PER_ORDER,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 4,
                     title: AVERAGE_PROFIT_PER_ORDER,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 5,
                     title: US_ORDERS_PERCENTAGE,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 }
             ],
             hasShopifyAccount: false

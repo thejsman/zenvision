@@ -104,8 +104,8 @@ export default {
             "ShopifyStores",
             "ShopifyProductCount",
             "ShopifyRefundTotal",
-            "startDate",
-            "endDate"
+            "startDateS",
+            "endDateS"
         ])
     },
     created() {
@@ -162,10 +162,7 @@ export default {
                 this.paypalTransactions = paypalTransactions;
 
                 let d = new Date();
-                this.handleDateChange({
-                    startDate: moment(d).add(-1, "months"),
-                    endDate: moment(d)
-                });
+                this.handleDateChange();
             } catch (error) {
                 console.log(error);
             }
@@ -225,11 +222,6 @@ export default {
                     setTimeout(() => {
                         this.showModal("tiktok-noaccount");
                     }, 100);
-
-                    // window.location.href = "/";
-                    // this.tiktokError = true;
-                    // this.tiktokAdAccounts = [];
-                    // this.$bvModal.show("tiktok-connect");
                 } else {
                     const result = await axios.get(
                         "tiktokaccount-listaccount",
@@ -268,10 +260,9 @@ export default {
                 this.snapchatError = true;
             }
         },
-        handleDateChange(dateRange) {
-            const { startDate, endDate } = dateRange;
-            const s_date = moment(startDate).format("MM-DD-YYYY");
-            const e_date = moment(endDate).format("MM-DD-YYYY");
+        handleDateChange() {
+            const s_date = moment(this.startDateS).format("MM-DD-YYYY");
+            const e_date = moment(this.endDateS).format("MM-DD-YYYY");
 
             const filteredOrders = this.backupOrders.filter(order => {
                 const orderDate = moment(order.created_on_shopify).format(
@@ -285,7 +276,7 @@ export default {
                 );
             });
             this.dateRangeSelected = [moment(s_date), moment(e_date)];
-            //   this.getMerchantfeesTotal(s_date, e_date);
+
             this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
 
             eventBus.$emit("dateChanged", { s_date, e_date });
@@ -318,33 +309,13 @@ export default {
         ></loading>
         <div class="row">
             <div class="col-xl-5">
-                <Profit
-                    :profitData="allOrders"
-                    :startDate="dateRangeSelected"
-                    :fbSpend="fb_spend"
-                />
-                <Revenue
-                    :revenueData="allOrders"
-                    :dateRange="dateRangeSelected"
-                />
-                <Costs
-                    :costData="allOrders"
-                    :refundTotal="refund_total"
-                    :merchantFees="merchantFeesTotal"
-                />
+                <Profit :profitData="allOrders" />
+                <Revenue :revenueData="allOrders" />
+                <Costs :costData="allOrders" :refundTotal="refund_total" />
             </div>
             <div class="col-xl-7">
-                <Chart
-                    :chartData="allOrders"
-                    :ChartdateRange="dateRangeSelected"
-                    :fbSpend="fb_spend"
-                    :googleData="google_ads_data"
-                />
-                <KeyPerformance
-                    :performanceData="allOrders"
-                    :shopifyStores="enabled_on_dashboard"
-                    :totalProducts="number_of_products"
-                />
+                <Chart :chartData="allOrders" />
+                <KeyPerformance :performanceData="allOrders" />
             </div>
         </div>
         <b-modal

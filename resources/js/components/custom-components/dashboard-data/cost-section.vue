@@ -13,6 +13,7 @@
                 :totalSubscriptionCount="cost.totalSubscriptionCount"
                 :showIcon="cost.showIcon"
                 :iconName="cost.iconName"
+                :channelIcon="cost.channelIcon"
                 :toolTip="cost.toolTip"
             />
         </div>
@@ -36,6 +37,7 @@ import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import moment from "moment";
+import { mapGetters } from "vuex";
 import {
     displayCurrency,
     updateData,
@@ -85,33 +87,39 @@ export default {
                     loading: true,
                     onClick: this.handleCogsClick,
                     iconName: "exclamation-icon.svg",
-                    showIcon: true
+                    showIcon: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 2,
                     title: DISCOUNTS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 3,
                     title: REFUNDS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 4,
                     title: CHARGEBACKS_TOTAL,
                     value: `0`,
-                    loading: true
+                    loading: true,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 5,
                     title: MERCHANT_FEE,
                     value: `0`,
                     loading: true,
-                    iconName: "data-warning.svg",
-                    showIcon: false,
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -120,32 +128,36 @@ export default {
                     title: AD_SPEND_FACEBOOK,
                     value: `-`,
                     loading: true,
-                    iconName: "facebook-icon.svg",
-                    showIcon: true
+                    channelIcon: "facebook-icon.svg",
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 7,
                     title: AD_SPEND_GOOGLE,
                     value: `-`,
                     loading: true,
-                    iconName: "google-icon.svg",
-                    showIcon: true
+                    channelIcon: "google-icon.svg",
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 8,
                     title: AD_SPEND_SNAPCHAT,
                     value: `-`,
                     loading: true,
-                    iconName: "snapchat-icon.svg",
-                    showIcon: true
+                    channelIcon: "snapchat-icon.svg",
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 9,
                     title: AD_SPEND_TIKTOK,
                     value: `-`,
                     loading: true,
-                    iconName: "tiktok-icon.svg",
-                    showIcon: true
+                    channelIcon: "tiktok-icon.svg",
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
                 {
                     id: 10,
@@ -153,7 +165,9 @@ export default {
                     value: `0`,
                     loading: true,
                     onClick: this.handleSubscriptionClick,
-                    totalSubscriptionCount: 0
+                    totalSubscriptionCount: 0,
+                    toolTip:
+                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 }
             ],
             totalDiscount: 0,
@@ -173,6 +187,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(["startDateS", "endDateS"]),
         totalCost() {
             const totalCost = parseFloat(
                 this.totalMerchantFees +
@@ -200,12 +215,15 @@ export default {
         totalMerchantFees() {
             return this.stripeFeeTotal + this.paypalFeeTotal;
         },
-        totalChargeback() {
-            return (
-                this.stripeChargebackTotal +
-                this.paypalChargebackTotal +
-                this.shopifyChargebackTotal
-            );
+        totalChargeback: {
+            get() {
+                return (
+                    this.stripeChargebackTotal +
+                    this.paypalChargebackTotal +
+                    this.shopifyChargebackTotal
+                );
+            },
+            set() {}
         }
     },
     props: {
@@ -330,7 +348,7 @@ export default {
 
                 this.getSubscriptionData();
                 this.getChargebackTotal();
-            }, 500);
+            }, 1000);
 
             // this.getMerchantfeesTotal(s_date, e_date);
         },
@@ -564,17 +582,17 @@ export default {
             try {
                 //Shopify Chargebacks
                 if (this.hasShopifyAccount) {
-                    setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-                    this.shopifyChargebackTotal = 0;
-                    const result = await axios.get("getshopifydisputes");
-                    const { disputes } = result.data;
-                    if (disputes.length > 1) {
-                        data.forEach(dispute => {
-                            this.shopifyChargebackTotal += parseFloat(
-                                dispute.amount
-                            );
-                        });
-                    }
+                    // setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
+                    // this.shopifyChargebackTotal = 0;
+                    // const result = await axios.get("getshopifydisputes");
+                    // const { disputes } = result.data;
+                    // if (disputes.length > 1) {
+                    //     data.forEach(dispute => {
+                    //         this.shopifyChargebackTotal += parseFloat(
+                    //             dispute.amount
+                    //         );
+                    //     });
+                    // }
                 }
 
                 //Stripe Chargebacks
@@ -584,22 +602,21 @@ export default {
                     this.stripeChargebackTotal = 0;
 
                     const stripeResult = await axios.get(
-                        "stripeconnect-chargeback"
+                        "stripeconnect-chargeback",
+                        {
+                            params: {
+                                s_date: `${this.startDateS} 00:00:00`,
+                                e_date: `${this.endDateS} 23:59:59`
+                            }
+                        }
                     );
 
-                    let stripeChargebacks = stripeResult.data
-                        .filter(
-                            sc =>
-                                sc.status === "charge_refunded" ||
-                                sc.status === "lost"
-                        )
-                        .filter(
-                            sc =>
-                                new Date(sc.created * 1000) >=
-                                    new Date(this.startDate) &&
-                                new Date(sc.created * 1000) <=
-                                    new Date(this.endDate)
-                        );
+                    let stripeChargebacks = stripeResult.data.filter(
+                        sc =>
+                            sc.status === "charge_refunded" ||
+                            sc.status === "lost"
+                    );
+
                     if (stripeChargebacks.length > 0) {
                         eventBus.$emit(
                             "stripeChargebackEvent",
@@ -623,8 +640,9 @@ export default {
                             ? displayCurrency(this.totalChargeback)
                             : "-"
                     );
-                }, 500);
+                }, 2500);
             } catch (err) {
+                console.log(err);
                 this.totalChargeback = 0;
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                 setTimeout(() => {
