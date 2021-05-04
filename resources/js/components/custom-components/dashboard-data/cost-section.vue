@@ -605,25 +605,18 @@ export default {
                         "stripeconnect-chargeback",
                         {
                             params: {
-                                s_date: this.startDateS,
-                                e_date: this.endDateS
+                                s_date: `${this.startDateS} 00:00:00`,
+                                e_date: `${this.endDateS} 23:59:59`
                             }
                         }
                     );
 
-                    let stripeChargebacks = stripeResult.data
-                        .filter(
-                            sc =>
-                                sc.status === "charge_refunded" ||
-                                sc.status === "lost"
-                        )
-                        .filter(
-                            sc =>
-                                new Date(sc.created * 1000) >=
-                                    new Date(this.startDate) &&
-                                new Date(sc.created * 1000) <=
-                                    new Date(this.endDate)
-                        );
+                    let stripeChargebacks = stripeResult.data.filter(
+                        sc =>
+                            sc.status === "charge_refunded" ||
+                            sc.status === "lost"
+                    );
+
                     if (stripeChargebacks.length > 0) {
                         eventBus.$emit(
                             "stripeChargebackEvent",
