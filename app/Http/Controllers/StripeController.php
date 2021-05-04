@@ -286,6 +286,7 @@ class StripeController extends Controller
 
     public function getStripeChargebacks(Request $request)
     {
+
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
         $stripe_chargebacks = [];
@@ -295,8 +296,14 @@ class StripeController extends Controller
                 $stripe = new \Stripe\StripeClient(
                     $account->access_token
                 );
-                $disputes = $stripe->disputes->all(['limit' => 100]);
-                // return $disputes;
+                $disputes = $stripe->disputes->all([
+                    'limit' => 100,
+                    'created' => array(
+                        'gte' => strtotime($request->s_date),
+                        'lte' => strtotime($request->e_date),
+                    ),
+                ]);
+
                 foreach ($disputes->autoPagingIterator() as $dispute) {
                     array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
                 }
