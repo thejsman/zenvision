@@ -582,17 +582,17 @@ export default {
             try {
                 //Shopify Chargebacks
                 if (this.hasShopifyAccount) {
-                    setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-                    this.shopifyChargebackTotal = 0;
-                    const result = await axios.get("getshopifydisputes");
-                    const { disputes } = result.data;
-                    if (disputes.length > 1) {
-                        data.forEach(dispute => {
-                            this.shopifyChargebackTotal += parseFloat(
-                                dispute.amount
-                            );
-                        });
-                    }
+                    // setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
+                    // this.shopifyChargebackTotal = 0;
+                    // const result = await axios.get("getshopifydisputes");
+                    // const { disputes } = result.data;
+                    // if (disputes.length > 1) {
+                    //     data.forEach(dispute => {
+                    //         this.shopifyChargebackTotal += parseFloat(
+                    //             dispute.amount
+                    //         );
+                    //     });
+                    // }
                 }
 
                 //Stripe Chargebacks
@@ -642,6 +642,7 @@ export default {
                     );
                 }, 2500);
             } catch (err) {
+                console.log(err);
                 this.totalChargeback = 0;
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                 setTimeout(() => {
