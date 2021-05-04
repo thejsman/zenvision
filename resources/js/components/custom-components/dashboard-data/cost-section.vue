@@ -348,7 +348,7 @@ export default {
 
                 this.getSubscriptionData();
                 this.getChargebackTotal();
-            }, 500);
+            }, 1000);
 
             // this.getMerchantfeesTotal(s_date, e_date);
         },
@@ -602,7 +602,13 @@ export default {
                     this.stripeChargebackTotal = 0;
 
                     const stripeResult = await axios.get(
-                        "stripeconnect-chargeback"
+                        "stripeconnect-chargeback",
+                        {
+                            params: {
+                                s_date: this.startDateS,
+                                e_date: this.endDateS
+                            }
+                        }
                     );
 
                     let stripeChargebacks = stripeResult.data
