@@ -6,6 +6,33 @@ import PlaceholderLoader from "../../components/custom-components/placeholder-lo
 
 export default {
     components: { PlaceholderLoader },
+    data() {
+        return {
+            showWarning: false
+        };
+    },
+    mounted() {
+        setTimeout(() => {
+            if (this.loading === true) {
+                this.showWarning = true;
+            }
+        }, 15000);
+    },
+    watch: {
+        loading(value, newValue) {
+            if (!this.loading) {
+                this.showWarning = false;
+            }
+
+            if (this.loading) {
+                setTimeout(() => {
+                    if (this.loading === true) {
+                        this.showWarning = true;
+                    }
+                }, 15000);
+            }
+        }
+    },
     props: {
         title: {
             type: String,
@@ -36,13 +63,17 @@ export default {
         },
         showIcon: {
             type: Boolean,
-            default: null
+            default: false
         },
         iconName: {
             type: String,
             default: ""
         },
         toolTip: {
+            type: String,
+            default: ""
+        },
+        channelIcon: {
             type: String,
             default: ""
         }
@@ -63,25 +94,40 @@ export default {
                         class="d-flex justify-content-between align-items-baseline"
                     >
                         <p class="text-muted font-weight-medium">{{ title }}</p>
-                        <b-badge
-                            variant="primary"
-                            class="p-2"
-                            v-if="totalSubscriptionCount"
-                            >{{ totalSubscriptionCount }}</b-badge
-                        >
-                        <div v-if="showIcon" v-b-tooltip.hover :title="toolTip">
+
+                        <div class="d-flex justify-content-end">
+                            <b-badge
+                                variant="primary"
+                                class="mr-2 mt-0"
+                                v-if="totalSubscriptionCount"
+                                >{{ totalSubscriptionCount }}</b-badge
+                            >
                             <img
+                                v-if="channelIcon"
+                                :src="`/images/icons/${this.channelIcon}`"
+                                alt
+                                height="19"
+                                class="channel-icons"
+                            />
+
+                            <img
+                                v-if="showWarning"
+                                v-b-tooltip.hover
+                                :title="toolTip"
+                                :src="`/images/icons/data-warning.svg`"
+                                alt
+                                height="19"
+                                class="channel-icons"
+                            />
+
+                            <img
+                                v-if="showIcon"
                                 :src="`/images/icons/${this.iconName}`"
                                 alt
                                 height="19"
                                 class="channel-icons"
                             />
                         </div>
-
-                        <!-- <i
-                            class="fas fa-exclamation-circle text-warning"
-                            v-if="showIcon"
-                        ></i> -->
                     </div>
 
                     <div class="mb-0 mt-1" v-if="loading">

@@ -13,6 +13,7 @@
                 :totalSubscriptionCount="cost.totalSubscriptionCount"
                 :showIcon="cost.showIcon"
                 :iconName="cost.iconName"
+                :channelIcon="cost.channelIcon"
                 :toolTip="cost.toolTip"
             />
         </div>
@@ -119,8 +120,6 @@ export default {
                     title: MERCHANT_FEE,
                     value: `0`,
                     loading: true,
-                    iconName: "data-warning.svg",
-                    showIcon: false,
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -129,8 +128,7 @@ export default {
                     title: AD_SPEND_FACEBOOK,
                     value: `-`,
                     loading: true,
-                    iconName: "facebook-icon.svg",
-                    showIcon: true,
+                    channelIcon: "facebook-icon.svg",
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -139,8 +137,7 @@ export default {
                     title: AD_SPEND_GOOGLE,
                     value: `-`,
                     loading: true,
-                    iconName: "google-icon.svg",
-                    showIcon: true,
+                    channelIcon: "google-icon.svg",
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -149,8 +146,7 @@ export default {
                     title: AD_SPEND_SNAPCHAT,
                     value: `-`,
                     loading: true,
-                    iconName: "snapchat-icon.svg",
-                    showIcon: true,
+                    channelIcon: "snapchat-icon.svg",
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -159,8 +155,7 @@ export default {
                     title: AD_SPEND_TIKTOK,
                     value: `-`,
                     loading: true,
-                    iconName: "tiktok-icon.svg",
-                    showIcon: true,
+                    channelIcon: "tiktok-icon.svg",
                     toolTip:
                         "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
                 },
@@ -646,7 +641,7 @@ export default {
                             ? displayCurrency(this.totalChargeback)
                             : "-"
                     );
-                }, 500);
+                }, 2500);
             } catch (err) {
                 this.totalChargeback = 0;
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
