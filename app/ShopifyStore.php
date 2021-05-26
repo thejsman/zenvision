@@ -2,14 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use App\ShopifyOrderProduct;
 use App\ShopifyOrder;
+use App\ShopifyOrderProduct;
+use Illuminate\Database\Eloquent\Model;
 
 class ShopifyStore extends Model
 {
     protected $fillable = [
-        'user_id', 'store_name', 'store_url', 'api_token'
+        'user_id', 'store_name', 'store_url', 'api_token',
     ];
 
     public function user()
@@ -22,10 +22,10 @@ class ShopifyStore extends Model
         return $this->hasMany(ShopifyOrderProduct::class, 'store_id')->get()->count();
     }
 
-    public function getOrders()
+    public function getOrders($start_date, $end_date)
     {
-        $orders =  $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->get();
-
+        $orders = $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->whereBetween('created_on_shopify', [$start_date, $end_date])->get();
+        // created_on_shopify
         foreach ($orders as $order) {
             $order['total_cost'] = $order->getCogs();
         }
@@ -38,12 +38,12 @@ class ShopifyStore extends Model
             'user_id' => $this->user_id,
             'store_name' => $this->store_name,
             'store_url' => $this->store_url,
-            'api_token' => $this->api_token
+            'api_token' => $this->api_token,
         ];
     }
 
     public function getRefundTotal()
     {
-        return  $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['refunded', 'voided'])->get()->sum('total_price');
+        return $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['refunded', 'voided'])->get()->sum('total_price');
     }
 }

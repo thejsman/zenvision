@@ -45,15 +45,6 @@ export default {
         return {
             totalProfitValue: 0,
             data: [
-                // Disabling Conversion Rate & Abandoned Cart
-                /*
-        {
-          id: 1,
-          title: CONVERSION_RATE,
-          value: `-`,
-          loading: false,
-        },
-          */
                 {
                     id: 1,
                     title: ABANDONED_CART,
@@ -105,7 +96,9 @@ export default {
             default: () => []
         }
     },
-    computed: {},
+    computed: {
+        ...mapGetters(["keyPerformanceData"])
+    },
     watch: {
         performanceData(value, newValue) {
             this.assignData(this.performanceData);
@@ -156,7 +149,7 @@ export default {
                 this.getAvgUnitCount();
 
                 // Development - saving network requst
-                this.getAbandonedCartCount();
+                // this.getAbandonedCartCount();
             } else {
                 updateNoData(this.data);
             }

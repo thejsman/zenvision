@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use App\ShopifyStore;
-use App\ShopifyOrder;
 use App\Http\CustomRequests;
-use App\FacebookAd;
+use App\ShopifyOrder;
 use App\ShopifyOrderProduct;
+use App\ShopifyStore;
+use Auth;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     //Function to get store sata
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
@@ -22,22 +21,11 @@ class DashboardController extends Controller
         $cogs = 0;
         $refundTotal = 0;
         $fb_spend = [];
-        // $fb_ad_accounts = $user->getAdAccounts();
-
-        // foreach ($fb_ad_accounts as $key => $fb_ad_account) {
-        //     $url_account_data = "https://graph.facebook.com/v8.0/" . $fb_ad_account->ad_account_id . "/?fields=insights&access_token=" . $fb_ad_account->access_token;
-        //     $url2 = "https://graph.facebook.com/v8.0/act_2800689140251659/insights?&time_interval={%22since%22:%222020-07-15%22,%22until%22:%222020-10-14%22}&time_increment=1&access_token=EAAoUXIzcZBNUBAMVOq3OSrGYbNTrkeemc8ZCLsK3geCh3uZC4jqIbnYnzJAuYJs4uv4AhkCgdpu1GvpYbK0V75LTZA3ZBsZAECbALvdqqQ3FER75QhjiuRZBIF8Svs7EyxEf9BcFBsOhZCGW160MDGZAAhXCYJ2DuYgoQ4gbzmZAONjgZDZD";
-
-        //     $spend =  CustomRequests::getRequest($url2, "", "");
-        //     $fb_spend = $spend['data'];
-        // }
-        //check Currency
-        // https://openexchangerates.org/api/convert/19999.95/GBP/EUR?app_id=YOUR_APP_ID
 
         foreach ($enabled_on_dashboard as $store_id) {
             $store = ShopifyStore::find($store_id);
             $numberOfProducts += $store->getOrderedProductCount();
-            $orders = array_merge($orders, $store->getOrders()->toArray());
+            $orders = array_merge($orders, $store->getOrders($request->start_date, $request->end_date)->toArray());
             $refundTotal += $store->getRefundTotal();
         }
 
@@ -47,8 +35,20 @@ class DashboardController extends Controller
             'orders' => $orders,
             'refund_total' => $refundTotal,
             'fb_spend' => $fb_spend,
-            'fb_ad_accounts' => []
+            'fb_ad_accounts' => [],
         ];
+    }
+
+    public function getShopifyStoreOrders(Request $request)
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        $orders = [];
+        foreach ($enabled_on_dashboard as $store_id) {
+            $store = ShopifyStore::find($store_id);
+            $orders = array_merge($orders, $store->getOrders($request->start_date, $request->end_date)->toArray());
+        }
+        return $orders;
     }
 
     // Funciton to get abandoned cart count
@@ -63,11 +63,10 @@ class DashboardController extends Controller
             $url = "https://" . $store->store_url . "/admin/api/2020-07/checkouts/count.json";
             $access_token = $store->api_token;
             $response = CustomRequests::getRequest($url, [], $access_token);
-            $abandoned_cart_count +=  $response['count'];
+            $abandoned_cart_count += $response['count'];
         }
         return $abandoned_cart_count;
     }
-
 
     public static function mastersheet($user = null)
     {
@@ -99,7 +98,7 @@ class DashboardController extends Controller
             'total_inventory' => $total_inventory,
             'total_reserves' => $total_reserves,
             'total_credit_card' => $total_credit_card,
-            'total_supplier_payable' => $total_supplier_payable
+            'total_supplier_payable' => $total_supplier_payable,
         ];
     }
     public function msdebts($user = null)
@@ -111,13 +110,12 @@ class DashboardController extends Controller
 
         return [
             'debts_credit_card' => $debts_credit_card,
-            'debts_supplier_payable' => $debts_supplier_payable
+            'debts_supplier_payable' => $debts_supplier_payable,
         ];
     }
 
     public static function getShopifyStoreBalance($user = null)
     {
-
 
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
         $store_balance = 0;
@@ -139,7 +137,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
 
-        $orders =  ShopifyOrder::whereIn('store_id', $enabled_on_dashboard)->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->pluck('order_id');
+        $orders = ShopifyOrder::whereIn('store_id', $enabled_on_dashboard)->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->pluck('order_id');
         if (count($orders)) {
             $productsCount = ShopifyOrderProduct::whereIn('order_id', $orders)->sum('quantity');
             return round($productsCount / count($orders), 2);

@@ -1,34 +1,32 @@
 import axios from "axios";
 
 const state = {
-    orders: [],
-    enabledStores: [],
-    numberOfProducts: 0,
-    refundTotal: 0
+    orders: []
 };
 const getters = {
-    ShopifyOrders: state => state.orders,
-    ShopifyStores: state => state.enabledStores,
-    ShopifyProductCount: state => state.numberOfProducts,
-    ShopifyRefundTotal: state => state.refundTotal
+    ShopifyOrders: state => state.orders
 };
 const actions = {
-    async fetchShopifyData({ commit }) {
+    getShopifyStoreOrders: async ({ commit, rootState }) => {
         try {
-            const response = await axios.get("shopifydata");
-            console.log({ response });
-            commit("setShopifyData", response.data);
+            const response = await axios.get("shopify-orders", {
+                params: {
+                    start_date: rootState.dateRange.startDateS,
+                    end_date: `${rootState.dateRange.endDateS} 23:59:59`
+                }
+            });
+
+            commit("setShopifyStoreOrders", response.data);
+            return response.data;
         } catch (err) {
             console.log(err);
+            commit("setShopifyStoreOrders", []);
         }
     }
 };
 const mutations = {
-    setShopifyData: (state, data) => {
-        state.orders = data.orders;
-        state.enabledStores = data.enabled_on_dashboard;
-        state.numberOfProducts = data.number_of_products;
-        state.refundTotal = data.refund_total;
+    setShopifyStoreOrders: (state, payload) => {
+        state.orders = payload.orders;
     }
 };
 
