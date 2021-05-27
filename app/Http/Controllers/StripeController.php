@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 // ini_set('max_execution_time', '300');
 
+use App\Jobs\ProcessStripeCsvReport;
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
 use Auth;
@@ -159,8 +160,14 @@ class StripeController extends Controller
                 'success',
             ], 200);
         } finally {
-            ini_set('max_execution_time', 500);
-            $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
+            // $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
+            // $report_url = 'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents';
+            // $access_token = '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';
+            ProcessStripeCsvReport::dispatch(
+                'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents',
+                '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',
+                $stripe_account->user_id,
+                $stripe_account->stripe_user_id);
         }
     }
 
