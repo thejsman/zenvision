@@ -32,7 +32,7 @@ class StripeController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Authorization: Bearer ' . env('STRIPE_ACCESS_TOKEN');
-        //Windows Dev system disable SSL
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
@@ -40,7 +40,6 @@ class StripeController extends Controller
         $response = json_decode($result, true);
 
         if ($response) {
-
             $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
             $stripeData = [];
             $stripeData['user_id'] = Auth::user()->id;
@@ -53,6 +52,11 @@ class StripeController extends Controller
             $stripeData['enabled_on_dashboard'] = true;
 
             StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+
+            $this->createReportRun($response['access_token']);
+            return redirect()->route('home', ['stripeAddAccount' => 'success']);
+        } else {
+            return redirect()->route('home', ['stripeAddAccount' => 'error']);
         }
 
         if (curl_errno($ch)) {
@@ -60,8 +64,7 @@ class StripeController extends Controller
         }
         curl_close($ch);
         // $this->createReportWebhook($response['access_token']);
-        $this->createReportRun($response['access_token']);
-        return redirect('/');
+
     }
 
     public function getMerchantFees(Request $request)
@@ -160,12 +163,9 @@ class StripeController extends Controller
                 'success',
             ], 200);
         } finally {
-            // $report_data = $this->getReportContent($url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id);
-            // $report_url = 'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents';
-            // $access_token = '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';
             ProcessStripeCsvReport::dispatch(
-                'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents',
-                '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',
+                $url,
+                $access_token,
                 $stripe_account->user_id,
                 $stripe_account->stripe_user_id);
         }
@@ -234,10 +234,6 @@ class StripeController extends Controller
 
     public function getReportContent($report_url, $access_token, $user_id, $stripe_user_id)
     {
-        // $url, $access_token, $stripe_account->user_id, $stripe_account->stripe_user_id
-
-        // $report_url = 'https://files.stripe.com/v1/files/file_1IeNN5LInuel29pDXtOOe8LY/contents';
-        // $access_token = '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';
 
         $options = array('http' => array(
             'method' => 'GET',

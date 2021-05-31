@@ -122,6 +122,16 @@ export default {
         if (new URL(location.href).searchParams.get("listFacebookAdAccounts")) {
             this.getFacebookAdsAccounts();
         }
+        if (new URL(location.href).searchParams.get("stripeAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "stripeAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("stripe-add-account")
+                    : this.$bvModal.show("stripe-add-account-error");
+            }, 1000);
+        }
 
         this.getShopifyStoreData();
 
@@ -391,6 +401,30 @@ export default {
             @hide="handleOk"
         >
             <p class="my-2">No Snapchat Ad Account found!</p>
+        </b-modal>
+
+        // Stripe modal
+        <b-modal
+            id="stripe-add-account"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+        >
+            <p class="my-2">
+                We are importing your Stripe transactions, this process can take
+                up to 5-10 minutes, please check back later.
+            </p>
+        </b-modal>
+        <b-modal
+            id="stripe-add-account-error"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+        >
+            <p class="my-2">
+                We are unable to connect your Stripe account, please try again
+                later.
+            </p>
         </b-modal>
     </Layout>
 </template>
