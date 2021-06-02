@@ -1,47 +1,56 @@
 <?php
 
-namespace App\Http;
+namespace App\Jobs;
 
 use App\ShopifyOrder;
-use App\ShopifyOrderProduct;
-use Auth;
-use Illuminate\Http\Request;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
-class GetAllOrders
+class ProcessShopifyGetAllOrders implements ShouldQueue
 {
-    public function getAllOrders($shop_domain, $access_token, $store_id, $created_at_min = 0)
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $shop_domain;
+    public $param;
+    public $store_id;
+    public $user_id;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct($shop_domain, $param, $store_id, $user_id)
     {
-
-        $param = [];
-        // 9get specific fields only
-        $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
-        // order record per page
-        $param['limit'] = 250;
-
-        $param['since_id'] = $created_at_min;
-
-        $param['access_token'] = $access_token;
-
-        // ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id, Auth::user()->id);
-        return $this->getOrderHistory($shop_domain, $param, $store_id, Auth::user()->id);
+        $this->shop_domain = $shop_domain;
+        $this->param = $param;
+        $this->store_id = $store_id;
+        $this->user_id = $user_id;
     }
 
-    private function getOrderHistory($shop_domain = '', $param = [], $store_id = '', $user_id = '')
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
     {
-        // initialize variable
         $nextPageToken = null;
 
         do {
             // check if next page token is not null
             if ($nextPageToken != null) {
                 // remove since id if page info parameter set
-                unset($param['since_id']);
+                unset($this->param['since_id']);
             }
             // next page token
-            $param['page_info'] = $nextPageToken;
+            $this->param['page_info'] = $nextPageToken;
 
             // shopify order count api
-            $orders_url = 'https://' . $shop_domain . '/admin/api/2019-10/orders.json' . '?' . http_build_query($param);
+            $orders_url = 'https://' . $this->shop_domain . '/admin/api/2019-10/orders.json' . '?' . http_build_query($this->param);
 
             // get order data
             $orders = $this->shopRequest('get', $orders_url);
@@ -53,12 +62,11 @@ class GetAllOrders
                     // iterate each order
                     foreach ($orders['orders'] as $order_key => $order) {
                         $new_order = array(
-                            'user_id' => $user_id,
-                            'store_id' => $store_id,
+                            'user_id' => $this->user_id,
+                            'store_id' => $this->store_id,
                             'order_id' => $order['id'],
                             'order_number' => $order['order_number'],
                             'created_on_shopify' => $order['created_at'],
-
                             'total_price' => $order['total_price'],
                             'total_tax' => $order['total_tax'],
                             'currency' => $order['currency'],
@@ -80,28 +88,28 @@ class GetAllOrders
                         ShopifyOrder::insert($new_order);
 
                         // iterate each line item
-                        foreach ($order['line_items'] as $line_item_key => $line_item) {
-                            $new_line_item = array(
-                                'user_id' => Auth::user()->id,
-                                'store_id' => $store_id,
-                                'order_id' => $order['id'],
-                                'order_number' => $order['order_number'],
-                                'line_item_id' => $line_item['id'],
-                                'variant_id' => $line_item['variant_id'],
-                                'title' => $line_item['title'],
-                                'quantity' => $line_item['quantity'],
-                                'sku' => $line_item['sku'],
-                                'variant_title' => $line_item['variant_title'],
-                                'fulfillment_service' => $line_item['fulfillment_service'],
-                                'product_id' => $line_item['product_id'],
-                                'price' => $line_item['price'],
-                                'total_discount' => $line_item['total_discount'],
-                                'fulfillment_status' => $line_item['fulfillment_status'],
-                                //    'duties' => $line_item['duties'],
-                                'tax_lines' => $line_item['tax_lines'],
-                            );
-                            ShopifyOrderProduct::create($new_line_item);
-                        }
+                        // foreach ($order['line_items'] as $line_item_key => $line_item) {
+                        //     $new_line_item = array(
+                        //         'user_id' => $this->user_id,
+                        //         'store_id' => $this->store_id,
+                        //         'order_id' => $order['id'],
+                        //         'order_number' => $order['order_number'],
+                        //         'line_item_id' => $line_item['id'],
+                        //         'variant_id' => $line_item['variant_id'],
+                        //         'title' => $line_item['title'],
+                        //         'quantity' => $line_item['quantity'],
+                        //         'sku' => $line_item['sku'],
+                        //         'variant_title' => $line_item['variant_title'],
+                        //         'fulfillment_service' => $line_item['fulfillment_service'],
+                        //         'product_id' => $line_item['product_id'],
+                        //         'price' => $line_item['price'],
+                        //         'total_discount' => $line_item['total_discount'],
+                        //         'fulfillment_status' => $line_item['fulfillment_status'],
+                        //         //    'duties' => $line_item['duties'],
+                        //         'tax_lines' => $line_item['tax_lines'],
+                        //     );
+                        //     ShopifyOrderProduct::create($new_line_item);
+                        // }
                     }
                 } else {
                     break;
@@ -111,9 +119,8 @@ class GetAllOrders
             // next page token
             $nextPageToken = $orders['next']['page_token'] ?? null;
         } while ($nextPageToken != null);
-        return $orders;
-    }
 
+    }
     private function shopRequest($method = '', $url = '')
     {
         try {
@@ -126,6 +133,7 @@ class GetAllOrders
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
+
                 ],
             ];
 
