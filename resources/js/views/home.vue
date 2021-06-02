@@ -133,6 +133,17 @@ export default {
             }, 1000);
         }
 
+        if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "shopifyAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("shopify-add-account")
+                    : this.$bvModal.show("shopify-add-account-error");
+            }, 1000);
+        }
+
         this.getShopifyStoreData();
 
         eventBus.$on("changeDateRange", date => this.handleDateChange(date));
@@ -403,12 +414,14 @@ export default {
             <p class="my-2">No Snapchat Ad Account found!</p>
         </b-modal>
 
-        // Stripe modal
+        <!--  Stripe modal -->
         <b-modal
             id="stripe-add-account"
             title="Stripe Account"
             ok-only
             ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
         >
             <p class="my-2">
                 We are importing your Stripe transactions, this process can take
@@ -420,10 +433,28 @@ export default {
             title="Stripe Account"
             ok-only
             ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
         >
             <p class="my-2">
                 We are unable to connect your Stripe account, please try again
                 later.
+            </p>
+        </b-modal>
+
+        <!-- Shopify Modal -->
+
+        <b-modal
+            id="shopify-add-account"
+            title="Shopify Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are importing your Shopify orders and products, this process
+                can take up to 5-10 minutes, please check back later.
             </p>
         </b-modal>
     </Layout>
