@@ -6,7 +6,7 @@ use App\Http\CustomRequests;
 use App\Http\GetAllOrders;
 use App\Http\GetAllProducts;
 use App\Jobs\ProcessShopifyGetAllOrders;
-use App\Jobs\ProcessShopifyGetAllProducts
+use App\Jobs\ProcessShopifyGetAllProducts;
 use App\ShopifyOrder;
 use App\ShopifyStore;
 use Auth;
@@ -131,7 +131,7 @@ class ShopifyStoreController extends Controller
                 $param_products['access_token'] = $access_token;
 
                 ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
-                ProcessShopifyGetAllProducts::dispatch($shop_domain,$param_products, $store_id->id);
+                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
                 //$products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
                 return redirect()->route('home', ['shopifyAddAccount' => 'success']);
             }
