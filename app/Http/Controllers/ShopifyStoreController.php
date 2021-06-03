@@ -115,8 +115,8 @@ class ShopifyStoreController extends Controller
                 $param_products['access_token'] = $access_token;
 
                 // Dispatch the tasks to Queues
-                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
-                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
+                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $shop_exists->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $shop_exists->id);
                 return redirect()->route('home', ['shopifyAddAccount' => 'success']);
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
