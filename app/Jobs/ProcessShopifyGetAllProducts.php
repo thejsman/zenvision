@@ -96,7 +96,7 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
                             );
                             $newProduct = array_merge($new_product, $product_variant);
 
-                            ShopifyProductVariant::create($newProduct);
+                            ShopifyProductVariant::updateOrCreate(['variant_id' => $variant['id']], $newProduct);
                         }
                     }
                 } else {
