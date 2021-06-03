@@ -74,7 +74,7 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
 
                         //product processing here
                         $new_product = array(
-                            'store_id' => $store_id,
+                            'store_id' => $this->store_id,
                             'product_id' => $product['id'],
                             'product_title' => $product['title'],
                         );
@@ -108,9 +108,9 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
             $nextPageToken = $products['next']['page_token'] ?? null;
         } while ($nextPageToken != null);
     }
+
     private function shopRequest($method = '', $url = '')
     {
-
         try {
             // http client object
             $client = new \GuzzleHttp\Client();
