@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\CustomRequests;
 use App\Http\GetAllOrders;
 use App\Http\GetAllProducts;
-// use App\Jobs\ProcessShopifyGetAllOrders;
+use App\Jobs\ProcessShopifyGetAllOrders;
 use App\ShopifyOrder;
 use App\ShopifyStore;
 use Auth;
@@ -113,7 +113,7 @@ class ShopifyStoreController extends Controller
                     'enabled_on_dashboard' => true,
                 ]);
                 $this->registerWebhook($shop_domain, $access_token);
-                $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
+                // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
                 // $param = [];
                 // // 9get specific fields only
                 // $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
@@ -123,8 +123,8 @@ class ShopifyStoreController extends Controller
                 // $param['since_id'] = 0;
 
                 // $param['access_token'] = $access_token;
-                //  ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
-                $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
+                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
+                //$products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
                 return redirect()->route('home', ['shopifyAddAccount' => 'success']);
             }
         }
