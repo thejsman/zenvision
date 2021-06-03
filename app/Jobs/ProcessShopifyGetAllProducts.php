@@ -85,8 +85,7 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
                             $cost = $inventory['products'][0]['cost'];
                             $product_variant = array(
                                 'variant_id' => $variant['id'],
-                                // 'variant_title' => $variant['title'],
-                                'variant_title' => "title from queue",
+                                'variant_title' => $variant['title'],
                                 'sku' => $variant['sku'] ? $variant['sku'] : 'no_sku',
                                 'sales_price' => $variant['price'],
                                 'inventory_item_id' => $variant['inventory_item_id'],

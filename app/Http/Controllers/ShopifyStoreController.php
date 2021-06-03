@@ -115,7 +115,7 @@ class ShopifyStoreController extends Controller
                     'enabled_on_dashboard' => true,
                 ]);
                 $this->registerWebhook($shop_domain, $access_token);
-                // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
+
                 // Params for Orders and Ordered products
                 $param = [];
                 $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
@@ -130,9 +130,10 @@ class ShopifyStoreController extends Controller
                 $param_products['since_id'] = 0;
                 $param_products['access_token'] = $access_token;
 
+                // Dispatch the tasks to Queues
                 ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
                 ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
-                //$products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
+
                 return redirect()->route('home', ['shopifyAddAccount' => 'success']);
             }
         }
@@ -140,9 +141,9 @@ class ShopifyStoreController extends Controller
     public function getAccessToken($shop_domain = '', $code = '')
     {
         $query = array(
-            "client_id" => config('shopify.api_key'), // Your API key
-            "client_secret" => config('shopify.api_secret'), // Your app credentials (secret key)
-            "code" => $code, // Grab the access key from the URL
+            "client_id" => config('shopify.api_key'),
+            "client_secret" => config('shopify.api_secret'),
+            "code" => $code,
         );
 
         $access_token_url = "https://" . $shop_domain . "/admin/oauth/access_token";

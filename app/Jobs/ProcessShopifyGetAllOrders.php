@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class ProcessShopifyGetAllOrders implements ShouldQueue
 {
@@ -56,7 +55,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
 
             // get order data
             $orders = $this->shopRequest('get', $orders_url);
-            Log::info("The log message:NB");
+
             // Log::info($orders);
             // check if order response exist in request
             if (isset($orders['orders'])) {
@@ -73,8 +72,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                             'total_price' => $order['total_price'],
                             'total_tax' => $order['total_tax'],
                             'currency' => $order['currency'],
-                            // 'financial_status' => $order['financial_status'],
-                            'financial_status' => 'Order from Queue',
+                            'financial_status' => $order['financial_status'],
                             'total_discounts' => $order['total_discounts'],
                             'referring_site' => $order['referring_site'],
                             'landing_site' => $order['landing_site'],
@@ -88,7 +86,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                             'shipping_country' => $order['shipping_address']['country'],
                             'shipping_lines' => json_encode($order['shipping_lines']),
                         );
-                        Log::info($new_order);
+
                         ShopifyOrder::insert($new_order);
 
                         // iterate each line item
@@ -110,7 +108,6 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                                 'total_discount' => $line_item['total_discount'],
                                 'fulfillment_status' => $line_item['fulfillment_status'],
                                 // 'duties' => $line_item['duties'],
-                                'duties' => 'duties from queue',
                                 'tax_lines' => $line_item['tax_lines'],
                             );
                             ShopifyOrderProduct::create($new_line_item);
