@@ -3,13 +3,13 @@
 namespace App\Jobs;
 
 use App\ShopifyOrder;
+use App\ShopifyOrderProduct;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\ShopifyOrderProduct;
 
 class ProcessShopifyGetAllOrders implements ShouldQueue
 {
@@ -91,7 +91,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                         Log::info($new_order);
                         ShopifyOrder::insert($new_order);
 
-                        iterate each line item
+                        // iterate each line item
                         foreach ($order['line_items'] as $line_item_key => $line_item) {
                             $new_line_item = array(
                                 'user_id' => $this->user_id,
