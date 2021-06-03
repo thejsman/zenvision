@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ProcessShopifyGetAllOrders implements ShouldQueue
 {
@@ -54,7 +55,8 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
 
             // get order data
             $orders = $this->shopRequest('get', $orders_url);
-
+            Log::info("The log message:NB");
+            Log::info($orders);
             // check if order response exist in request
             if (isset($orders['orders'])) {
                 // check if no data found
@@ -84,7 +86,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                             'shipping_country' => $order['shipping_address']['country'],
                             'shipping_lines' => json_encode($order['shipping_lines']),
                         );
-
+                        Log::info($new_order);
                         ShopifyOrder::insert($new_order);
 
                         // iterate each line item
