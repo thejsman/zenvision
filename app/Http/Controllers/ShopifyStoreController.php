@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\CustomRequests;
-use App\Http\GetAllOrders;
-use App\Http\GetAllProducts;
 use App\Jobs\ProcessShopifyGetAllOrders;
 use App\Jobs\ProcessShopifyGetAllProducts;
 use App\ShopifyOrder;
@@ -100,10 +98,26 @@ class ShopifyStoreController extends Controller
                 }
 
                 $this->registerWebhook($shop_domain, $access_token);
-                $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $shop_exists->id, $created_at_min);
-                $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $shop_exists->id);
+                // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $shop_exists->id, $created_at_min);
+                // $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $shop_exists->id);
                 $shop_exists->save();
-                return redirect('/');
+                $param = [];
+                $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
+                $param['limit'] = 250;
+                $param['since_id'] = 0;
+                $param['access_token'] = $access_token;
+
+                // Params for Product variant
+                $param_products = [];
+                $param_products['fields'] = 'id, title, variants, options';
+                $param_products['limit'] = 50;
+                $param_products['since_id'] = 0;
+                $param_products['access_token'] = $access_token;
+
+                // Dispatch the tasks to Queues
+                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
+                return redirect()->route('home', ['shopifyAddAccount' => 'success']);
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
                     // 'user_id' => Auth::user()->id,
