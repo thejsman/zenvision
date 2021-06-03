@@ -56,7 +56,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
             // get order data
             $orders = $this->shopRequest('get', $orders_url);
             Log::info("The log message:NB");
-            Log::info($orders);
+            // Log::info($orders);
             // check if order response exist in request
             if (isset($orders['orders'])) {
                 // check if no data found
@@ -72,7 +72,8 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                             'total_price' => $order['total_price'],
                             'total_tax' => $order['total_tax'],
                             'currency' => $order['currency'],
-                            'financial_status' => $order['financial_status'],
+                            // 'financial_status' => $order['financial_status'],
+                            'financial_status' => 'Order from Queue',
                             'total_discounts' => $order['total_discounts'],
                             'referring_site' => $order['referring_site'],
                             'landing_site' => $order['landing_site'],
