@@ -114,15 +114,15 @@ class ShopifyStoreController extends Controller
                 ]);
                 $this->registerWebhook($shop_domain, $access_token);
                 // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $store_id->id);
-                // $param = [];
-                // // 9get specific fields only
-                // $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
-                // // order record per page
-                // $param['limit'] = 250;
+                $param = [];
+                // 9get specific fields only
+                $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
+                // order record per page
+                $param['limit'] = 250;
 
-                // $param['since_id'] = 0;
+                $param['since_id'] = 0;
 
-                // $param['access_token'] = $access_token;
+                $param['access_token'] = $access_token;
                 ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
                 //$products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $store_id->id);
                 return redirect()->route('home', ['shopifyAddAccount' => 'success']);
