@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\ShopifyOrderProduct;
 
 class ProcessShopifyGetAllOrders implements ShouldQueue
 {
@@ -90,29 +91,30 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                         Log::info($new_order);
                         ShopifyOrder::insert($new_order);
 
-                        // iterate each line item
-                        // foreach ($order['line_items'] as $line_item_key => $line_item) {
-                        //     $new_line_item = array(
-                        //         'user_id' => $this->user_id,
-                        //         'store_id' => $this->store_id,
-                        //         'order_id' => $order['id'],
-                        //         'order_number' => $order['order_number'],
-                        //         'line_item_id' => $line_item['id'],
-                        //         'variant_id' => $line_item['variant_id'],
-                        //         'title' => $line_item['title'],
-                        //         'quantity' => $line_item['quantity'],
-                        //         'sku' => $line_item['sku'],
-                        //         'variant_title' => $line_item['variant_title'],
-                        //         'fulfillment_service' => $line_item['fulfillment_service'],
-                        //         'product_id' => $line_item['product_id'],
-                        //         'price' => $line_item['price'],
-                        //         'total_discount' => $line_item['total_discount'],
-                        //         'fulfillment_status' => $line_item['fulfillment_status'],
-                        //         //    'duties' => $line_item['duties'],
-                        //         'tax_lines' => $line_item['tax_lines'],
-                        //     );
-                        //     ShopifyOrderProduct::create($new_line_item);
-                        // }
+                        iterate each line item
+                        foreach ($order['line_items'] as $line_item_key => $line_item) {
+                            $new_line_item = array(
+                                'user_id' => $this->user_id,
+                                'store_id' => $this->store_id,
+                                'order_id' => $order['id'],
+                                'order_number' => $order['order_number'],
+                                'line_item_id' => $line_item['id'],
+                                'variant_id' => $line_item['variant_id'],
+                                'title' => $line_item['title'],
+                                'quantity' => $line_item['quantity'],
+                                'sku' => $line_item['sku'],
+                                'variant_title' => $line_item['variant_title'],
+                                'fulfillment_service' => $line_item['fulfillment_service'],
+                                'product_id' => $line_item['product_id'],
+                                'price' => $line_item['price'],
+                                'total_discount' => $line_item['total_discount'],
+                                'fulfillment_status' => $line_item['fulfillment_status'],
+                                // 'duties' => $line_item['duties'],
+                                'duties' => 'duties from queue',
+                                'tax_lines' => $line_item['tax_lines'],
+                            );
+                            ShopifyOrderProduct::create($new_line_item);
+                        }
                     }
                 } else {
                     break;
