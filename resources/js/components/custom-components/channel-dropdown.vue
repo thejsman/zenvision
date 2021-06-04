@@ -31,9 +31,7 @@
             />
             Google Ads
         </b-dropdown-item>
-        <b-dropdown-item
-            href="https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal"
-        >
+        <b-dropdown-item :href="paypalUrl">
             <img
                 src="/images/icons/paypal.png"
                 alt
@@ -42,9 +40,7 @@
             />
             Paypal
         </b-dropdown-item>
-        <b-dropdown-item
-            href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect"
-        >
+        <b-dropdown-item :href="stripeUrl">
             <img
                 src="/images/icons/stripe-icon.svg"
                 alt
@@ -80,7 +76,13 @@ export default {
             snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=${process.env.MIX_SNAPCHAT_REDIRECT_URL}&scope=snapchat-marketing-api`,
             tiktokUrl: `https://ads.tiktok.com/marketing_api/auth?app_id=${process.env.MIX_TIKTOK_APP_ID}&redirect_uri=${process.env.MIX_TIKTOK_REDIRECT_URL}`,
             googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?prompt=consent&scope=https://www.googleapis.com/auth/adwords&response_type=code&access_type=offline&redirect_uri=${process.env.MIX_GOOGLE_REDIRECT_URL}&client_id=${process.env.MIX_GOOGLE_CLIENT_ID}`,
-            facebookUrl: `https://www.facebook.com/v10.0/dialog/oauth?client_id=${process.env.MIX_FACEBOOK_CLIENT_ID}&redirect_uri=${process.env.MIX_FACEBOOK_REDIRECT_URL}&scope=ads_management,ads_read`
+            facebookUrl: `https://www.facebook.com/v10.0/dialog/oauth?client_id=${process.env.MIX_FACEBOOK_CLIENT_ID}&redirect_uri=${process.env.MIX_FACEBOOK_REDIRECT_URL}&scope=ads_management,ads_read`,
+            stripeUrl: `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect&state=profitanalysis-${Math.floor(
+                Math.random() * 10000000 + 1
+            )}`,
+            paypalUrl: `https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal&state=profitanalysis-${Math.floor(
+                Math.random() * 10000000 + 1
+            )}`
         };
     }
 };

@@ -22,7 +22,7 @@ class StripeController extends Controller
     {
         $params = $request->query();
         $code = $params['code'];
-
+        $state = $params['state'];
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, 'https://connect.stripe.com/oauth/token');
@@ -54,9 +54,19 @@ class StripeController extends Controller
             StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
 
             $this->createReportRun($response['access_token']);
-            return redirect()->route('home', ['stripeAddAccount' => 'success']);
+
+            if (strpos($state, 'mastersheet') !== false) {
+                return redirect()->route('mastersheet', ['stripeAddAccount' => 'success']);
+            } else {
+                return redirect()->route('home', ['stripeAddAccount' => 'success']);
+            }
+
         } else {
-            return redirect()->route('home', ['stripeAddAccount' => 'error']);
+            if (strpos($state, 'mastersheet') !== false) {
+                return redirect()->route('mastersheet', ['stripeAddAccount' => 'error']);
+            } else {
+                return redirect()->route('home', ['stripeAddAccount' => 'error']);
+            }
         }
 
         if (curl_errno($ch)) {
