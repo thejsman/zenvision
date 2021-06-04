@@ -76,11 +76,14 @@ class ShopifyStoreController extends Controller
 
     public function getResponse(Request $request)
     {
+
         // response code from shopify
         $response_code = $request->input('code');
         // shopify store domain
         $shop_domain = $request->input('shop');
         // generating token
+        $state = $request->input('state');
+
         $access_token = $this->getAccessToken($shop_domain, $response_code);
 
         if ($access_token != "") {
@@ -117,7 +120,13 @@ class ShopifyStoreController extends Controller
                 // Dispatch the tasks to Queues
                 ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $shop_exists->id, Auth::user()->id);
                 ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $shop_exists->id);
-                return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+
+                if (strpos($state, 'mastersheet') !== false) {
+                    return redirect()->route('mastersheet', ['shopifyAddAccount' => 'success']);
+                } else {
+                    return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+                }
+
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
                     // 'user_id' => Auth::user()->id,
@@ -148,7 +157,11 @@ class ShopifyStoreController extends Controller
                 ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
                 ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
 
-                return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+                if (strpos($state, 'mastersheet') !== false) {
+                    return redirect()->route('mastersheet', ['shopifyAddAccount' => 'success']);
+                } else {
+                    return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+                }
             }
         }
     }
