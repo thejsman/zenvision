@@ -61,7 +61,7 @@
 export default {
     data() {
         return {
-            stripeUrl: `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://localhost:8000/stripeconnect&state=mastersheet-${Math.floor(
+            stripeUrl: `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect&state=mastersheet-${Math.floor(
                 Math.random() * 10000000 + 1
             )}`,
             paypalUrl: `https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal&state=mastersheet-${Math.floor(
