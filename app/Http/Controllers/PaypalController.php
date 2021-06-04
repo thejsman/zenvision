@@ -18,14 +18,17 @@ class PaypalController extends Controller
 
     public function store(Request $request)
     {
+
         $params = $request->query();
         $code = $params['code'];
+        $state = $params['state'];
 
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'oauth2/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $code);
 
         $headers = array();
@@ -55,7 +58,12 @@ class PaypalController extends Controller
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
-        return redirect('/');
+        if (strpos($state, 'mastersheet') !== false) {
+
+            return redirect('/mastersheet');
+        } else {
+            return redirect('/');
+        }
     }
 
     public function toogleAccount(Request $request)
@@ -88,6 +96,7 @@ class PaypalController extends Controller
                 curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'reporting/transactions?start_date=' . $request->s_date . '&end_date=' . $request->e_date . '&fields=transaction_info');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 $headers = array();
                 $headers[] = 'Content-Type: application/json';
                 $headers[] = 'Authorization: Bearer ' . $account->access_token;
@@ -124,6 +133,7 @@ class PaypalController extends Controller
                 curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'customer/disputes/?start_date=' . $request->s_date . '&end_date=' . $request->e_date);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 $headers = array();
                 $headers[] = 'Content-Type: application/json';
                 $headers[] = 'Authorization: Bearer ' . $account->access_token;
@@ -144,6 +154,7 @@ class PaypalController extends Controller
         curl_setopt_array($curl, array(
             CURLOPT_URL => env('PAYPAL_API_URL') . "identity/openidconnect/tokenservice",
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => "grant_type=refresh_token&refresh_token=" . $account->refresh_token,
             CURLOPT_HTTPHEADER => array(
@@ -176,7 +187,7 @@ class PaypalController extends Controller
         curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'identity/oauth2/userinfo?schema=paypalv1.1');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Content-Type: application/json';
         $headers[] = 'Authorization: Bearer ' . $access_token;

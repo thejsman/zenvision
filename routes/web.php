@@ -17,7 +17,7 @@ Auth::routes();
 Route::get('user/stores', 'ShopifyStoreController@getStores');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/', 'HomeController@index')->name('home');
-Route::get('/mastersheet', 'MastersheetController@index');
+Route::get('/mastersheet', 'MastersheetController@index')->name('mastersheet');
 Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 
 Route::get('/{group}/{component}', 'HomeController@show');
@@ -66,7 +66,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
 
-    Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
+    // Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
 
     Route::get('stripe-report-balancetransaction', 'StripeController@createBalanceTransactionReport');
     Route::get('stripe-report-report', 'StripeController@getReport');
