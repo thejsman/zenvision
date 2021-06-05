@@ -57,7 +57,7 @@ class User extends Authenticatable
 
     public function getStripeAccounts()
     {
-        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name', 'stripe_user_id')->get();
     }
 
     public function getTiktokAccounts()

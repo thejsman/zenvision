@@ -62,7 +62,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('stripeconnect-merchantfee', 'StripeController@getMerchantFees');
 
     Route::get('getstripeaccountsbalance', 'StripeController@getAccountBalance');
-    // Route::get('getStripeTransactions', 'StripeController@getStripeTransactions');
+    Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsFromDb');
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
 
