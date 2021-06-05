@@ -40,6 +40,7 @@ class StripeController extends Controller
         $response = json_decode($result, true);
 
         if ($response) {
+
             $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
             $stripeData = [];
             $stripeData['user_id'] = Auth::user()->id;
@@ -87,6 +88,22 @@ class StripeController extends Controller
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
                 $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('available_on', [$request->s_date, $request->e_date])->select('available_on', 'fee')->get();
+                return $stripeTransactions;
+            }
+
+        }
+        return ['stripeTransactions' => $stripeTransactions];
+    }
+
+    public function getStripeTransactionsFromDb(Request $request)
+    {
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripeTransactions = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->orderBy('created', 'desc')->paginate(20);
                 return $stripeTransactions;
             }
 
