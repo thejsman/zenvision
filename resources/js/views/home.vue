@@ -424,8 +424,8 @@ export default {
             @hide="handleOk"
         >
             <p class="my-2">
-                We are importing your Stripe transactions, this process can take
-                up to 5-10 minutes, please check back later.
+                We are importing your Stripe transactions, this process
+                can take a few minutes, please check back later.
             </p>
         </b-modal>
         <b-modal
@@ -454,7 +454,7 @@ export default {
         >
             <p class="my-2">
                 We are importing your Shopify orders and products, this process
-                can take up to 5-10 minutes, please check back later.
+                can take a few minutes, please check back later.
             </p>
         </b-modal>
     </Layout>
