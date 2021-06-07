@@ -89,7 +89,11 @@
                                 No transactions to show.
                             </h3>
                         </div>
-                        <div v-else v-for="(i, index) in items" :key="index">
+                        <div
+                            v-else
+                            v-for="(i, index) in itemsList"
+                            :key="index"
+                        >
                             <p class="p-2 bg-light sticky">{{ index }}</p>
                             <div v-for="item in i" :key="item.id">
                                 <div
@@ -153,16 +157,39 @@ export default {
     },
     created() {
         eventBus.$on("stripeChannelRemoved", accountId => {
-            const tempTrans = this.allTransactions.filter(
+            const filteredStripeTransactions = this.allTransactions.filter(
                 e => e.stripe_user_id === accountId
             );
-            console.log({ tempTrans });
-            this.items = tempTrans;
+            var ordered = {};
+            if (filteredStripeTransactions.length > 0) {
+                //Group all transaction by date
+                var groups = _.groupBy(filteredStripeTransactions, function(
+                    transaction
+                ) {
+                    return transaction.date;
+                });
+
+                _(groups)
+                    .keys()
+                    .sort()
+                    .each(function(key) {
+                        ordered[key] = groups[key];
+                    })
+                    .reverse();
+
+                this.items = ordered;
+            } else {
+                this.noTransactions = true;
+                this.items = ordered;
+            }
         });
     },
     computed: {
         tagsLenght() {
             return this.chips.length;
+        },
+        itemsList() {
+            return this.items;
         }
     },
 
