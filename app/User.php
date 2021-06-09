@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -16,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'lastname', 'email', 'phone', 'password'
+        'firstname', 'lastname', 'email', 'phone', 'password',
     ];
 
     /**
@@ -58,6 +57,10 @@ class User extends Authenticatable
     public function getStripeAccounts()
     {
         return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+    }
+    public function getBankAccounts()
+    {
+        return $this->hasMany(BankAccount::class, 'user_id')->where('isDeleted', false)->get();
     }
     public function getStripeAccountConnectIds()
     {

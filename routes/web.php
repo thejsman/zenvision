@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
 Auth::routes();
 Route::get('user/stores', 'ShopifyStoreController@getStores');
@@ -21,8 +21,6 @@ Route::get('/mastersheet', 'MastersheetController@index');
 Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 
 Route::get('/{group}/{component}', 'HomeController@show');
-
-
 
 Route::group(['middleware' => ['auth']], function () {
     //Shopify Connect APIs
@@ -34,7 +32,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('msdebts', 'DashboardController@msdebts');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
     Route::get('shopifybalance', 'DashboardController@getShopifyStoreBalance');
-
 
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
@@ -53,7 +50,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('paypaldelete', 'PaypalController@destroy');
     Route::get('paypaltransactions', 'PaypalController@getPaypalTransactions');
 
-
     //Stripe
     Route::get('getstripeaccounts', 'StripeController@index');
     Route::get('stripeconnect', 'StripeController@store');
@@ -64,4 +60,5 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Bank Account
     Route::post('bankaccount', 'BankAccountController@store');
+    Route::get('bankaccounts', 'BankAccountController@getBankAccounts');
 });

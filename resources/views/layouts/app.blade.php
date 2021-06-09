@@ -26,7 +26,9 @@
     </title>
     <meta content="Skote is a fully featured premium Vuejs admin dashboard template built on top of awesome Bootstrap 4.4.1" name="description" />
     <script src="{{ asset('js/app.js') }}" defer></script>
+
     <link href="{{ asset($css_file) }}" rel="stylesheet" id="layout-css">
+    <script src="https://cdn.teller.io/connect/connect.js"></script>
 </head>
 
 <body>
@@ -39,6 +41,7 @@
     </div>
     <!-- built files will be auto injected -->
     @stack('scripts')
+
 </body>
 
 </html>
