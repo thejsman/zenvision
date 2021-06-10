@@ -79,6 +79,8 @@ export default {
             snapchatAdsSpend: 0,
             facebookAdsSpend: 0,
             googleAdsSpend: 0,
+            timer: null,
+            firstLoadStripe: false,
             data: [
                 {
                     id: 1,
@@ -239,6 +241,21 @@ export default {
     watch: {
         costData(value, newValue) {
             this.assignData(this.refundTotal, this.costData);
+        },
+        firstLoadStripe(value, newValue) {
+            if (this.firstLoadStripe === true) {
+                const objIndex = this.data.findIndex(obj => obj.id === 5);
+                const objIndexCB = this.data.findIndex(obj => obj.id === 4);
+
+                this.data[objIndex].loading = true;
+                this.data[objIndexCB].loading = true;
+            } else {
+                const objIndex = this.data.findIndex(obj => obj.id === 5);
+                const objIndexCB = this.data.findIndex(obj => obj.id === 4);
+
+                this.data[objIndex].loading = false;
+                this.data[objIndexCB].loading = false;
+            }
         }
     },
     created() {
@@ -252,7 +269,7 @@ export default {
 
             // setLoading(this.data);
 
-            this.getMerchantfeesTotal(s_date, e_date);
+            // this.getMerchantfeesTotal(s_date, e_date);
             this.checkAndShowAdAccountsData(s_date, e_date);
         });
 
@@ -312,24 +329,28 @@ export default {
             this.stripeChargebacks = 0;
             this.stripeFeeTotal = 0;
             setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-            if (status) {
+            if (status && !this.firstLoadStripe) {
+                console.log("firstLoadStripe 2");
                 this.getStripeTransactions();
-                // this.getChargebackTotal();
+                this.getChargebackTotal();
             } else {
                 this.stripeFeeTotal = 0;
                 this.stripeChargebackTotal = 0;
-                updateDataMerchantFee(
-                    this.data,
-                    MERCHANT_FEE,
-                    displayCurrency(this.totalMerchantFees)
-                );
-                eventBus.$emit("stripeTransactionEvent", []);
-                eventBus.$emit("stripeChargebackEvent", []);
-                updateDataMerchantFee(
-                    this.data,
-                    CHARGEBACKS_TOTAL,
-                    displayCurrency(this.totalChargeback)
-                );
+                console.log("called 1");
+                if (!this.firstLoadStripe) {
+                    updateDataMerchantFee(
+                        this.data,
+                        MERCHANT_FEE,
+                        displayCurrency(this.totalMerchantFees)
+                    );
+                    eventBus.$emit("stripeTransactionEvent", []);
+                    eventBus.$emit("stripeChargebackEvent", []);
+                    updateDataMerchantFee(
+                        this.data,
+                        CHARGEBACKS_TOTAL,
+                        displayCurrency(this.totalChargeback)
+                    );
+                }
             }
         });
 
@@ -340,14 +361,35 @@ export default {
             this.hasShopifyAccount = status;
             // this.assignData(this.refundTotal, this.costData);
         });
+        eventBus.$on("triggerStripeCheck", recordId => {
+            this.firstLoadStripe = true;
+            this.checkStripeReportStatus(recordId);
+            console.log("Stripe check started ", recordId);
+        });
     },
     methods: {
+        checkStripeReportStatus(recordId) {
+            this.timer = setInterval(async () => {
+                const result = await axios.get("stripe-report-status", {
+                    params: {
+                        record_id: recordId
+                    }
+                });
+
+                const { report_status } = result.data;
+                console.log({ report_status });
+                if (report_status) {
+                    this.firstLoadStripe = false;
+                    clearInterval(this.timer);
+                }
+            }, 5000);
+        },
         assignData(refundTotal, orders) {
             setTimeout(() => {
                 this.getCogsData(orders, refundTotal);
 
                 this.getSubscriptionData();
-                this.getChargebackTotal();
+                // this.getChargebackTotal();
             }, 1000);
 
             // this.getMerchantfeesTotal(s_date, e_date);
@@ -660,10 +702,12 @@ export default {
                 await this.getPaypalTransactionsTotal(s_date, e_date);
             }
 
-            if (this.hasStripeAccount) {
+            if (this.hasStripeAccount && !this.firstLoadStripe) {
+                console.log("firstLoadStripe 1");
                 await this.getStripeTransactions();
             }
             setTimeout(() => {
+                console.log("Called 2");
                 updateData(
                     this.data,
                     MERCHANT_FEE,
@@ -710,6 +754,7 @@ export default {
                     });
                 }
             });
+            console.log("Called 3");
             updateDataMerchantFee(
                 this.data,
                 MERCHANT_FEE,
@@ -808,13 +853,14 @@ export default {
                             this.stripeFeeTotal += parseFloat(sTransaction.fee);
                         });
                     }
-
+                    console.log("Called 4");
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
                         displayCurrency(this.totalMerchantFees)
                     );
                 } catch (err) {
+                    console.log("Called 5");
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
@@ -822,6 +868,7 @@ export default {
                     );
                 }
             } else {
+                console.log("Called 6");
                 this.stripeFeeTotal = 0;
                 updateDataMerchantFee(
                     this.data,

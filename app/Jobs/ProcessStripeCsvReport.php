@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -75,5 +76,6 @@ class ProcessStripeCsvReport implements ShouldQueue
                 StripeBalanceTransactionsReport::updateOrCreate(['user_id' => $this->user_id, 'stripe_user_id' => $this->stripe_user_id, 'balance_transaction_id' => $transaction['balance_transaction_id']], $transaction);
             }
         }
+        StripeAccount::where(['user_id' => $this->user_id, 'stripe_user_id' => $this->stripe_user_id])->update('report_status', true);
     }
 }

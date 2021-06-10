@@ -138,3 +138,4 @@ Route::post('stripe/webhook/charge', 'StripeController@chargeWebookHandler');
 
 Route::get('stripe-reportrun', 'StripeController@createReportRun');
 Route::get('stripe-report-content', 'StripeController@getReportContent');
+Route::get('stripe-report-status', 'StripeController@getReportStatus');
