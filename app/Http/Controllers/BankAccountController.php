@@ -17,10 +17,16 @@ class BankAccountController extends Controller
         $bankAccount['bank_user'] = $request->user;
         $bankAccount['bank_name'] = $request->institution_name;
         $bankAccount['isDeleted'] = false;
-        BankAccount::updateOrCreate(['user_id' => Auth::user()->id], $bankAccount);
+        BankAccount::updateOrCreate(['user_id' => Auth::user()->id, 'bank_user' => $request->user, 'bank_name' => $request->institution_name], $bankAccount);
     }
     public function getBankAccounts()
     {
         return Auth::user()->getBankAccounts();
+    }
+    public function destroy(Request $request)
+    {
+        $account = BankAccount::find($request->id);
+        $account->isDeleted = true;
+        $account->save();
     }
 }

@@ -3,7 +3,7 @@
         <div class="d-flex flex-row dropdown">
             <div v-for="account in bankAccounts" :key="account.id">
                 <div
-                    class="border rounded p-2 dropbtn border-primary bg-white"
+                    class="border rounded p-2 dropbtn border-primary bg-white  ml-2"
                     v-b-tooltip.hover="account.bank_name"
                 >
                     <img
@@ -54,17 +54,17 @@ export default {
                 console.log(error);
             }
         },
-        async removeChannel(store, event) {
+        async removeChannel(account, event) {
             try {
-                // eventBus.$emit("removeShopifyStore", store.id);
-                await axios.patch("shopifystoredelete", store);
-                eventBus.$emit("toggleShopifyStore");
+                // eventBus.$emit("removeShopifyaccount", account.id);
+                await axios.patch("bankaccountdelete", account);
+                eventBus.$emit("toggleBankAccount");
                 this.getBankAccounts();
             } catch (error) {
                 console.log(error);
             }
         },
-        showMsgBoxOne(store) {
+        showMsgBoxOne(account) {
             this.boxOne = "";
             this.$bvModal
                 .msgBoxConfirm(
@@ -74,7 +74,7 @@ export default {
                     this.boxOne = value;
                     console.log("Yes", value);
                     if (value) {
-                        this.removeChannel(store);
+                        this.removeChannel(account);
                     }
                 })
                 .catch(err => {
