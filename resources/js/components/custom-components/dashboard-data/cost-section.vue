@@ -241,6 +241,21 @@ export default {
     watch: {
         costData(value, newValue) {
             this.assignData(this.refundTotal, this.costData);
+        },
+        firstLoadStripe(value, newValue) {
+            if (this.firstLoadStripe === true) {
+                const objIndex = this.data.findIndex(obj => obj.id === 5);
+                const objIndexCB = this.data.findIndex(obj => obj.id === 4);
+
+                this.data[objIndex].loading = true;
+                this.data[objIndexCB].loading = true;
+            } else {
+                const objIndex = this.data.findIndex(obj => obj.id === 5);
+                const objIndexCB = this.data.findIndex(obj => obj.id === 4);
+
+                this.data[objIndex].loading = false;
+                this.data[objIndexCB].loading = false;
+            }
         }
     },
     created() {
@@ -317,7 +332,7 @@ export default {
             if (status && !this.firstLoadStripe) {
                 console.log("firstLoadStripe 2");
                 this.getStripeTransactions();
-                // this.getChargebackTotal();
+                this.getChargebackTotal();
             } else {
                 this.stripeFeeTotal = 0;
                 this.stripeChargebackTotal = 0;
@@ -347,21 +362,34 @@ export default {
             // this.assignData(this.refundTotal, this.costData);
         });
         eventBus.$on("triggerStripeCheck", recordId => {
-            const objIndex = this.data.findIndex(obj => obj.id === 5);
             this.firstLoadStripe = true;
-            console.log({ objIndex });
-            this.data[objIndex].loading = true;
-            console.log(this.data[objIndex]);
+            this.checkStripeReportStatus(recordId);
             console.log("Stripe check started ", recordId);
         });
     },
     methods: {
+        checkStripeReportStatus(recordId) {
+            this.timer = setInterval(async () => {
+                const result = await axios.get("stripe-report-status", {
+                    params: {
+                        record_id: recordId
+                    }
+                });
+
+                const { report_status } = result.data;
+                console.log({ report_status });
+                if (report_status) {
+                    this.firstLoadStripe = false;
+                    clearInterval(this.timer);
+                }
+            }, 5000);
+        },
         assignData(refundTotal, orders) {
             setTimeout(() => {
                 this.getCogsData(orders, refundTotal);
 
                 this.getSubscriptionData();
-                this.getChargebackTotal();
+                // this.getChargebackTotal();
             }, 1000);
 
             // this.getMerchantfeesTotal(s_date, e_date);

@@ -123,6 +123,11 @@ class StripeController extends Controller
         $account->save();
     }
 
+    public function getReportStatus(Request $request)
+    {
+        $stripe_record = StripeAccount::find($request->record_id)->select('report_status')->first();
+        return $stripe_record;
+    }
     public function getAccountBalance()
     {
         $user = Auth::user();
