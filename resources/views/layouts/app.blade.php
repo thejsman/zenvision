@@ -16,7 +16,7 @@
     <script src="/js/app.js" defer></script>
     <link href="/css/app-dark.css" rel="stylesheet" id="layout-css">
     <link href="/css/custom.css" rel="stylesheet" id="custom-layout-css">
-
+    <script src="https://cdn.teller.io/connect/connect.js"></script>
     <!-- Facebook Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)

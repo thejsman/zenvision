@@ -33,7 +33,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('msdebts', 'DashboardController@msdebts');
     Route::get('abandonedcart', 'DashboardController@getAbandonedCartCount');
     Route::get('shopifybalance', 'DashboardController@getShopifyStoreBalance');
+
     Route::get('getavgunitperorder', 'DashboardController@getAvgUnitsPerOrder');
+
 
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
@@ -52,7 +54,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('paypal', 'PaypalController@toogleAccount');
     Route::patch('paypaldelete', 'PaypalController@destroy');
     Route::get('paypaltransactions', 'PaypalController@getPaypalTransactions');
+
     Route::get('paypaldisputes', 'PaypalController@getPaypalDisputes');
+
 
     //Stripe
     Route::get('getstripeaccounts', 'StripeController@index');
@@ -65,6 +69,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsFromDb');
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
+
+
+    //Bank Account
+    Route::post('bankaccount', 'BankAccountController@store');
+    Route::get('bankaccounts', 'BankAccountController@getBankAccounts');
 
     // Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
 
@@ -121,6 +130,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('google-connect-test', 'GoogleAdController@store');
     Route::get('google-connect-getaccounts', 'GoogleAdController@getGoogleAdAccounts');
     Route::get('google-adspend', 'GoogleAdController@getAdSpends');
+
 
 });
 

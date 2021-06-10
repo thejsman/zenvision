@@ -4,7 +4,7 @@
             Add Channels
             <i class="fas fa-plus pl-1"></i>
         </template>
-        <b-dropdown-item href="#">
+        <b-dropdown-item href="#" id="teller-connect">
             <img
                 src="/images/icons/bank-icon.svg"
                 alt
@@ -12,6 +12,7 @@
                 width="21"
                 class="channel-icons"
             />
+
             Bank accounts
         </b-dropdown-item>
         <b-dropdown-item :href="paypalUrl">
@@ -58,6 +59,8 @@
     </b-dropdown>
 </template>
 <script>
+import axios from "axios";
+
 export default {
     data() {
         return {
@@ -68,6 +71,41 @@ export default {
                 Math.random() * 10000000 + 1
             )}`
         };
+    },
+    created() {
+        document.addEventListener("DOMContentLoaded", function() {
+            var tellerConnect = TellerConnect.setup({
+                applicationId: "app_ne846be906r2t6156a000",
+                onInit: function() {
+                    console.log("Teller Connect has initialized");
+                },
+                // Part 3. Handle a successful enrollment's accessToken
+                onSuccess: async enrollment => {
+                    console.log("User enrolled successfully", enrollment);
+
+                    try {
+                        const result = await axios.post("bankaccount", {
+                            user: enrollment.user.id,
+                            institution_name:
+                                enrollment.enrollment.institution.name,
+                            access_token: enrollment.accessToken
+                        });
+                        window.location.href = "/mastersheet";
+                    } catch (err) {
+                        console.log(err);
+                    }
+                },
+                onExit: function() {
+                    console.log("User closed Teller Connect");
+                }
+            });
+
+            // Part 4. Hook user actions to start Teller Connect
+            var el = document.getElementById("teller-connect");
+            el.addEventListener("click", function() {
+                tellerConnect.open();
+            });
+        });
     }
 };
 </script>

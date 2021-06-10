@@ -7,6 +7,7 @@ import ShopifyConnect from "../../components/custom-components/modals/ShopifyCon
 import ShopifyStoreIcon from "../../components/custom-components/shopifystore-icon";
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
+import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
 
 import { eventBus } from "../../app";
 export default {
@@ -23,12 +24,15 @@ export default {
         ShopifyConnect,
         ShopifyStoreIcon,
         PaypalAccountIcon,
-        StripeAccount
+        StripeAccount,
+        BankAccount
+
     },
     created() {
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
+
         if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
             const result = new URL(location.href).searchParams.get(
                 "shopifyAddAccount"
@@ -50,6 +54,7 @@ export default {
             }, 1000);
         }
 
+
         this.getShopifyData();
     },
     methods: {
@@ -58,9 +63,11 @@ export default {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
             this.allOrders = orders;
+
         },
         handleOk() {
             window.location.href = "/mastersheet";
+
         }
     }
 };
@@ -75,6 +82,9 @@ export default {
                     <ShopifyStoreIcon :disableFeature="false" />
                     <PaypalAccountIcon :disableFeature="false" />
                     <StripeAccount :disableFeature="false" />
+
+                    <BankAccount />
+
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
                     >Export</b-button
@@ -87,6 +97,7 @@ export default {
                 <Mainpanel :orders="allOrders" />
             </div>
         </div>
+
         <b-modal
             id="shopify-connect"
             size="lg"
@@ -141,6 +152,7 @@ export default {
                 We are unable to connect your Stripe account, please try again
                 later.
             </p>
+
         </b-modal>
     </Layout>
 </template>
