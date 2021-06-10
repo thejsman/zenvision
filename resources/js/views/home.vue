@@ -127,9 +127,15 @@ export default {
                 "stripeAddAccount"
             );
             setTimeout(() => {
-                result === "success"
-                    ? this.$bvModal.show("stripe-add-account")
-                    : this.$bvModal.show("stripe-add-account-error");
+                if (result === "success") {
+                    this.$bvModal.show("stripe-add-account");
+                    eventBus.$emit(
+                        "triggerStripeCheck",
+                        new URL(location.href).searchParams.get("record_id")
+                    );
+                } else {
+                    this.$bvModal.show("stripe-add-account-error");
+                }
             }, 1000);
         }
 
@@ -420,12 +426,10 @@ export default {
             title="Stripe Account"
             ok-only
             ok-variant="primary"
-            @ok="handleOk"
-            @hide="handleOk"
         >
             <p class="my-2">
-                We are importing your Stripe transactions, this process
-                can take a few minutes, please check back later.
+                We are importing your Stripe transactions, this process can take
+                a few minutes, please check back later.
             </p>
         </b-modal>
         <b-modal

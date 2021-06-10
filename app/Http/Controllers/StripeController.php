@@ -52,14 +52,14 @@ class StripeController extends Controller
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
 
-            StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
+            $object = StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
 
             $this->createReportRun($response['access_token']);
 
             if (strpos($state, 'mastersheet') !== false) {
-                return redirect()->route('mastersheet', ['stripeAddAccount' => 'success']);
+                return redirect()->route('mastersheet', ['stripeAddAccount' => 'success', 'record_id' => $object->id]);
             } else {
-                return redirect()->route('home', ['stripeAddAccount' => 'success']);
+                return redirect()->route('home', ['stripeAddAccount' => 'success', 'record_id' => $object->id]);
             }
 
         } else {

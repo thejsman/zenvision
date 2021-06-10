@@ -79,6 +79,8 @@ export default {
             snapchatAdsSpend: 0,
             facebookAdsSpend: 0,
             googleAdsSpend: 0,
+            timer: null,
+            firstLoadStripe: false,
             data: [
                 {
                     id: 1,
@@ -252,7 +254,7 @@ export default {
 
             // setLoading(this.data);
 
-            this.getMerchantfeesTotal(s_date, e_date);
+            // this.getMerchantfeesTotal(s_date, e_date);
             this.checkAndShowAdAccountsData(s_date, e_date);
         });
 
@@ -312,24 +314,28 @@ export default {
             this.stripeChargebacks = 0;
             this.stripeFeeTotal = 0;
             setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-            if (status) {
+            if (status && !this.firstLoadStripe) {
+                console.log("firstLoadStripe 2");
                 this.getStripeTransactions();
                 // this.getChargebackTotal();
             } else {
                 this.stripeFeeTotal = 0;
                 this.stripeChargebackTotal = 0;
-                updateDataMerchantFee(
-                    this.data,
-                    MERCHANT_FEE,
-                    displayCurrency(this.totalMerchantFees)
-                );
-                eventBus.$emit("stripeTransactionEvent", []);
-                eventBus.$emit("stripeChargebackEvent", []);
-                updateDataMerchantFee(
-                    this.data,
-                    CHARGEBACKS_TOTAL,
-                    displayCurrency(this.totalChargeback)
-                );
+                console.log("called 1");
+                if (!this.firstLoadStripe) {
+                    updateDataMerchantFee(
+                        this.data,
+                        MERCHANT_FEE,
+                        displayCurrency(this.totalMerchantFees)
+                    );
+                    eventBus.$emit("stripeTransactionEvent", []);
+                    eventBus.$emit("stripeChargebackEvent", []);
+                    updateDataMerchantFee(
+                        this.data,
+                        CHARGEBACKS_TOTAL,
+                        displayCurrency(this.totalChargeback)
+                    );
+                }
             }
         });
 
@@ -339,6 +345,14 @@ export default {
         eventBus.$on("hasShopifyAccount", status => {
             this.hasShopifyAccount = status;
             // this.assignData(this.refundTotal, this.costData);
+        });
+        eventBus.$on("triggerStripeCheck", recordId => {
+            const objIndex = this.data.findIndex(obj => obj.id === 5);
+            this.firstLoadStripe = true;
+            console.log({ objIndex });
+            this.data[objIndex].loading = true;
+            console.log(this.data[objIndex]);
+            console.log("Stripe check started ", recordId);
         });
     },
     methods: {
@@ -660,10 +674,12 @@ export default {
                 await this.getPaypalTransactionsTotal(s_date, e_date);
             }
 
-            if (this.hasStripeAccount) {
+            if (this.hasStripeAccount && !this.firstLoadStripe) {
+                console.log("firstLoadStripe 1");
                 await this.getStripeTransactions();
             }
             setTimeout(() => {
+                console.log("Called 2");
                 updateData(
                     this.data,
                     MERCHANT_FEE,
@@ -710,6 +726,7 @@ export default {
                     });
                 }
             });
+            console.log("Called 3");
             updateDataMerchantFee(
                 this.data,
                 MERCHANT_FEE,
@@ -808,13 +825,14 @@ export default {
                             this.stripeFeeTotal += parseFloat(sTransaction.fee);
                         });
                     }
-
+                    console.log("Called 4");
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
                         displayCurrency(this.totalMerchantFees)
                     );
                 } catch (err) {
+                    console.log("Called 5");
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
@@ -822,6 +840,7 @@ export default {
                     );
                 }
             } else {
+                console.log("Called 6");
                 this.stripeFeeTotal = 0;
                 updateDataMerchantFee(
                     this.data,
