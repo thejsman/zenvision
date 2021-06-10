@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+if (App::environment('production')) {
+    URL::forceScheme('https');
+}
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -25,3 +29,18 @@ Route::group(['middleware' => 'guest:api'], function () {
     /*register route*/
     Route::post('register', 'Auth\RegisterController@register');
 });
+
+//Order webHooks
+Route::post('webhooks/create-order', 'WebhookController@createorder');
+Route::post('webhooks/orders-updated', 'WebhookController@ordersUpdated');
+Route::post('webhooks/orders-cancelled', 'WebhookController@ordersCancelled');
+Route::post('webhooks/orders-delete', 'WebhookController@ordersDelete');
+
+
+// Product Webhooks
+Route::post('webhooks/product-create', 'ProductsController@store');
+Route::post('webhooks/product-update', 'ProductsController@update');
+
+//Inventory Items Webhook
+Route::post('webhooks/inventory-create', 'InventoryController@store');
+Route::post('webhooks/inventory-update', 'InventoryController@update');

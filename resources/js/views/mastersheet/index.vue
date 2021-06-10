@@ -26,11 +26,35 @@ export default {
         PaypalAccountIcon,
         StripeAccount,
         BankAccount
+
     },
     created() {
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
+
+        if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "shopifyAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("shopify-add-account")
+                    : this.$bvModal.show("shopify-add-account-error");
+            }, 1000);
+        }
+        if (new URL(location.href).searchParams.get("stripeAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "stripeAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("stripe-add-account")
+                    : this.$bvModal.show("stripe-add-account-error");
+            }, 1000);
+        }
+
+
         this.getShopifyData();
     },
     methods: {
@@ -39,6 +63,11 @@ export default {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
             this.allOrders = orders;
+
+        },
+        handleOk() {
+            window.location.href = "/mastersheet";
+
         }
     }
 };
@@ -53,7 +82,9 @@ export default {
                     <ShopifyStoreIcon :disableFeature="false" />
                     <PaypalAccountIcon :disableFeature="false" />
                     <StripeAccount :disableFeature="false" />
+
                     <BankAccount />
+
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
                     >Export</b-button
@@ -66,8 +97,62 @@ export default {
                 <Mainpanel :orders="allOrders" />
             </div>
         </div>
-        <b-modal id="shopify-connect" centered hide-footer hide-header>
-            <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
+
+        <b-modal
+            id="shopify-connect"
+            size="lg"
+            centered
+            hide-footer
+            hide-header
+        >
+            <ShopifyConnect
+                :called-from="'mastersheet'"
+                @handle-close="$bvModal.hide('shopify-connect')"
+            />
+        </b-modal>
+        <!-- Shopify Modal -->
+
+        <b-modal
+            id="shopify-add-account"
+            title="Shopify Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are importing your Shopify orders and products, this process
+                can take a few minutes, please check back later.
+            </p>
+        </b-modal>
+
+        <!--  Stripe modal -->
+        <b-modal
+            id="stripe-add-account"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are importing your Stripe transactions, this process
+                can take a few minutes, please check back later.
+            </p>
+        </b-modal>
+        <b-modal
+            id="stripe-add-account-error"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are unable to connect your Stripe account, please try again
+                later.
+            </p>
+
         </b-modal>
     </Layout>
 </template>

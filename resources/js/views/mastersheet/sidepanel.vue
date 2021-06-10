@@ -87,7 +87,9 @@ export default {
   methods: {
     async getMastersheetData() {
       const assets = await axios.get("mastersheetdata");
-      const cogs = _.sumBy(this.orders, (order) => parseFloat(order.cogs));
+      const cogs = _.sumBy(this.orders, (order) =>
+        parseFloat(order.total_cost)
+      );
 
       const {
         total_cash,
@@ -157,7 +159,7 @@ export default {
     },
     async getStripeTransactions() {
       try {
-        const result = await axios.get("getbalancetransactions");
+        const result = await axios.get("getStripeTransactions");
         const data = result.data;
         return data;
       } catch (err) {

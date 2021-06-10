@@ -2,6 +2,8 @@
 
 namespace App;
 
+
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -56,7 +58,25 @@ class User extends Authenticatable
 
     public function getStripeAccounts()
     {
-        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name')->get();
+        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'enabled_on_dashboard', 'name', 'stripe_user_id')->get();
+    }
+
+    public function getTiktokAccounts()
+    {
+        return $this->hasMany(TiktokAd::class, 'user_id')->where('isDeleted', false)->get();
+    }
+
+    public function getFacebookAccounts()
+    {
+        return $this->hasMany(FacebookAd::class, 'user_id')->where('isDeleted', false)->select('id', 'ad_account_id', 'ad_account_name', 'enabled_on_dashboard', 'access_token')->get();
+    }
+    public function getSnapchatAccounts()
+    {
+        return $this->hasMany(SnapchatAdAccount::class, 'user_id')->where('isDeleted', false)->get();
+    }
+    public function getGoogleAccounts()
+    {
+        return $this->hasMany(GoogleAd::class, 'user_id')->where('isDeleted', false)->get();
     }
     public function getBankAccounts()
     {
@@ -64,6 +84,14 @@ class User extends Authenticatable
     }
     public function getStripeAccountConnectIds()
     {
-        return $this->hasMany(Stripe::class, 'user_id')->where('isDeleted', false)->select('id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
+        return $this->hasMany(StripeAccount::class, 'user_id')->where('isDeleted', false)->select('id', 'user_id', 'stripe_user_id', 'access_token', 'refresh_token', 'enabled_on_dashboard')->get();
+    }
+    public function getPaypalAccountConnectIds()
+    {
+        return $this->hasMany(Paypal::class, 'user_id')->where('isDeleted', false)->select('id', 'access_token', 'refresh_token', 'enabled_on_dashboard', 'expires_at')->get();
+    }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

@@ -4,8 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Stripe extends Model
+class GoogleAd extends Model
 {
     protected $guarded = [];
-    protected $table = "stripe";
 }

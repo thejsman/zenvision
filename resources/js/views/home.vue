@@ -8,6 +8,11 @@ import ChannelDropdown from "../components/custom-components/channel-dropdown";
 import DateRange from "../components/custom-components/date-range";
 import StoreIcon from "../components/custom-components/shopifystore-icon";
 import PaypalAccount from "../components/custom-components/paypal-icon";
+import StripeAccount from "../components/custom-components/stripe-icon";
+import FacebookAccount from "../components/custom-components/facebook-icon";
+import SnapchatAccount from "../components/custom-components/snapchat-icon";
+import TiktokAccount from "../components/custom-components/tiktok-icon";
+import GoogleAccount from "../components/custom-components/google-icon";
 
 //Dashboard Data sections import
 import Profit from "../components/custom-components/dashboard-data/profit-section";
@@ -18,187 +23,439 @@ import Chart from "../components/custom-components/dashboard-data/chart-section"
 
 //Modal import
 import ShopifyConnect from "../components/custom-components/modals/ShopifyConnect-modal";
-
+import FacebookConnect from "../components/custom-components/modals/facebook-adaccount-modal";
+import SnapchatConnect from "../components/custom-components/modals/snapchat-adaccount-modal";
+import GoogleConnect from "../components/custom-components/modals/google-adaccount-modal";
+import TiktokConnect from "../components/custom-components/modals/tiktok-adaccount-modal";
 import moment from "moment";
 import { mapState, mapGetters, mapActions } from "vuex";
-import dayjs from "dayjs";
+
 import { eventBus } from "../app";
 
+import Loading from "vue-loading-overlay";
+// Import stylesheet
+import "vue-loading-overlay/dist/vue-loading.css";
+
 export default {
-  components: {
-    Layout,
-    PageHeader,
-    ShopifyConnect,
-    StoreIcon,
-    DateRange,
-    ChannelDropdown,
-    Profit,
-    Revenue,
-    Costs,
-    KeyPerformance,
-    Chart,
-    PaypalAccount,
-  },
-  data() {
-    return {
-      title: "Zenvision Dashboard",
-      allOrders: [],
-      enabled_on_dashboard: [],
-      refund_total: 0,
-      number_of_products: 0,
-      orders: [],
-      chargebacks: 0,
-      merchantFees: [],
-      merchantFeesTotal: 0,
-      chargebacksTotal: 0,
-      backupOrders: [],
-      dateRangeSelected: [],
-      facebookData: [],
-      googleData: [],
-      facebookError: false,
-      facebookAdAccounts: [],
-      googleAdAccounts: [],
-      fb_spend: [],
-      google_ads_data: [],
-      paypalChargebacks: [],
-      stripeChargebacks: [],
-      paypalAccounts: [],
-      stripeAccounts: [],
-      stripeTransactions: [],
-      paypalTransactions: [],
-    };
-  },
-  mounted() {},
-  computed: {
-    ...mapGetters([
-      "ShopifyOrders",
-      "ShopifyStores",
-      "ShopifyProductCount",
-      "ShopifyRefundTotal",
-      "startDate",
-      "endDate",
-    ]),
-  },
-  created() {
-    // this.fetchShopifyData();
+    components: {
+        Layout,
+        PageHeader,
+        ShopifyConnect,
+        StoreIcon,
+        DateRange,
+        ChannelDropdown,
+        Profit,
+        Revenue,
+        Costs,
+        KeyPerformance,
+        Chart,
+        PaypalAccount,
+        StripeAccount,
+        FacebookConnect,
+        FacebookAccount,
+        SnapchatAccount,
+        SnapchatConnect,
+        TiktokAccount,
+        GoogleConnect,
+        GoogleAccount,
+        TiktokConnect,
+        Loading
+    },
+    data() {
+        return {
+            title: "Zenvision Dashboard",
+            allOrders: [],
+            enabled_on_dashboard: [],
+            refund_total: 0,
+            number_of_products: 0,
+            orders: [],
+            chargebacks: 0,
+            merchantFees: [],
+            merchantFeesTotal: 0,
+            chargebacksTotal: 0,
+            backupOrders: [],
+            dateRangeSelected: [],
+            facebookData: [],
+            snapchatAdAccounts: [],
+            tiktokAdAccounts: [],
+            googleAdAccounts: [],
+            googleData: [],
+            facebookError: false,
+            snapchatError: false,
+            tiktokError: false,
+            googleError: false,
+            facebookAdAccounts: [],
 
-    this.getShopifyStoreData();
+            fb_spend: [],
+            google_ads_data: [],
+            paypalChargebacks: [],
+            stripeChargebacks: [],
+            paypalAccounts: [],
+            stripeAccounts: [],
+            stripeTransactions: [],
+            paypalTransactions: [],
+            isLoading: false
+        };
+    },
 
-    eventBus.$on("changeDateRange", (date) => this.handleDateChange(date));
-  },
-  methods: {
-    ...mapActions(["fetchShopifyData"]),
+    computed: {
+        ...mapGetters([
+            "ShopifyOrders",
+            "ShopifyStores",
+            "ShopifyProductCount",
+            "ShopifyRefundTotal",
+            "startDateS",
+            "endDateS"
+        ])
+    },
+    created() {
+        if (new URL(location.href).searchParams.get("listSnapchatAccount")) {
+            this.getSnapchatAdAccounts();
+        }
 
-    async getShopifyStoreData() {
-      try {
-        const {
-          data: {
-            enabled_on_dashboard,
-            refund_total,
-            orders,
-            number_of_products,
-            paypalAccounts,
-            paypalTransactions,
-          },
-        } = await axios.get("shopifystoredata");
+        if (new URL(location.href).searchParams.get("listGoogleAccounts")) {
+            this.getGoogleAdAccounts();
+        }
+        if (new URL(location.href).searchParams.get("listTiktokAccounts")) {
+            this.getTiktokAccounts();
+        }
+        if (new URL(location.href).searchParams.get("listFacebookAdAccounts")) {
+            this.getFacebookAdsAccounts();
+        }
+        if (new URL(location.href).searchParams.get("stripeAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "stripeAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("stripe-add-account")
+                    : this.$bvModal.show("stripe-add-account-error");
+            }, 1000);
+        }
 
-        //assign values
+        if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "shopifyAddAccount"
+            );
+            setTimeout(() => {
+                result === "success"
+                    ? this.$bvModal.show("shopify-add-account")
+                    : this.$bvModal.show("shopify-add-account-error");
+            }, 1000);
+        }
 
-        this.backupOrders = [...orders];
-        this.paypalAccounts = paypalAccounts;
-        this.paypalTransactions = paypalTransactions;
+        this.getShopifyStoreData();
 
-        let d = new Date();
-        this.handleDateChange({
-          startDate: moment(d).add(-3, "months"),
-          endDate: moment(d),
+        eventBus.$on("changeDateRange", date => this.handleDateChange(date));
+        eventBus.$on("toggleShopifyStore", async () => {
+            this.getShopifyStoreData();
         });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    getMerchantfeesTotal(s_date, e_date) {
-      let total = 0;
+        eventBus.$on("cogs-updated", async () => {
+            this.getShopifyStoreData();
+        });
 
-      //   this.paypalTransactions.map((transaction) => {
-      //     const orderDate = moment(transaction.transaction_updated_date).format(
-      //       "MM-DD-YYYY"
-      //     );
-      //     console.log(transaction.transaction_info.fee_amount.value);
-      //     if (
-      //       new Date(orderDate) >= new Date(s_date) &&
-      //       new Date(orderDate) <= new Date(e_date)
-      //     ) {
-      //       total += Math.abs(
-      //         parseFloat(transaction.transaction_info.fee_amount.value)
-      //       );
-      //     }
-      //   });
-
-      this.merchantFeesTotal = total;
+        eventBus.$on("setLoadingTrue", () => {
+            this.isLoading = true;
+        });
+        eventBus.$on("setLoadingFalse", () => {
+            this.isLoading = false;
+        });
     },
-    handleDateChange(dateRange) {
-      const { startDate, endDate } = dateRange;
-      const s_date = moment(startDate).format("MM-DD-YYYY");
-      const e_date = moment(endDate).format("MM-DD-YYYY");
+    methods: {
+        ...mapActions(["fetchShopifyData"]),
 
-      const filteredOrders = this.backupOrders.filter((order) => {
-        const orderDate = moment(order.created_on_shopify).format("MM-DD-YYYY");
-        return (
-          new Date(orderDate) >= new Date(s_date) &&
-          new Date(orderDate) <= new Date(e_date)
-        );
-      });
-      this.dateRangeSelected = [moment(s_date), moment(e_date)];
-      this.allOrders = filteredOrders;
-      this.getMerchantfeesTotal(s_date, e_date);
-    },
-  },
+        showModal(modalId) {
+            this.$bvModal.show(modalId);
+        },
+        handleOk() {
+            window.location.href = "/";
+        },
+        async getShopifyStoreData() {
+            try {
+                const {
+                    data: { orders, paypalAccounts, paypalTransactions }
+                } = await axios.get("shopifystoredata");
+
+                //assign values
+
+                this.backupOrders = [...orders];
+                this.paypalAccounts = paypalAccounts;
+                this.paypalTransactions = paypalTransactions;
+
+                let d = new Date();
+                this.handleDateChange();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async getFacebookAdsAccounts(code) {
+            try {
+                const result = await axios.get("facebook-listadaccounts", {
+                    params: {
+                        access_token: new URL(location.href).searchParams.get(
+                            "listFacebookAdAccounts"
+                        )
+                    }
+                });
+                this.facebookData = result.data;
+
+                this.$bvModal.show("facebook-connect");
+            } catch (error) {
+                console.log(error);
+                this.facebookError = true;
+            }
+        },
+
+        async getSnapchatAdAccounts() {
+            try {
+                if (
+                    new URL(location.href).searchParams.get(
+                        "listSnapchatAccount"
+                    ) === "noaccount"
+                ) {
+                    setTimeout(() => {
+                        this.showModal("snapchat-noaccount");
+                    }, 100);
+                    return;
+                }
+                const result = await axios.get("snapchat-listadaccounts", {
+                    params: {
+                        organization_id: new URL(
+                            location.href
+                        ).searchParams.get("listSnapchatAccount")
+                    }
+                });
+                this.snapchatAdAccounts = result.data;
+
+                this.$bvModal.show("snapchat-connect");
+            } catch (error) {
+                console.log(error);
+                this.snapchatError = true;
+            }
+        },
+        async getTiktokAccounts() {
+            try {
+                const accessToken = new URL(location.href).searchParams.get(
+                    "listTiktokAccounts"
+                );
+
+                if (accessToken === "noaccount") {
+                    setTimeout(() => {
+                        this.showModal("tiktok-noaccount");
+                    }, 100);
+                } else {
+                    const result = await axios.get(
+                        "tiktokaccount-listaccount",
+                        {
+                            params: {
+                                access_token: new URL(
+                                    location.href
+                                ).searchParams.get("listTiktokAccounts")
+                            }
+                        }
+                    );
+                    this.tiktokAdAccounts = result.data;
+
+                    this.$bvModal.show("tiktok-connect");
+                }
+            } catch (error) {
+                console.log(error);
+                this.tiktokError = true;
+            }
+        },
+
+        async getGoogleAdAccounts() {
+            try {
+                const result = await axios.get("google-connect-listaccounts", {
+                    params: {
+                        access_token: new URL(location.href).searchParams.get(
+                            "listGoogleAccounts"
+                        )
+                    }
+                });
+                this.googleAdAccounts = result.data;
+
+                this.$bvModal.show("google-connect");
+            } catch (error) {
+                console.log(error);
+                this.snapchatError = true;
+            }
+        },
+        handleDateChange() {
+            const s_date = moment(this.startDateS).format("MM-DD-YYYY");
+            const e_date = moment(this.endDateS).format("MM-DD-YYYY");
+
+            const filteredOrders = this.backupOrders.filter(order => {
+                const orderDate = moment(order.created_on_shopify).format(
+                    "MM-DD-YYYY"
+                );
+                order.created_on_shopify = orderDate;
+                order.total_price = parseFloat(order.total_price);
+                return (
+                    new Date(orderDate) >= new Date(s_date) &&
+                    new Date(orderDate) <= new Date(e_date)
+                );
+            });
+            this.dateRangeSelected = [moment(s_date), moment(e_date)];
+
+            this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
+
+            eventBus.$emit("dateChanged", { s_date, e_date });
+        }
+    }
 };
 </script>
 <template>
-  <Layout>
-    <div class="row">
-      <div class="col-12">
-        <div class="page-title-box d-flex align-items-center">
-          <ChannelDropdown />
-          <StoreIcon />
-          <PaypalAccount :ppAccounts="paypalAccounts" />
-          <DateRange @changeDateRange="handleDateChange" />
+    <Layout>
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-flex align-items-center">
+                    <ChannelDropdown />
+                    <StoreIcon />
+                    <PaypalAccount :ppAccounts="paypalAccounts" />
+                    <StripeAccount />
+                    <FacebookAccount />
+                    <SnapchatAccount />
+                    <TiktokAccount />
+                    <GoogleAccount />
+                    <DateRange @changeDateRange="handleDateChange" />
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
+        <loading
+            :active.sync="isLoading"
+            :can-cancel="false"
+            :is-full-page="true"
+            :background-color="'#2F3863'"
+        ></loading>
+        <div class="row">
+            <div class="col-xl-5">
+                <Profit :profitData="allOrders" />
+                <Revenue :revenueData="allOrders" />
+                <Costs :costData="allOrders" :refundTotal="refund_total" />
+            </div>
+            <div class="col-xl-7">
+                <Chart :chartData="allOrders" />
+                <KeyPerformance :performanceData="allOrders" />
+            </div>
+        </div>
+        <b-modal
+            id="shopify-connect"
+            size="lg"
+            centered
+            hide-footer
+            hide-header
+        >
+            <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
+        </b-modal>
+        <b-modal
+            id="facebook-connect"
+            size="lg"
+            centered
+            hide-footer
+            hide-header
+        >
+            <FacebookConnect
+                :facebookData="facebookData"
+                :facebookError="facebookError"
+                :adAccounts="facebookAdAccounts"
+                :startDate="dateRangeSelected"
+                @handle-close="$bvModal.hide('facebook-connect')"
+            />
+        </b-modal>
+        <b-modal
+            id="snapchat-connect"
+            size="lg"
+            centered
+            hide-footer
+            hide-header
+        >
+            <SnapchatConnect
+                :snapchatData="snapchatAdAccounts"
+                :snapchatError="snapchatError"
+                @handle-close="$bvModal.hide('snapchat-connect')"
+            />
+        </b-modal>
+        <b-modal id="google-connect" size="lg" centered hide-footer hide-header>
+            <GoogleConnect
+                :googleData="googleAdAccounts"
+                :googleError="googleError"
+                @handle-close="$bvModal.hide('google-connect')"
+            />
+        </b-modal>
+        <b-modal id="tiktok-connect" size="lg" centered hide-footer hide-header>
+            <TiktokConnect
+                :tiktokData="tiktokAdAccounts"
+                :tiktokError="tiktokError"
+                @handle-close="$bvModal.hide('tiktok-connect')"
+            />
+        </b-modal>
+        <!-- Tiktok No ad account -->
+        <b-modal
+            id="tiktok-noaccount"
+            title="TikTok Ad Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">No TikTok Ad Account found!</p>
+        </b-modal>
 
-    <div class="row">
-      <div class="col-xl-5">
-        <Profit
-          :profitData="allOrders"
-          :startDate="dateRangeSelected"
-          :fbSpend="fb_spend"
-        />
-        <Revenue :revenueData="allOrders" :dateRange="dateRangeSelected" />
-        <Costs
-          :costData="allOrders"
-          :refundTotal="refund_total"
-          :merchantFees="merchantFeesTotal"
-        />
-      </div>
-      <div class="col-xl-7">
-        <Chart
-          :chartData="allOrders"
-          :ChartdateRange="dateRangeSelected"
-          :fbSpend="fb_spend"
-          :googleData="google_ads_data"
-        />
-        <KeyPerformance
-          :performanceData="allOrders"
-          :shopifyStores="enabled_on_dashboard"
-          :totalProducts="number_of_products"
-        />
-      </div>
-    </div>
-    <b-modal id="shopify-connect" centered hide-footer hide-header>
-      <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
-    </b-modal>
-  </Layout>
+        <!-- Snapchat No Organization -->
+        <b-modal
+            id="snapchat-noaccount"
+            title="Snapchat Ad Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">No Snapchat Ad Account found!</p>
+        </b-modal>
+
+        <!--  Stripe modal -->
+        <b-modal
+            id="stripe-add-account"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are importing your Stripe transactions, this process
+                can take a few minutes, please check back later.
+            </p>
+        </b-modal>
+        <b-modal
+            id="stripe-add-account-error"
+            title="Stripe Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are unable to connect your Stripe account, please try again
+                later.
+            </p>
+        </b-modal>
+
+        <!-- Shopify Modal -->
+
+        <b-modal
+            id="shopify-add-account"
+            title="Shopify Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We are importing your Shopify orders and products, this process
+                can take a few minutes, please check back later.
+            </p>
+        </b-modal>
+    </Layout>
 </template>

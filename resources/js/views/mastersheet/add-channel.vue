@@ -12,11 +12,10 @@
                 width="21"
                 class="channel-icons"
             />
-            Bank Account
+
+            Bank accounts
         </b-dropdown-item>
-        <b-dropdown-item
-            href="https://www.sandbox.paypal.com/connect/?flowEntry=static&client_id=AdZIt50i5iAVT5V688yGmgm-ZHAyLyncY0NlIPW9Y4zkQOfsbJ2m4-7BJa7U6EeGivB09Xnu-5xLjs2J&response_type=code&scope=openid email https://uri.paypal.com/services/paypalattributes&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fpaypal"
-        >
+        <b-dropdown-item :href="paypalUrl">
             <img
                 src="/images/icons/paypal.png"
                 alt
@@ -26,9 +25,7 @@
             />
             Paypal
         </b-dropdown-item>
-        <b-dropdown-item
-            href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IVj0p0IFc5yVVUGsGdtvL8aX0kQocmvQ&scope=read_write&redirect_uri=http://localhost:8000/stripeconnect"
-        >
+        <b-dropdown-item :href="stripeUrl">
             <img
                 src="/images/icons/stripe-icon.svg"
                 alt
@@ -38,7 +35,7 @@
             />
             Stripe
         </b-dropdown-item>
-        <b-dropdown-item href="#" v-b-modal.shopify-connect>
+        <b-dropdown-item href="#">
             <img
                 src="/images/icons/creditcard-icon.svg"
                 alt
@@ -65,6 +62,16 @@
 import axios from "axios";
 
 export default {
+    data() {
+        return {
+            stripeUrl: `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://staging.zenvision.io/stripeconnect&state=mastersheet-${Math.floor(
+                Math.random() * 10000000 + 1
+            )}`,
+            paypalUrl: `https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal&state=mastersheet-${Math.floor(
+                Math.random() * 10000000 + 1
+            )}`
+        };
+    },
     created() {
         document.addEventListener("DOMContentLoaded", function() {
             var tellerConnect = TellerConnect.setup({
@@ -99,9 +106,6 @@ export default {
                 tellerConnect.open();
             });
         });
-    },
-    methods: {
-        async addBankAccount(enrollment) {}
     }
 };
 </script>

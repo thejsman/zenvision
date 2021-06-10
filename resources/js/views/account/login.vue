@@ -40,7 +40,7 @@ export default {
         <div class="card-body pt-0">
           <div class="text-center">
             <h4 class="text-white text-uppercase mb-4 mt-4">
-              Log in - Heroku Test
+              Log in
             </h4>
           </div>
           <b-alert
@@ -88,7 +88,7 @@ export default {
               <b-button
                 type="submit"
                 variant="primary"
-                class="btn-block btn-success"
+                class="btn-block"
                 >Log In</b-button
               >
             </div>

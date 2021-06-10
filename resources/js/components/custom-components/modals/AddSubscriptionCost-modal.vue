@@ -3,13 +3,14 @@
     <div class="font-weight-bold font-size-18 text-white mt-4 pb-3">
       Add Subscription Cost
     </div>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form @submit="onSubmit" v-if="show">
       <b-form-group id="input-group-1" label="Name" label-for="name">
         <b-form-input
           id="name"
           v-model="form.subscription_name"
           required
           placeholder="Product Name"
+          autocomplete="off"
         ></b-form-input>
       </b-form-group>
 
@@ -29,6 +30,7 @@
         id="input-group-3"
         label="Price"
         label-for="price"
+        autocomplete="off"
         prepend="$"
       >
         <b-form-input
@@ -37,6 +39,7 @@
           required
           placeholder="0.00"
           prepend="$"
+          autocomplete="off"
         ></b-form-input>
       </b-form-group>
 
@@ -61,7 +64,7 @@
         ></b-form-datepicker>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Add</b-button>
+      <b-button type="submit" variant="green">Add</b-button>
       <b-button class="btn btn-cancel" @click="$emit('handle-close')"
         >Cancel</b-button
       >
@@ -72,7 +75,6 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../../app";
-
 export default {
   data() {
     return {
@@ -97,22 +99,16 @@ export default {
   methods: {
     async onSubmit(evt) {
       evt.preventDefault();
-      const result = await axios.post("/subscriptioncost", this.form);
-      console.log({ result });
-      this.$emit("updateSubscription");
-      this.$emit("handle-close");
-      eventBus.$emit("subscriptionUpdate");
+      try {
+        const result = await axios.post("/subscriptioncost", this.form);
+        eventBus.$emit("updateSubscription");
+        this.$emit("handle-close");
+      } catch (err) {
+        eventBus.$emit("updateSubscription");
+        this.$emit("handle-close");
+      }
     },
-    onReset(evt) {
-      evt.preventDefault();
-      // Reset our form values
-      this.form.email = "";
-      this.form.name = "";
-      this.form.food = null;
-      this.form.checked = [];
-      // Trick to reset/clear native browser form validation state
-      this.show = false;
-    },
+
   },
 };
 </script>

@@ -20,7 +20,9 @@ export const CHARGEBACKS_TOTAL = "Chargebacks";
 export const MERCHANT_FEE = "Merchant Fees";
 export const AD_SPEND_FACEBOOK = "Ad Spend";
 export const AD_SPEND_GOOGLE = "Ad Spend";
-export const SUBSCRIPTION_COST = "Subscription Cost";
+export const AD_SPEND_SNAPCHAT = "Ad Spend";
+export const AD_SPEND_TIKTOK = "Ad Spend";
+export const SUBSCRIPTION_COST = "Subscriptions";
 
 /*
 MasterSheet Section

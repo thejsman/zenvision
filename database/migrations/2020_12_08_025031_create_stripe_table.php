@@ -36,6 +36,6 @@ class CreateStripeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stripes');
+        Schema::dropIfExists('stripe');
     }
 }

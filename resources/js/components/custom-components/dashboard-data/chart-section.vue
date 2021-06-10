@@ -1,371 +1,440 @@
 <template>
-  <div class="row">
-    <div class="col-xl-12 mt-4 mb-3 ml-2">
-      <h3>Profit Analysis</h3>
-    </div>
-    <div class="card w-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-end mt-3 legends">
-          <i class="profit-circle"></i>
-          <span class="mr-3">Profit</span>
-          <i class="loss-circle"></i><span class="mr-3 pr-3">Loss</span>
+    <div class="row">
+        <div class="col-xl-12 mt-4">
+            <h3>Profit Analysis</h3>
         </div>
-
-        <chartist
-          ratio="ct-chart"
-          :data="polarBarChart.data"
-          :options="polarBarChart.options"
-          type="Bar"
-          :event-handlers="polarBarChart.chartHandlers"
-        ></chartist>
-      </div>
+        <div class="card w-100 ml-2 mr-1">
+            <div class="card-body">
+                <div class="d-flex justify-content-end mt-3 mb-4 legends">
+                    <i class="profit-circle"></i>
+                    <span class="mr-3">Profit</span>
+                    <i class="loss-circle"></i
+                    ><span class="mr-3 pr-3">Loss</span>
+                </div>
+                <b-skeleton
+                    v-if="!showGraph"
+                    animation="wave"
+                    width="100%"
+                    height="297px"
+                ></b-skeleton>
+                <div v-else>
+                    <highcharts
+                        :options="chartOptions"
+                        ref="lineCharts"
+                    ></highcharts>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 <script>
-import Stat from "../../widgets/stat";
-
+import { Chart } from "highcharts-vue";
+import _ from "lodash";
 import moment from "moment";
 import { eventBus } from "../../../app";
+import { displayCurrency } from "../../../utils";
+import { mapGetters } from "vuex";
 
 export default {
-  components: { Stat },
-  data() {
-    return {
-      compiledOrders: [],
-      dateDifference: 0,
-      subscriptionArray: [],
-      polarBarChart: {
-        data: {
-          labels: [],
-          series: [[]],
-        },
+    components: { highcharts: Chart },
+    data() {
+        return {
+            chartOptions: {
+                chart: {
+                    backgroundColor: "#2a3042",
+                    polar: false,
+                    type: "line",
+                    height: 300
+                },
+                title: {
+                    text: ""
+                },
+                legend: {
+                    enabled: false
+                },
+                xAxis: {
+                    type: "datetime",
+                    dateTimeLabelFormats: {
+                        week: "%e' %b"
+                    },
+                    tickInterval: 24 * 3600 * 1000 * 7,
+                    labels: {
+                        rotation: -45
+                    }
+                },
 
-        options: {
-          height: 300,
-          legend: {
-            position: "bottom",
-          },
-          plugins: [this.$chartist.plugins.tooltip({})],
-        },
+                yAxis: {
+                    gridLineColor: "#32394e",
 
-        chartHandlers: [
-          {
-            event: "draw",
-            fn(context) {
-              let red = "#ff0000";
+                    minPadding: 0,
+                    startOnTick: true,
+                    minRange: 100,
 
-              if (context.type === "bar") {
-                context.element._node.id = "tooltip-" + context.index;
+                    title: {
+                        text: "Profit"
+                    },
+                    labels: {
+                        style: {
+                            color: "#FFFFFF"
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: "Profit",
+                        color: "#34c38f",
+                        negativeColor: "#FF0000",
+                        data: [],
+                        type: "line"
+                    }
+                ],
 
-                if (context.value.y < 0) {
-                  context.element.attr({
-                    style: "stroke: " + red + "; fill: " + red + ";",
-                  });
+                tooltip: {
+                    formatter: function() {
+                        var formatStr =
+                            "<b class='tooltip-title'>Profit Analysis</b><hr /><br/>";
+
+                        for (var i = 0; i < this.points.length; i++) {
+                            var point = this.points[i];
+
+                            formatStr +=
+                                "<b>" +
+                                moment(point.x).format("LL") +
+                                "<br /><b>" +
+                                (point.y >= 0 ? "Profit" : "Loss") +
+                                ": " +
+                                displayCurrency(point.y) +
+                                "</b>";
+                        }
+                        return formatStr;
+                    },
+                    shared: true,
+                    opacity: 0.7,
+                    borderWidth: 1
                 }
-                // console.log(context);
-                context.element._node.addEventListener("mouseover", (event) => {
-                  //   event.target.id = "tooltip-" + context.index;
-                  //   console.log(event.target);
-
-                  eventBus.$emit("fireMethod", context.index);
-                });
-              }
             },
-          },
-        ],
-      },
-    };
-  },
-  methods: {
-    assignData(orders) {
-      if (this.ChartdateRange.length > 0) {
-        const dateDiff = this.ChartdateRange[1].diff(
-          this.ChartdateRange[0],
-          "days"
-        );
-        this.dateDifference = dateDiff;
-        if (dateDiff <= 6) {
-          const dates = [...Array(dateDiff + 1)].map((_, i) => {
-            const d = new Date(this.ChartdateRange[0]);
-            d.setDate(d.getDate() + i);
-            return moment(d).format("M/D/YY");
-          });
-          this.polarBarChart.data.labels = dates;
-          let dayArray = [];
-          const data_per_day = dates.map((day) => {
-            const sum = _.sumBy(this.chartData, (order) => {
-              if (moment(order.created_on_shopify).format("M/D/YY") === day) {
-                return parseFloat(order.total_price - order.cogs);
-              } else {
-                return 0;
-              }
+
+            showGraph: false,
+            stripeTransactionArray: [],
+            stripeTransactionStatus: false,
+
+            facebookTransactionArray: [],
+            facebookTransationStatus: false,
+
+            snapchatTransactionArray: [],
+            snapchatTransationStatus: false,
+
+            googleTransactionArray: [],
+            googleTransationStatus: false,
+
+            tiktokTransactionArray: [],
+            tiktokTransationStatus: false,
+
+            stripeChargebackArray: [],
+            stripeChargebackStatus: false,
+
+            subscriptionDataStatus: false,
+            subscriptionDataArray: [],
+
+            chartSeries: []
+        };
+    },
+    computed: {
+        ...mapGetters(["startDateS", "endDateS"])
+    },
+    created() {
+        //Stripe
+        eventBus.$on("stripeTransactionEvent", async stripeData => {
+            if (stripeData.length > 0) {
+                this.stripeTransationStatus = true;
+                this.stripeTransactionArray = stripeData;
+                this.assignData();
+            } else {
+                this.stripeTransationStatus = false;
+                this.assignData();
+            }
+        });
+        //Facebook
+        eventBus.$on("facebookTransactionEvent", facebookData => {
+            if (facebookData.length > 0) {
+                this.facebookTransationStatus = true;
+                this.facebookTransactionArray = facebookData;
+                this.assignData();
+            } else {
+                this.facebookTransationStatus = false;
+                this.assignData();
+            }
+        });
+        //Snapchat
+        eventBus.$on("snapchatTransactionEvent", snapchatData => {
+            if (snapchatData.length > 0) {
+                this.snapchatTransationStatus = true;
+                this.snapchatTransactionArray = snapchatData;
+                this.assignData();
+            } else {
+                this.snapchatTransationStatus = false;
+                this.assignData();
+            }
+        });
+
+        //Google
+        eventBus.$on("googleTransactionEvent", googleData => {
+            if (googleData.length > 0) {
+                this.googleTransationStatus = true;
+                this.googleTransactionArray = googleData;
+                this.assignData();
+            } else {
+                this.googleTransationStatus = false;
+                this.assignData();
+            }
+        });
+
+        //Tiktok
+        eventBus.$on("tiktokTransactionEvent", tiktokData => {
+            if (tiktokData.length > 0) {
+                this.tiktokTransationStatus = true;
+                this.tiktokTransactionArray = tiktokData;
+                this.assignData();
+            } else {
+                this.tiktokTransationStatus = false;
+                this.assignData();
+            }
+        });
+
+        //StripeChargeback
+        eventBus.$on("stripeChargebackEvent", stripeChargeback => {
+            if (stripeChargeback.length > 0) {
+                this.stripeChargebackStatus = true;
+                this.stripeChargebackArray = stripeChargeback;
+                this.assignData();
+            } else {
+                this.stripeChargebackStatus = false;
+                this.assignData();
+            }
+        });
+
+        //Subscription
+        eventBus.$on("subscriptionDataEvent", subscriptionData => {
+            if (subscriptionData.length > 0) {
+                this.subscriptionDataStatus = true;
+                this.subscriptionDataArray = subscriptionData;
+                this.assignData();
+            } else {
+                this.subscriptionDataStatus = false;
+                this.assignData();
+            }
+        });
+    },
+    methods: {
+        assignData(orders) {
+            this.showGraph = false;
+            const dates = this.getDaysBetweenDates(
+                moment(this.startDateS),
+                moment(this.endDateS)
+            );
+
+            let dayArray = [];
+            dates.map(day => {
+                const sum = _.sumBy(this.chartData, order => {
+                    if (
+                        moment(order.created_on_shopify).format(
+                            "YYYY-MM-DD"
+                        ) === day
+                    ) {
+                        return parseFloat(order.total_price - order.total_cost);
+                    } else {
+                        return 0;
+                    }
+                });
+                dayArray.push([Date.parse(day), sum]);
             });
-            dayArray.push(sum);
-          });
-          const final = dayArray.map((day) => parseFloat(day).toFixed(2));
-          this.polarBarChart.data.series = [final];
-        } else if (dateDiff <= 120 && dateDiff >= 7) {
-          var result = [];
-          if (this.ChartdateRange[1].isBefore(this.ChartdateRange[0])) {
-            console.log("End date must be greated than start date.");
-          }
-          let temp = this.ChartdateRange[0];
-          while (
-            moment(this.ChartdateRange[0]) <= moment(this.ChartdateRange[1])
-          ) {
-            result.push(this.ChartdateRange[0].format("M/D/YY"));
+            this.chartSeries = dayArray;
+            if (this.stripeTransationStatus) {
+                this.renderStripeData();
+            }
 
-            this.ChartdateRange[0] = this.ChartdateRange[0].add(1, "weeks");
-          }
-          this.ChartdateRange[0] = temp;
+            if (this.facebookTransationStatus) {
+                this.renderFacebookData();
+            }
+            if (this.snapchatTransationStatus) {
+                this.renderSnapchatData();
+            }
+            if (this.googleTransationStatus) {
+                this.renderGoogleData();
+            }
+            if (this.tiktokTransationStatus) {
+                this.renderTiktokData();
+            }
 
-          this.polarBarChart.data.labels = result;
+            if (this.stripeChargebackStatus) {
+                this.renderStripeChargeback();
+            }
 
-          let weekArray = [];
+            if (this.subscriptionDataStatus) {
+                this.renderSubscriptionData();
+            }
 
-          for (let [index, val] of result.entries()) {
-            const sum = _.sumBy(this.chartData, (order) => {
-              const orderDate = moment(order.created_on_shopify).format(
-                "M/D/YY"
-              );
+            const profitSeries = this.chartSeries.map(cs =>
+                parseFloat(cs[1]).toFixed(2)
+            );
 
-              if (
-                moment(orderDate).isBetween(
-                  result[index],
-                  result[index + 1],
-                  undefined,
-                  "[]"
-                )
-              ) {
-                return parseFloat(order.total_price - order.cogs);
-              } else {
-                return 0;
-              }
+            eventBus.$emit("profitSeriesData", profitSeries);
+            this.updateSeries();
+        },
+
+        getDaysBetweenDates(startDate, endDate) {
+            let now = startDate.clone(),
+                dates = [];
+
+            while (now.isSameOrBefore(endDate)) {
+                dates.push(now.format("YYYY-MM-DD"));
+                now.add(1, "days");
+            }
+            return dates;
+        },
+        renderStripeData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.stripeTransactionArray, stripeTrans =>
+                    moment(stripeTrans.available_on).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(stripeTrans.fee)
+                        : 0
+                );
             });
-            weekArray.push(sum);
-          }
-          //   const data_per_day = result.map((week) => {
-          //     const sum = _.sumBy(this.chartData, (order) => {
-          //       if (moment(order.created_on_shopify).format("M/D/YY") === week) {
-          //         return parseFloat(order.total_price - order.cogs);
-          //       } else {
-          //         return 0;
-          //       }
-          //     });
-          //     weekArray.push(sum);
-          //   });
-          const final = weekArray.map((day) => parseFloat(day).toFixed(2));
-          this.polarBarChart.data.series = [final];
-        } else {
-          const months = this.getMonths();
-          let monthDataArray = [];
-          const data_per_month = months.map((month) => {
-            const sum = _.sumBy(this.chartData, (order) => {
-              let googleSum = 0;
-              if (moment(order.created_on_shopify).format("MMM") === month) {
-                return parseFloat(order.total_price - order.cogs);
-              } else {
-                return 0;
-              }
+
+            this.updateSeries();
+        },
+        renderFacebookData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.facebookTransactionArray, facebookTrans =>
+                    moment(facebookTrans.date_start).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(facebookTrans.spend)
+                        : 0
+                );
             });
-            monthDataArray.push(sum);
-          });
-          const final = monthDataArray.map((month) =>
-            parseFloat(month).toFixed(2)
-          );
-          this.polarBarChart.data.series = [final];
+
+            this.updateSeries();
+        },
+        renderSnapchatData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.snapchatTransactionArray, snapchatTrans =>
+                    moment(snapchatTrans.start_time).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(snapchatTrans.stats.spend / 1000000)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+        renderGoogleData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.googleTransactionArray, googleTrans =>
+                    moment(googleTrans.segments.date).format("YYYY-MM-DD") ===
+                    moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(googleTrans.metrics.costMicros / 1000000)
+                        : 0
+                );
+            });
+
+            this.updateSeries();
+        },
+
+        renderTiktokData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.tiktokTransactionArray, tiktokTrans => {
+                    return moment(tiktokTrans.stat_datetime).format(
+                        "YYYY-MM-DD"
+                    ) === moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(tiktokTrans.stat_cost)
+                        : 0;
+                });
+            });
+
+            this.updateSeries();
+        },
+
+        renderStripeChargeback() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(
+                    this.stripeChargebackArray,
+                    stripeChargeback => {
+                        return moment(stripeChargeback.created * 1000).format(
+                            "YYYY-MM-DD"
+                        ) === moment(cs[0]).format("YYYY-MM-DD")
+                            ? parseFloat(stripeChargeback.amount / 100)
+                            : 0;
+                    }
+                );
+            });
+
+            this.updateSeries();
+        },
+
+        renderSubscriptionData() {
+            this.chartSeries.forEach(cs => {
+                cs[1] -= _.sumBy(this.subscriptionDataArray, sub => {
+                    return moment(sub.sub_date).format("YYYY-MM-DD") ===
+                        moment(cs[0]).format("YYYY-MM-DD")
+                        ? parseFloat(sub.amount)
+                        : 0;
+                });
+            });
+
+            this.updateSeries();
+        },
+
+        updateSeries() {
+            this.showGraph = false;
+            setTimeout(() => {
+                this.chartOptions.series[0].data = this.chartSeries;
+                this.showGraph = true;
+            }, 3000);
         }
-      }
     },
-    getMonths() {
-      const months = [...Array(Math.round(this.dateDifference / 30))].map(
-        (_, i) => {
-          const d = new Date(
-            moment(this.ChartdateRange[0]).format("MM-DD-YYYY")
-          );
-          // const d = moment(this.ChartdateRange[0]).format("DD-MM-YYYY");
-
-          d.setMonth(d.getMonth() + i);
-          return moment(d).format("MMM");
+    mounted() {},
+    props: {
+        chartData: {
+            type: Array,
+            default: () => []
         }
-      );
-      this.polarBarChart.data.labels = months;
-      return months;
     },
-  },
-  mounted() {},
-  props: {
-    chartData: {
-      type: Array,
-      default: () => [],
-    },
-    ChartdateRange: {
-      type: Array,
-      default: () => [],
-    },
-    fbSpend: {
-      type: Array,
-      default: () => [],
-    },
-    googleData: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  watch: {
-    chartData(value, newValue) {
-      this.assignData(this.chartData);
-    },
-  },
+    watch: {
+        chartData(value, newValue) {
+            this.assignData(this.chartData);
+        }
+    }
 };
 </script>
 
-
-
 <style lang="scss">
+.highcharts-credits {
+    color: #2a3042 !important;
+    fill: #2a3042 !important;
+}
 .legends {
-  height: 8px;
+    height: 8px;
 }
 .profit-circle {
-  background: #3ec38f;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-right: 6px;
-  margin-top: 3px;
+    background: #3ec38f;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
 }
 .loss-circle {
-  background: #df1e1e;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  margin-right: 6px;
-  margin-top: 3px;
+    background: #df1e1e;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
 }
-.chartist-tooltip {
-  position: absolute;
-  display: none;
-  min-width: 5em;
-  padding: 8px 10px;
-  background: #383838;
-  color: #fff;
-  text-align: center;
-  pointer-events: none;
-  z-index: 100;
-  transition: opacity 0.2s linear;
+.tooltip-title {
+    text-decoration: underline;
 }
-
-.chartist-tooltip:before {
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  pointer-events: none;
-  border-color: rgba(251, 249, 228, 0);
-  border-top-color: #383838;
-  border-width: 7px;
-  margin-left: -8px;
-}
-
-.chartist-tooltip.tooltip-show {
-  display: inline-block !important;
-}
-
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-
-  .tooltip-inner {
-    background: black;
-    color: white;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-  }
-
-  .tooltip-arrow {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    position: absolute;
-    margin: 5px;
-    border-color: black;
-  }
-
-  &[x-placement^="top"] {
-    margin-bottom: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 0 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      bottom: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="bottom"] {
-    margin-top: 5px;
-
-    .tooltip-arrow {
-      border-width: 0 5px 5px 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-top-color: transparent !important;
-      top: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="right"] {
-    margin-left: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 5px 0;
-      border-left-color: transparent !important;
-      border-top-color: transparent !important;
-      border-bottom-color: transparent !important;
-      left: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[x-placement^="left"] {
-    margin-right: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 0 5px 5px;
-      border-top-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      right: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[aria-hidden="true"] {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s, visibility 0.15s;
-  }
-
-  &[aria-hidden="false"] {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
+.highcharts-tooltip {
 }
 </style>
-

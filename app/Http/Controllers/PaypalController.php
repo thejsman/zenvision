@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\CustomRequests;
 use App\Paypal;
 use Auth;
+use Carbon\Carbon as Time;
+use Illuminate\Http\Request;
 
 class PaypalController extends Controller
 {
@@ -18,18 +18,21 @@ class PaypalController extends Controller
 
     public function store(Request $request)
     {
+
         $params = $request->query();
         $code = $params['code'];
+        $state = $params['state'];
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/oauth2/token');
+        curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'oauth2/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $code);
 
         $headers = array();
-        $headers[] = 'Authorization: Basic QWRaSXQ1MGk1aUFWVDVWNjg4eUdtZ20tWkhBeUx5bmNZME5sSVBXOVk0emtRT2ZzYkoybTQtN0JKYTdVNkVlR2l2QjA5WG51LTV4TGpzMko6RUotLXFaWHV6dlVJZ05UdDkzZXlKYUoyY2QxYloyZXhqMUZabGNOS21idjhnODVuYkR3XzdiR0dSMVRvUVRhTTNRMFptdnF4RzBDYTlacHM=';
+        $headers[] = 'Authorization: Basic ' . env('PAYPAL_BASE64_CODE');
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
@@ -37,21 +40,30 @@ class PaypalController extends Controller
         $response = json_decode($result, true);
 
         $access_token = $response['access_token'];
-        $refresh_token  = $response['refresh_token'];
-
-
+        $refresh_token = $response['refresh_token'];
+        $expires_in = $response['expires_in'];
+        $paypal_account_name = $this->getPaypalAccountInfo($access_token);
         $ppData = [];
         $ppData['user_id'] = Auth::user()->id;
-        $ppData['access_token']  = $access_token;
-        $ppData['refresh_token']  = $refresh_token;
+        $ppData['access_token'] = $access_token;
+        $ppData['refresh_token'] = $refresh_token;
+        $ppData['expires_at'] = date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
+        $ppData['name'] = $paypal_account_name;
+        $ppData['isDeleted'] = false;
+        $ppData['enabled_on_dashboard'] = true;
 
-        $result2 =  Paypal::updateOrCreate(['user_id' => Auth::user()->id], $ppData);
+        Paypal::updateOrCreate(['user_id' => Auth::user()->id, 'name' => $paypal_account_name], $ppData);
 
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
-        return redirect('/');
+        if (strpos($state, 'mastersheet') !== false) {
+
+            return redirect('/mastersheet');
+        } else {
+            return redirect('/');
+        }
     }
 
     public function toogleAccount(Request $request)
@@ -67,31 +79,131 @@ class PaypalController extends Controller
         $account->save();
     }
 
-    public function getPaypalTransactions()
+    public function getPaypalTransactions(Request $request)
+    {
+
+        $user = Auth::user();
+        $paypalAccounts = $user->getPaypalAccountConnectIds();
+
+        if ($paypalAccounts->count()) {
+            foreach ($paypalAccounts as $account) {
+                if (Time::now() > $account->expires_at) {
+                    // generate new access token from refresh token
+                    $this->getAccessToken($account);
+                }
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'reporting/transactions?start_date=' . $request->s_date . '&end_date=' . $request->e_date . '&fields=transaction_info');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $headers = array();
+                $headers[] = 'Content-Type: application/json';
+                $headers[] = 'Authorization: Bearer ' . $account->access_token;
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+                if (array_key_exists('transaction_details', $response)) {
+                    return $response['transaction_details'];
+                } else {
+                    return [];
+                }
+            }
+        }
+    }
+
+    public function getPaypalDisputes(Request $request)
+    {
+
+        $user = Auth::user();
+        $paypalAccounts = $user->getPaypalAccountConnectIds();
+
+        if ($paypalAccounts->count()) {
+            foreach ($paypalAccounts as $account) {
+                if (Time::now() > $account->expires_at) {
+                    // generate new access token from refresh token
+                    $this->getAccessToken($account);
+                }
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'customer/disputes/?start_date=' . $request->s_date . '&end_date=' . $request->e_date);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $headers = array();
+                $headers[] = 'Content-Type: application/json';
+                $headers[] = 'Authorization: Bearer ' . $account->access_token;
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+                return $response;
+            }
+        }
+    }
+    public function getAccessToken($account)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => env('PAYPAL_API_URL') . "identity/openidconnect/tokenservice",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "grant_type=refresh_token&refresh_token=" . $account->refresh_token,
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Basic " . env('PAYPAL_BASE64_CODE'),
+                "content-type: application/x-www-form-urlencoded",
+            ),
+        ));
+
+        $result = curl_exec($curl);
+        $response = json_decode($result, true);
+        $access_token = $response['access_token'];
+        $expires_in = $response['expires_in'];
+
+        $ppData = [];
+        $ppData['user_id'] = Auth::user()->id;
+        $ppData['access_token'] = $access_token;
+
+        $ppData['expires_at'] = date('Y/m/d H:i:s', Time::now()->timestamp + $expires_in);
+        Paypal::updateOrCreate(['user_id' => Auth::user()->id], $ppData);
+
+        $err = curl_error($curl);
+
+        curl_close($curl);
+    }
+
+    public function getPaypalAccountInfo($access_token)
     {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2020-12-01T00:00:00-0700&end_date=2020-12-30T23:59:59-0700&fields=transaction_info');
+        curl_setopt($ch, CURLOPT_URL, env('PAYPAL_API_URL') . 'identity/oauth2/userinfo?schema=paypalv1.1');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $headers = array();
         $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Authorization: Bearer A23AAIDatwQvYPQ2r0IMtaMDNy6Lk7KBEoWWqh15yB_fYWJy7-gh8YSs3lDQlAk2-sWXxxHf0vdyKVZ9rLU59wivMvcIkwBZQ';
+        $headers[] = 'Authorization: Bearer ' . $access_token;
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
-
         curl_close($ch);
         $response = json_decode($result, true);
-        if (array_key_exists('transaction_details', $response)) {
-            return $response['transaction_details'];
+
+        if (count($response)) {
+            return $response['name'];
         } else {
-            return [];
+            return null;
         }
     }
 }

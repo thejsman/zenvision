@@ -1,0 +1,690 @@
+@charset "UTF-8";
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    text-align: left;
+    background-color: #222736;
+}
+
+b,
+strong {
+    font-weight: 700;
+}
+
+.card-login {
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: 45px;
+    padding: 0.47rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    background-color: #2e3548;
+    background-clip: padding-box;
+    border: 1px solid #32394e;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: 0.3s;
+}
+
+.form-control:hover {
+    background-color: #333c4e;
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #34c38f;
+    border-color: #34c38f;
+    padding: 13px 23px 13px 23px;
+    transition: 0.3s;
+}
+
+.custom-control {
+    position: relative;
+    display: block;
+    min-height: 1.21875rem;
+    padding-left: 1.5rem;
+}
+
+.forgot-password {
+    transition: 0.3s;
+}
+
+.forgot-password:hover {
+    opacity: 0.5;
+}
+
+.text-primary {
+    color: #f77062;
+    transition: 0.3s;
+}
+
+a.text-primary:hover,
+a.text-primary:focus {
+    color: #be5348;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+    border-radius: 10px;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #2a3042;
+    background-clip: border-box;
+    border: 0 solid #32394e;
+    border-radius: 10px;
+}
+
+.mini-stats-wid {
+    border-radius: 10px;
+}
+
+.profit-card {
+    background: #2f3863;
+    border-radius: 10px;
+}
+
+.pa-chart {
+    width: 100%;
+    height: 377px;
+    background-color: #2a3042;
+}
+
+.logo {
+    line-height: 70px;
+    transition: 0.3s;
+}
+
+.logo:hover {
+    opacity: 0.5;
+}
+
+.bx-cog {
+    transition: 0.3s;
+}
+
+.bx-cog:hover {
+    opacity: 0.5;
+}
+
+.dropdown-menu.show {
+    transition: 0.3s;
+    box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.navbar-header .dropdown.show .header-item {
+    background-color: transparent;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.35rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #bfc8e2;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    transition: 0.3s;
+}
+
+.reportrange-text[data-v-267f4ee2] {
+    background: #2a3043 !important;
+    cursor: pointer;
+    border: 0px !important;
+    width: 100%;
+    background: #2a3142;
+    padding: 12px 20px 12px 20px !important;
+    transition: 0.3s;
+    border-radius: 7px;
+}
+
+.reportrange-text[data-v-267f4ee2]:hover {
+    opacity: 0.7;
+}
+
+.mr-2,
+.mx-2 {
+    margin-top: 13px;
+    margin-right: 15px;
+}
+
+td[data-v-aab6e828],
+th[data-v-aab6e828] {
+    padding: 5px;
+    background-color: #2a3142;
+}
+
+.daterangepicker .calendar-table {
+    border: 1px solid #2a3142 !important;
+    border-radius: 4px;
+    background-color: #2a3142 !important;
+}
+
+.daterangepicker td.in-range {
+    background-color: #fa836f !important;
+    border-color: transparent;
+    color: #ffffff !important;
+    border-radius: 0;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+    background-color: #d8634f !important;
+    border-color: transparent;
+    color: #fff;
+}
+
+td[data-v-aab6e828],
+th[data-v-aab6e828] {
+    background-color: #2a3242 !important;
+}
+
+.vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
+    padding: 15px;
+    background: #2a3142 !important;
+    padding: 0;
+    border: 0px;
+    box-shadow: 0 12px 70px 0 rgba(0, 0, 0, 0.5);
+}
+
+.fa-calendar:before {
+    content: "\F133";
+    margin-right: 7px;
+}
+
+.daterangepicker .drp-buttons {
+    clear: both;
+    text-align: right;
+    padding: 10px;
+    border-top: 0px;
+    line-height: 12px;
+    vertical-align: middle;
+}
+
+.daterangepicker .drp-selected {
+    display: inline-block;
+    font-size: 12px;
+    padding-right: 15px;
+}
+
+.vue-daterange-picker .dropdown-menu[data-v-267f4ee2] {
+    padding: 0;
+    border-radius: 10px;
+}
+
+.daterangepicker.opensleft:before {
+    right: 9px;
+    visibility: hidden;
+}
+
+.daterangepicker.opensleft:after {
+    right: 10px;
+    visibility: hidden;
+}
+
+.daterangepicker.opensleft[data-v-267f4ee2] {
+    right: 0px;
+    left: auto;
+    margin-top: 20px;
+}
+
+.daterangepicker .drp-buttons .btn {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: 0.3s;
+    padding: 14px 25px !important;
+}
+
+.daterangepicker .drp-buttons .btn:hover {
+    opacity: 0.7;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #556ee7;
+    border-color: #556ee7;
+    padding: 12px 17px 12px 17px;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #556ee6;
+    border-color: none;
+    transform: scale(1.04);
+}
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #556ee6;
+    border-color: #556ee6;
+}
+
+.channel-icons {
+    margin-right: 10px;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    clear: both;
+    font-weight: 400;
+    color: #bfc8e2;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    transition: 0.3s;
+    padding: 13px 30px 10px 24px;
+}
+
+.modal-body {
+    position: relative;
+    flex: 1 1 auto;
+    padding: 40px 60px 40px 60px;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #2a3042;
+    background-clip: padding-box;
+    border: 1px solid #32394e;
+    border-radius: 15px;
+    outline: 0;
+}
+
+.shopify-icon {
+    margin-right: 15px;
+    margin-top: -10px;
+}
+
+.text100 {
+    font-weight: 100;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.font-size-10 {
+    font-size: 13px;
+    color: #fff;
+    text-decoration: underline;
+    transition: 0.3s;
+}
+
+.font-size-10:hover {
+    opacity: 0.5;
+    color: #fff;
+}
+
+.btn-cancel {
+    color: #fff !important;
+    background-color: #32394f;
+    padding: 13px 23px 13px 23px;
+    transition: 0.3s;
+}
+
+.btn-cancel:hover {
+    opacity: 0.5;
+}
+
+.underlined {
+    text-decoration: underline;
+    transition: 0.3s;
+}
+
+.underlined:hover {
+    opacity: 0.5;
+}
+
+.btn-link {
+    font-weight: 400;
+    color: #556ee6;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-link:hover {
+    opacity: 0.5;
+}
+
+.b-calendar .b-calendar-grid-body .col[data-date] .btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    line-height: 1;
+    margin: 3px auto;
+    padding: 9px 0;
+}
+
+.btn-success:focus,
+.btn-success.focus {
+    box-shadow: 0 0 0 0rem rgba(82, 204, 160, 0);
+}
+
+.btn-green {
+    color: #fff;
+    background-color: #34c48f;
+    border-color: #34c48f;
+    padding: 12px 17px 12px 17px;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.btn-green:hover {
+    opacity: 0.7;
+    color: #fff;
+}
+
+.btn-secondary {
+    color: #f8f9fa;
+    background-color: #c3cbe4;
+    border-color: #4b5676;
+}
+
+.btn-cancel {
+    color: #ffffff;
+    background-color: #4b5676;
+    padding: 13px 23px 13px 23px;
+    transition: 0.3s;
+    margin-left: 6px;
+}
+
+.btn-secondary:hover {
+    color: #ffffff;
+    background-color: #4b5676;
+    border-color: #4b5676;
+    opacity: 0.7;
+}
+
+.btn-link:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.subscription-header {
+    margin-bottom: -15px;
+}
+
+.custom-select {
+    display: inline-block;
+    width: 100%;
+    height: calc(1.5em + 0.94rem + 2px);
+    padding: 0.47rem 1.75rem 0.47rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    height: 45px;
+    color: #fff;
+    vertical-align: middle;
+    background: #2e3548;
+    border: 1px solid #32394e;
+    border-radius: 0.25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.custom-select:hover {
+    background: #333c4e;
+}
+
+.btn-group > .btn,
+.btn-group-vertical > .btn {
+    position: relative;
+    flex: 1 1 auto;
+    color: #fff;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 0px solid #32394e;
+    color: #fff;
+    padding: 10px 0px 10px 29px;
+}
+
+.table .thead-dark th {
+    color: #fff;
+    background-color: #32394e;
+    border: 0px solid #fff;
+    padding: 25px 17px 21px 28px;
+}
+
+.border-primary {
+    border: 2px #556ee6 solid !important;
+    cursor: pointer;
+}
+
+.apex-charts {
+    min-height: 10px;
+    cursor: crosshair;
+}
+
+.text-warning {
+    color: #f1b44c;
+    font-size: 17px;
+}
+
+.cogscard {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cogscard:hover {
+    transform: scale(1.04);
+    box-shadow: 0 2px 34px 0 rgba(0, 0, 0, 0.19);
+}
+
+.badge-primary {
+    color: #fff;
+    background-color: #556ee6;
+    font-size: 13px;
+}
+
+.actionbutton .btn {
+    font-size: 27px;
+    display: flex;
+    margin-bottom: 14px;
+}
+
+.actionBtn {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.table-hover tbody tr:hover {
+    color: #a6b0cf;
+    background-color: #222736;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    color: #e9ecef;
+    text-decoration: none;
+    background-color: #3c445c;
+}
+
+.btn:focus,
+.btn.focus {
+    outline: 0;
+    box-shadow: 0 0 0 0rem rgba(85, 110, 230, 0);
+}
+
+.custom-select:focus {
+    border-color: #363e54;
+    outline: 0;
+    box-shadow: 0 0 0 0rem rgba(85, 110, 230, 0);
+}
+
+.btn-link:focus,
+.btn-link.focus {
+    text-decoration: none;
+    box-shadow: none;
+}
+
+:focus {
+    outline: -webkit-focus-ring-color auto 0px;
+}
+
+.ct-chart {
+    max-height: 300px;
+    cursor: crosshair;
+}
+
+.emptyInput {
+    border: 2px solid #e78d55;
+    border-radius: 5px;
+}
+
+.tablecogs {
+    padding: 25px 0px 25px 30px;
+    background-color: red;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px #c8c8c8 !important;
+    border-radius: 0px !important;
+    background-color: #32394e !important;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #556de6 !important;
+    -webkit-box-shadow: inset 0 0 0px rgba(90, 90, 90, 0.7);
+}
+
+.app-search span {
+    line-height: 40px;
+}
+
+.app-search span {
+    position: absolute;
+    z-index: 10;
+    font-size: 13px;
+    line-height: 38px;
+    left: 14px;
+    top: 0;
+    color: #c3cbe4;
+}
+
+.alert-danger {
+    color: #ffffff;
+    background-color: #e78c54;
+    border-color: #e78c54;
+}
+
+.header-key-perf {
+    padding-top: 22px;
+}
+
+.loss-circle {
+    background: #e75555;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
+}
+
+.profit-circle {
+    background: #34c48f;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    margin-top: 3px;
+}
+
+::-webkit-input-placeholder {
+    color: #ffffff7d;
+}
+
+::-moz-placeholder {
+    color: #ffffff7d;
+}
+
+:-ms-input-placeholder {
+    color: #ffffff7d;
+}
+
+::-ms-input-placeholder {
+    color: #ffffff7d;
+}
+
+::placeholder {
+    color: #ffffff7d;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.b-table-sticky-header {
+    overflow-y: auto;
+    max-height: 300px;
+    border-radius: 10px;
+}
+
+.custom-control-label {
+    position: relative;
+    margin-bottom: 0;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+@-moz-document url-prefix() {
+    /* Disable scrollbar Firefox */
+    html {
+        scrollbar-width: none;
+    }
+}
+body {
+    scrollbar-width: none;
+    /* Disable scrollbar Firefox */
+    -ms-overflow-style: none;
+    /* Disable scrollbar IE 10+ */
+    overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
