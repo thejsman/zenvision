@@ -250,11 +250,9 @@ export default {
                 this.data[objIndex].loading = true;
                 this.data[objIndexCB].loading = true;
             } else {
-                const objIndex = this.data.findIndex(obj => obj.id === 5);
-                const objIndexCB = this.data.findIndex(obj => obj.id === 4);
-
-                this.data[objIndex].loading = false;
-                this.data[objIndexCB].loading = false;
+                this.getStripeTransactions();
+                this.getChargebackTotal();
+                // window.location.href = "/";
             }
         }
     },
@@ -323,35 +321,39 @@ export default {
                 updateAdData(this.data, "GOOGLE", displayCurrency("-"));
             }
         });
-
+        eventBus.$on("triggerStripeCheck", recordId => {
+            this.firstLoadStripe = true;
+            this.checkStripeReportStatus(recordId);
+        });
         eventBus.$on("hasStripeAccount", status => {
-            this.hasStripeAccount = status;
-            this.stripeChargebacks = 0;
-            this.stripeFeeTotal = 0;
-            setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-            if (status && !this.firstLoadStripe) {
-                console.log("firstLoadStripe 2");
-                this.getStripeTransactions();
-                this.getChargebackTotal();
-            } else {
+            setTimeout(() => {
+                this.hasStripeAccount = status;
+                this.stripeChargebacks = 0;
                 this.stripeFeeTotal = 0;
-                this.stripeChargebackTotal = 0;
-                console.log("called 1");
-                if (!this.firstLoadStripe) {
-                    updateDataMerchantFee(
-                        this.data,
-                        MERCHANT_FEE,
-                        displayCurrency(this.totalMerchantFees)
-                    );
-                    eventBus.$emit("stripeTransactionEvent", []);
-                    eventBus.$emit("stripeChargebackEvent", []);
-                    updateDataMerchantFee(
-                        this.data,
-                        CHARGEBACKS_TOTAL,
-                        displayCurrency(this.totalChargeback)
-                    );
+                setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
+                if (status && !this.firstLoadStripe) {
+                    this.getStripeTransactions();
+                    this.getChargebackTotal();
+                } else {
+                    this.stripeFeeTotal = 0;
+                    this.stripeChargebackTotal = 0;
+
+                    if (!this.firstLoadStripe) {
+                        updateDataMerchantFee(
+                            this.data,
+                            MERCHANT_FEE,
+                            displayCurrency(this.totalMerchantFees)
+                        );
+                        eventBus.$emit("stripeTransactionEvent", []);
+                        eventBus.$emit("stripeChargebackEvent", []);
+                        updateDataMerchantFee(
+                            this.data,
+                            CHARGEBACKS_TOTAL,
+                            displayCurrency(this.totalChargeback)
+                        );
+                    }
                 }
-            }
+            }, 1000);
         });
 
         eventBus.$on("hasPaypalAccount", status => {
@@ -360,11 +362,6 @@ export default {
         eventBus.$on("hasShopifyAccount", status => {
             this.hasShopifyAccount = status;
             // this.assignData(this.refundTotal, this.costData);
-        });
-        eventBus.$on("triggerStripeCheck", recordId => {
-            this.firstLoadStripe = true;
-            this.checkStripeReportStatus(recordId);
-            console.log("Stripe check started ", recordId);
         });
     },
     methods: {
@@ -377,7 +374,7 @@ export default {
                 });
 
                 const { report_status } = result.data;
-                console.log({ report_status });
+
                 if (report_status) {
                     this.firstLoadStripe = false;
                     clearInterval(this.timer);
@@ -703,11 +700,9 @@ export default {
             }
 
             if (this.hasStripeAccount && !this.firstLoadStripe) {
-                console.log("firstLoadStripe 1");
                 await this.getStripeTransactions();
             }
             setTimeout(() => {
-                console.log("Called 2");
                 updateData(
                     this.data,
                     MERCHANT_FEE,
@@ -720,7 +715,7 @@ export default {
             }, 500);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
-            paypalFeeTotal = 0;
+            this.paypalFeeTotal = 0;
             const dates = getDatesBetweenDates(s_date, e_date);
             dates.forEach(async date => {
                 const paypalResult = await axios.get("paypaltransactions", {
@@ -754,7 +749,7 @@ export default {
                     });
                 }
             });
-            console.log("Called 3");
+
             updateDataMerchantFee(
                 this.data,
                 MERCHANT_FEE,
@@ -853,14 +848,13 @@ export default {
                             this.stripeFeeTotal += parseFloat(sTransaction.fee);
                         });
                     }
-                    console.log("Called 4");
+
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
                         displayCurrency(this.totalMerchantFees)
                     );
                 } catch (err) {
-                    console.log("Called 5");
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
@@ -868,7 +862,6 @@ export default {
                     );
                 }
             } else {
-                console.log("Called 6");
                 this.stripeFeeTotal = 0;
                 updateDataMerchantFee(
                     this.data,

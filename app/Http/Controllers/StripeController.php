@@ -51,6 +51,7 @@ class StripeController extends Controller
             $stripeData['name'] = $account_name;
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
+            $stripeData['report_status'] = false;
 
             $object = StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
 
