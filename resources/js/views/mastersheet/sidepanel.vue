@@ -90,12 +90,18 @@ export default {
                 this.getStripeTransactions();
                 this.getBankAccountBalance();
             }, 1000);
-        }),
-            eventBus.$on("toggleShopifyStore", () => {
+        });
+        eventBus.$on("toggleShopifyStore", () => {
+            this.totalCash = 0;
+            setTimeout(() => {
                 setLoading(this.statData);
                 setLoading(this.netEquityData);
                 this.getMastersheetData();
-            });
+                this.getStripeBalance();
+                this.getStripeTransactions();
+                this.getBankAccountBalance();
+            }, 1000);
+        });
         this.getMastersheetData();
         this.getStripeBalance();
         this.getStripeTransactions();
