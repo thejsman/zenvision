@@ -115,6 +115,14 @@
                                         width="30"
                                         class="channel-icons ml-3"
                                     />
+                                    <img
+                                        v-if="item.type === 'bank'"
+                                        src="/images/bank-icons/Citibank.svg"
+                                        alt
+                                        height="30"
+                                        width="30"
+                                        class="channel-icons ml-3 bg-white rounded"
+                                    />
 
                                     <div
                                         class="d-flex justify-content-between flex-fill align-items-center"
@@ -256,7 +264,16 @@ export default {
                 return [];
             }
         },
-
+        async getBankAccountTransactions() {
+            try {
+                const result = await axios.get("bankaccount-transactions");
+                const data = result.data;
+                return data;
+            } catch (err) {
+                console.log(err);
+                return [];
+            }
+        },
         async getTransactions() {
             this.loading = true;
             // const paypal = await this.getPaypalTransactions();
@@ -303,6 +320,21 @@ export default {
                 );
             }
 
+            const bankTransactions = await this.getBankAccountTransactions();
+            console.log({ bankTransactions });
+            if (bankTransactions.length > 0) {
+                this.noTransactions = false;
+                bankTransactions.forEach(bt =>
+                    this.allTransactions.push({
+                        type: "bank",
+                        id: bt.id,
+                        date: moment(bt.date).format("LL"),
+                        description: bt.description,
+                        amount: displayCurrency(Math.abs(bt.amount))
+                    })
+                );
+            }
+
             //Group all transaction by date
             var groups = _.groupBy(this.allTransactions, function(transaction) {
                 return transaction.date;
@@ -318,6 +350,7 @@ export default {
                 .reverse();
 
             this.items = ordered;
+            console.log({ ordered });
             this.loading = false;
         },
         async loadMore() {
