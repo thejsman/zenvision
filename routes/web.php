@@ -72,6 +72,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('bankaccount', 'BankAccountController@store');
     Route::get('bankaccounts', 'BankAccountController@getBankAccounts');
     Route::patch('bankaccountdelete', 'BankAccountController@destroy');
+    Route::get('bankaccount-balance', 'BankAccountController@getAccountBalance');
 
     // Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
 
