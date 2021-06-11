@@ -193,7 +193,7 @@ export default {
 
                 const yesterdaysData = dailyEquityArray.find(
                     e =>
-                        moment(e.created_at).format("MM-DD-YYYY") ===
+                        moment.utc(e.created_at).format("MM-DD-YYYY") ===
                         this.yesterday
                 );
                 const graphData = this.lastSevenDaysArray.map(day => {
@@ -208,15 +208,26 @@ export default {
                         return 0;
                     }
                 });
-                console.log({ graphData });
+
                 this.netEquityArray = graphData;
-                updateGraphData(
-                    this.statData,
-                    YESTERDAYS_NET_EQUITY_FLUCTUATION,
-                    displayCurrency(yesterdaysData.net_equity),
-                    graphData
-                );
-                this.yesterDaysNetEquityTotal = yesterdaysData.net_equity;
+
+                if (yesterdaysData !== undefined) {
+                    updateGraphData(
+                        this.statData,
+                        YESTERDAYS_NET_EQUITY_FLUCTUATION,
+                        displayCurrency(yesterdaysData.net_equity),
+                        graphData
+                    );
+                    this.yesterDaysNetEquityTotal = yesterdaysData.net_equity;
+                } else {
+                    updateGraphData(
+                        this.statData,
+                        YESTERDAYS_NET_EQUITY_FLUCTUATION,
+                        displayCurrency(0),
+                        graphData
+                    );
+                    this.yesterDaysNetEquityTotal = 0;
+                }
             } catch (error) {
                 console.log(error);
                 updateGraphData(
