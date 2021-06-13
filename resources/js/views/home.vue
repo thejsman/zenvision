@@ -99,7 +99,12 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["ShopifyOrders", "startDateS", "endDateS"])
+        ...mapGetters([
+            "shopifyStores",
+            "startDateS",
+            "endDateS",
+            "shopifyOrders"
+        ])
     },
     created() {
         if (new URL(location.href).searchParams.get("listSnapchatAccount")) {
@@ -134,7 +139,7 @@ export default {
         });
     },
     methods: {
-        ...mapActions(["getShopifyStoreOrders"]),
+        ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
 
         showModal(modalId) {
             this.$bvModal.show(modalId);
@@ -143,6 +148,11 @@ export default {
             window.location.href = "/";
         },
         async getShopifyStoreData() {
+            await this.getShopifyStores();
+            await this.getShopifyStoreOrders();
+            console.log("This if from store: ", this.shopifyStores);
+
+            console.log("This if from orders: ", this.shopifyOrders);
             try {
                 const orders = await this.getShopifyStoreOrders();
                 //assign values

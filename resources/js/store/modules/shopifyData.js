@@ -1,12 +1,25 @@
 import axios from "axios";
 
 const state = {
+    shopifyStores: [],
     orders: []
 };
 const getters = {
-    ShopifyOrders: state => state.orders
+    shopifyOrders: state => state.orders,
+    shopifyStores: state => state.shopifyStores
 };
 const actions = {
+    getShopifyStores: async ({ commit, rootState }) => {
+        try {
+            const result = await axios.get("/user/stores");
+            const data = result.data;
+
+            commit("SHOPIFY_STORES", data);
+        } catch (err) {
+            commit("SHOPIFY_STORES", []);
+            console.log(err);
+        }
+    },
     getShopifyStoreOrders: async ({ commit, rootState }) => {
         try {
             const response = await axios.get("shopify-orders", {
@@ -16,8 +29,7 @@ const actions = {
                 }
             });
 
-            commit("setShopifyStoreOrders", response.data);
-            return response.data;
+            commit("SHOPIFY_ORDERS", response.data);
         } catch (err) {
             console.log(err);
             commit("setShopifyStoreOrders", []);
@@ -25,8 +37,19 @@ const actions = {
     }
 };
 const mutations = {
-    setShopifyStoreOrders: (state, payload) => {
-        state.orders = payload.orders;
+    SHOPIFY_STORES: (state, payload) => {
+        if (payload.length > 0) {
+            state.shopifyStores = payload;
+        } else {
+            state.shopifyStores = [];
+        }
+    },
+    SHOPIFY_ORDERS: (state, payload) => {
+        if (payload.length > 0) {
+            state.orders = payload;
+        } else {
+            state.orders = [];
+        }
     }
 };
 
