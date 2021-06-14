@@ -25,12 +25,23 @@ class ShopifyStore extends Model
     public function getOrders($start_date, $end_date)
     {
         $orders = $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->whereBetween('created_on_shopify', [$start_date, $end_date])->get();
-        // created_on_shopify
+
         foreach ($orders as $order) {
             $order['total_cost'] = $order->getCogs();
         }
         return $orders;
     }
+
+    public function getAllOrders()
+    {
+        $orders = $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->get();
+
+        foreach ($orders as $order) {
+            $order['total_cost'] = $order->getCogs();
+        }
+        return $orders;
+    }
+
     public function getStoreDetails()
     {
         return [
