@@ -154,7 +154,6 @@
 import axios from "axios";
 import { displayCurrency } from "../../utils";
 import moment from "moment";
-import { BIconArrowsAngleContract } from "bootstrap-vue";
 import { eventBus } from "../../app";
 export default {
     props: {
@@ -209,6 +208,8 @@ export default {
             items: [],
             allTransactions: [],
             noTransactions: true,
+            bankTransactionsLoaded: true,
+            bankTransactionsArray: [],
             chips: [
                 "Shopify",
                 "Facebook",
@@ -320,19 +321,65 @@ export default {
                 );
             }
 
-            const bankTransactions = await this.getBankAccountTransactions();
-            console.log({ bankTransactions });
-            if (bankTransactions.length > 0) {
-                this.noTransactions = false;
-                bankTransactions.forEach(bt =>
-                    this.allTransactions.push({
-                        type: "bank",
-                        id: bt.id,
-                        date: moment(bt.date).format("LL"),
-                        description: bt.description,
-                        amount: displayCurrency(Math.abs(bt.amount))
-                    })
-                );
+            if (this.bankTransactionsLoaded) {
+                console.log("Bank transactions started");
+                const bankTransactions = await this.getBankAccountTransactions();
+
+                if (bankTransactions.length > 0) {
+                    this.noTransactions = false;
+                    this.bankTransactionsArray = [...bankTransactions];
+                    const arrayLenght = this.bankTransactionsArray.length;
+                    if (arrayLenght > 10) {
+                        const tempArray = this.bankTransactionsArray.splice(
+                            0,
+                            10
+                        );
+                        tempArray.forEach(bt =>
+                            this.allTransactions.push({
+                                type: "bank",
+                                id: bt.id,
+                                date: moment(bt.date).format("LL"),
+                                description: bt.description,
+                                amount: displayCurrency(Math.abs(bt.amount))
+                            })
+                        );
+                    } else {
+                        this.bankTransactionsArray.forEach(bt =>
+                            this.allTransactions.push({
+                                type: "bank",
+                                id: bt.id,
+                                date: moment(bt.date).format("LL"),
+                                description: bt.description,
+                                amount: displayCurrency(Math.abs(bt.amount))
+                            })
+                        );
+                    }
+                }
+                this.bankTransactionsLoaded = false;
+            } else {
+                const arrayLenght = this.bankTransactionsArray.length;
+                if (arrayLenght > 10) {
+                    const tempArray = this.bankTransactionsArray.splice(0, 10);
+                    tempArray.forEach(bt =>
+                        this.allTransactions.push({
+                            type: "bank",
+                            id: bt.id,
+                            date: moment(bt.date).format("LL"),
+                            description: bt.description,
+                            amount: displayCurrency(Math.abs(bt.amount))
+                        })
+                    );
+                } else {
+                    this.bankTransactionsArray.forEach(bt =>
+                        this.allTransactions.push({
+                            type: "bank",
+                            id: bt.id,
+                            date: moment(bt.date).format("LL"),
+                            description: bt.description,
+                            amount: displayCurrency(Math.abs(bt.amount))
+                        })
+                    );
+                }
             }
 
             //Group all transaction by date

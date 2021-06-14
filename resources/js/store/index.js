@@ -4,6 +4,7 @@ import shopifyData from "./modules/shopifyData";
 import dateRange from "./modules/dateRange";
 import channelStatus from "./modules/channelStatus";
 import keyPerformance from "./modules/keyPerformance";
+import StripeAccount from "./modules/stripeAccount";
 //Load Vuex
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
         shopifyData,
         dateRange,
         channelStatus,
-        keyPerformance
+        keyPerformance,
+        StripeAccount
     }
 });
