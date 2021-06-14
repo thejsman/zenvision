@@ -1,8 +1,8 @@
 const state = {
-    hasShopifyStore: false
+    hasShopifyStore1: false
 };
 const getters = {
-    hasShopifyStore: state => state.hasShopifyStore
+    hasShopifyStoreCS: state => state.hasShopifyStore1
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }) => {
@@ -10,6 +10,15 @@ const actions = {
     }
 };
 const mutations = {
-    toggleShopifyStoreStatus: state =>
-        (state.hasShopifyStore = !state.hasShopifyStore)
+    TOGGGLE_SHOPIFY_STORE_STATUS: (state, status) => {
+        state.hasShopifyStore1 = status;
+        console.log("I have set the state", state, status);
+    }
+};
+
+export default {
+    state,
+    getters,
+    actions,
+    mutations
 };

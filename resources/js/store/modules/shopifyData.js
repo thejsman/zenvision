@@ -14,9 +14,20 @@ const actions = {
             const result = await axios.get("/user/stores");
             const data = result.data;
 
-            commit("SHOPIFY_STORES", data);
+            if (data.length > 0) {
+                commit("SHOPIFY_STORES", data);
+                const status = data.map(
+                    element => element.enabled_on_dashboard
+                );
+
+                commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
+            } else {
+                commit("SHOPIFY_STORES", []);
+                commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
+            }
         } catch (err) {
             commit("SHOPIFY_STORES", []);
+            commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
             console.log(err);
         }
     },

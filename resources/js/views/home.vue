@@ -103,7 +103,8 @@ export default {
             "shopifyStores",
             "startDateS",
             "endDateS",
-            "shopifyOrders"
+            "shopifyOrders",
+            "hasShopifyStoreCS"
         ])
     },
     created() {
@@ -150,9 +151,13 @@ export default {
         async getShopifyStoreData() {
             await this.getShopifyStores();
             await this.getShopifyStoreOrders();
-            console.log("This if from store: ", this.shopifyStores);
+            console.log("This is from store: ", this.shopifyStores);
+            console.log("This is from orders: ", this.shopifyOrders);
+            console.log(
+                "This is from hasShopifyStore1: ",
+                this.hasShopifyStoreCS
+            );
 
-            console.log("This if from orders: ", this.shopifyOrders);
             try {
                 const orders = await this.getShopifyStoreOrders();
                 //assign values
