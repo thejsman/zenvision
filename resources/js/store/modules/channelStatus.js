@@ -1,18 +1,25 @@
 const state = {
-    hasShopifyStore1: false
+    hasShopifyStore: false,
+    hasStripeAccount: false
 };
 const getters = {
-    hasShopifyStoreCS: state => state.hasShopifyStore1
+    hasShopifyStoreCS: state => state.hasShopifyStore,
+    hasStripeAccountCS: state => state.hasStripeAccount
 };
 const actions = {
-    toggleShopifyStoreStatus: ({ commit }) => {
-        commit("toggleShopifyStoreStatus");
+    toggleShopifyStoreStatus: ({ commit }, payload) => {
+        commit("TOGGGLE_SHOPIFY_STORE_STATUS", payload);
+    },
+    toggleStripeAccountStatus: ({ commit }, payload) => {
+        commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", payload);
     }
 };
 const mutations = {
     TOGGGLE_SHOPIFY_STORE_STATUS: (state, status) => {
-        state.hasShopifyStore1 = status;
-        console.log("I have set the state", state, status);
+        state.hasShopifyStore = status;
+    },
+    TOGGGLE_STRIPE_ACCOUNT_STATUS: (state, status) => {
+        state.hasStripeAccount = status;
     }
 };
 

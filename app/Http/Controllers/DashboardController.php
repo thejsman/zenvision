@@ -50,6 +50,17 @@ class DashboardController extends Controller
         }
         return $orders;
     }
+    public function getShopifyStoreAllOrders(Request $request)
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        $orders = [];
+        foreach ($enabled_on_dashboard as $store_id) {
+            $store = ShopifyStore::find($store_id);
+            $orders = array_merge($orders, $store->getAllOrders()->toArray());
+        }
+        return $orders;
+    }
 
     // Funciton to get abandoned cart count
     public function getAbandonedCartCount(Request $request)

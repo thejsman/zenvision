@@ -8,6 +8,7 @@ import ShopifyStoreIcon from "../../components/custom-components/shopifystore-ic
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
+import { mapGetters, mapActions } from "vuex";
 
 import { eventBus } from "../../app";
 export default {
@@ -15,6 +16,13 @@ export default {
         return {
             allOrders: []
         };
+    },
+    computed: {
+        ...mapGetters([
+            "stripeAccounts",
+            "hasStripeAccountCS",
+            "shopifyAllOrders"
+        ])
     },
     components: {
         Layout,
@@ -26,9 +34,11 @@ export default {
         PaypalAccountIcon,
         StripeAccount,
         BankAccount
-
     },
-    created() {
+    async created() {
+        await this.getStripeAccounts();
+        await this.getShopifyStoreAllOrders();
+
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
@@ -54,20 +64,26 @@ export default {
             }, 1000);
         }
 
-
         this.getShopifyData();
     },
     methods: {
+        ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         async getShopifyData() {
+            console.log(
+                "stripeAccounts",
+                this.stripeAccounts,
+                "hasStripeAccountCS",
+                this.hasStripeAccountCS,
+                "shopifyAllOrders",
+                this.shopifyAllOrders
+            );
             const {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
             this.allOrders = orders;
-
         },
         handleOk() {
             window.location.href = "/mastersheet";
-
         }
     }
 };
@@ -84,7 +100,6 @@ export default {
                     <StripeAccount :disableFeature="false" />
 
                     <BankAccount />
-
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
                     >Export</b-button
@@ -136,8 +151,8 @@ export default {
             @hide="handleOk"
         >
             <p class="my-2">
-                We are importing your Stripe transactions, this process
-                can take a few minutes, please check back later.
+                We are importing your Stripe transactions, this process can take
+                a few minutes, please check back later.
             </p>
         </b-modal>
         <b-modal
@@ -152,7 +167,6 @@ export default {
                 We are unable to connect your Stripe account, please try again
                 later.
             </p>
-
         </b-modal>
     </Layout>
 </template>

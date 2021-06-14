@@ -2,10 +2,12 @@ import axios from "axios";
 
 const state = {
     shopifyStores: [],
-    orders: []
+    orders: [],
+    allOrders: []
 };
 const getters = {
     shopifyOrders: state => state.orders,
+    shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores
 };
 const actions = {
@@ -15,18 +17,18 @@ const actions = {
             const data = result.data;
 
             if (data.length > 0) {
-                commit("SHOPIFY_STORES", data);
+                commit("SET_SHOPIFY_STORES", data);
                 const status = data.map(
                     element => element.enabled_on_dashboard
                 );
 
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
             } else {
-                commit("SHOPIFY_STORES", []);
+                commit("SET_SHOPIFY_STORES", []);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
             }
         } catch (err) {
-            commit("SHOPIFY_STORES", []);
+            commit("SET_SHOPIFY_STORES", []);
             commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
             console.log(err);
         }
@@ -40,26 +42,43 @@ const actions = {
                 }
             });
 
-            commit("SHOPIFY_ORDERS", response.data);
+            commit("SET_SHOPIFY_ORDERS", response.data);
         } catch (err) {
             console.log(err);
-            commit("setShopifyStoreOrders", []);
+            commit("SET_SHOPIFY_ORDERS", []);
+        }
+    },
+    getShopifyStoreAllOrders: async ({ commit, rootState }) => {
+        try {
+            const response = await axios.get("shopify-allorders");
+
+            commit("SET_SHOPIFY_ALL_ORDERS", response.data);
+        } catch (err) {
+            console.log(err);
+            commit("SET_SHOPIFY_ALL_ORDERS", []);
         }
     }
 };
 const mutations = {
-    SHOPIFY_STORES: (state, payload) => {
+    SET_SHOPIFY_STORES: (state, payload) => {
         if (payload.length > 0) {
             state.shopifyStores = payload;
         } else {
             state.shopifyStores = [];
         }
     },
-    SHOPIFY_ORDERS: (state, payload) => {
+    SET_SHOPIFY_ORDERS: (state, payload) => {
         if (payload.length > 0) {
             state.orders = payload;
         } else {
             state.orders = [];
+        }
+    },
+    SET_SHOPIFY_ALL_ORDERS: (state, payload) => {
+        if (payload.length > 0) {
+            state.allOrders = payload;
+        } else {
+            state.allOrders = [];
         }
     }
 };
