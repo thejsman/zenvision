@@ -36,6 +36,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('getavgunitperorder', 'DashboardController@getAvgUnitsPerOrder');
 
+    Route::get('shopify-orders', 'DashboardController@getShopifyStoreOrders');
+
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
     Route::get('getshopifydisputes', 'ShopifyStoreController@getDisputes');

@@ -90,22 +90,21 @@ export default {
             google_ads_data: [],
             paypalChargebacks: [],
             stripeChargebacks: [],
-            paypalAccounts: [],
+
             stripeAccounts: [],
             stripeTransactions: [],
-            paypalTransactions: [],
+
             isLoading: false
         };
     },
 
     computed: {
         ...mapGetters([
-            "ShopifyOrders",
-            "ShopifyStores",
-            "ShopifyProductCount",
-            "ShopifyRefundTotal",
+            "shopifyStores",
             "startDateS",
-            "endDateS"
+            "endDateS",
+            "shopifyOrders",
+            "hasShopifyStoreCS"
         ])
     },
     created() {
@@ -168,7 +167,7 @@ export default {
         });
     },
     methods: {
-        ...mapActions(["fetchShopifyData"]),
+        ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
 
         showModal(modalId) {
             this.$bvModal.show(modalId);
@@ -177,19 +176,19 @@ export default {
             window.location.href = "/";
         },
         async getShopifyStoreData() {
+            await this.getShopifyStores();
+            await this.getShopifyStoreOrders();
+            console.log("This is from store: ", this.shopifyStores);
+            console.log("This is from orders: ", this.shopifyOrders);
+            console.log(
+                "This is from hasShopifyStore1: ",
+                this.hasShopifyStoreCS
+            );
+
             try {
-                const {
-                    data: { orders, paypalAccounts, paypalTransactions }
-                } = await axios.get("shopifystoredata");
-
+                const orders = await this.getShopifyStoreOrders();
                 //assign values
-
-                this.backupOrders = [...orders];
-                this.paypalAccounts = paypalAccounts;
-                this.paypalTransactions = paypalTransactions;
-
-                let d = new Date();
-                this.handleDateChange();
+                this.allOrders = _.sortBy(orders, "created_on_shopify");
             } catch (error) {
                 console.log(error);
             }
@@ -287,24 +286,12 @@ export default {
                 this.snapchatError = true;
             }
         },
-        handleDateChange() {
+        async handleDateChange() {
             const s_date = moment(this.startDateS).format("MM-DD-YYYY");
             const e_date = moment(this.endDateS).format("MM-DD-YYYY");
 
-            const filteredOrders = this.backupOrders.filter(order => {
-                const orderDate = moment(order.created_on_shopify).format(
-                    "MM-DD-YYYY"
-                );
-                order.created_on_shopify = orderDate;
-                order.total_price = parseFloat(order.total_price);
-                return (
-                    new Date(orderDate) >= new Date(s_date) &&
-                    new Date(orderDate) <= new Date(e_date)
-                );
-            });
+            await this.getShopifyStoreData();
             this.dateRangeSelected = [moment(s_date), moment(e_date)];
-
-            this.allOrders = _.sortBy(filteredOrders, "created_on_shopify");
 
             eventBus.$emit("dateChanged", { s_date, e_date });
         }
@@ -318,7 +305,7 @@ export default {
                 <div class="page-title-box d-flex align-items-center">
                     <ChannelDropdown />
                     <StoreIcon />
-                    <PaypalAccount :ppAccounts="paypalAccounts" />
+                    <PaypalAccount />
                     <StripeAccount />
                     <FacebookAccount />
                     <SnapchatAccount />

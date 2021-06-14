@@ -1,34 +1,66 @@
 import axios from "axios";
 
 const state = {
-    orders: [],
-    enabledStores: [],
-    numberOfProducts: 0,
-    refundTotal: 0
+    shopifyStores: [],
+    orders: []
 };
 const getters = {
-    ShopifyOrders: state => state.orders,
-    ShopifyStores: state => state.enabledStores,
-    ShopifyProductCount: state => state.numberOfProducts,
-    ShopifyRefundTotal: state => state.refundTotal
+    shopifyOrders: state => state.orders,
+    shopifyStores: state => state.shopifyStores
 };
 const actions = {
-    async fetchShopifyData({ commit }) {
+    getShopifyStores: async ({ commit, rootState }) => {
         try {
-            const response = await axios.get("shopifydata");
-            console.log({ response });
-            commit("setShopifyData", response.data);
+            const result = await axios.get("/user/stores");
+            const data = result.data;
+
+            if (data.length > 0) {
+                commit("SHOPIFY_STORES", data);
+                const status = data.map(
+                    element => element.enabled_on_dashboard
+                );
+
+                commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
+            } else {
+                commit("SHOPIFY_STORES", []);
+                commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
+            }
+        } catch (err) {
+            commit("SHOPIFY_STORES", []);
+            commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
+            console.log(err);
+        }
+    },
+    getShopifyStoreOrders: async ({ commit, rootState }) => {
+        try {
+            const response = await axios.get("shopify-orders", {
+                params: {
+                    start_date: rootState.dateRange.startDateS,
+                    end_date: `${rootState.dateRange.endDateS} 23:59:59`
+                }
+            });
+
+            commit("SHOPIFY_ORDERS", response.data);
         } catch (err) {
             console.log(err);
+            commit("setShopifyStoreOrders", []);
         }
     }
 };
 const mutations = {
-    setShopifyData: (state, data) => {
-        state.orders = data.orders;
-        state.enabledStores = data.enabled_on_dashboard;
-        state.numberOfProducts = data.number_of_products;
-        state.refundTotal = data.refund_total;
+    SHOPIFY_STORES: (state, payload) => {
+        if (payload.length > 0) {
+            state.shopifyStores = payload;
+        } else {
+            state.shopifyStores = [];
+        }
+    },
+    SHOPIFY_ORDERS: (state, payload) => {
+        if (payload.length > 0) {
+            state.orders = payload;
+        } else {
+            state.orders = [];
+        }
     }
 };
 
