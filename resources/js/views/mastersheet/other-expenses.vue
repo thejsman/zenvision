@@ -322,7 +322,6 @@ export default {
             }
 
             if (this.bankTransactionsLoaded) {
-                console.log("Bank transactions started");
                 const bankTransactions = await this.getBankAccountTransactions();
 
                 if (bankTransactions.length > 0) {
@@ -397,7 +396,7 @@ export default {
                 .reverse();
 
             this.items = ordered;
-            console.log({ ordered });
+
             this.loading = false;
         },
         async loadMore() {

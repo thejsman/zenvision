@@ -1,7 +1,15 @@
-const state = {};
-const getters = {};
+const state = {
+    cogsTotal: 0
+};
+const getters = {
+    cogsTotal: state => state.cogsTotal
+};
 const actions = {};
-const mutations = {};
+const mutations = {
+    SET_COGS_TOTAL: (state, palyload) => {
+        state.cogsTotal = palyload;
+    }
+};
 
 export default {
     state,
