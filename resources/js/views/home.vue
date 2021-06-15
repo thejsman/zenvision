@@ -186,9 +186,10 @@ export default {
             );
 
             try {
-                const orders = await this.getShopifyStoreOrders();
+                const orders = this.shopifyOrders;
                 //assign values
                 this.allOrders = _.sortBy(orders, "created_on_shopify");
+                console.log("All orders from the api is ", this.allOrders);
             } catch (error) {
                 console.log(error);
             }
