@@ -9,7 +9,7 @@ import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
 import { mapGetters, mapActions } from "vuex";
-import Loading from "vue-loading-overlay";
+
 import { eventBus } from "../../app";
 export default {
     data() {
@@ -21,8 +21,7 @@ export default {
         ...mapGetters([
             "stripeAccounts",
             "hasStripeAccountCS",
-            "shopifyAllOrders",
-            "loadingStatus"
+            "shopifyAllOrders"
         ])
     },
     components: {
@@ -34,13 +33,12 @@ export default {
         ShopifyStoreIcon,
         PaypalAccountIcon,
         StripeAccount,
-        BankAccount,
-        Loading
+        BankAccount
     },
     async created() {
         await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
-        console.log("All orders ", this.shopifyAllOrders);
+
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
@@ -71,6 +69,14 @@ export default {
     methods: {
         ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         async getShopifyData() {
+            console.log(
+                "stripeAccounts",
+                this.stripeAccounts,
+                "hasStripeAccountCS",
+                this.hasStripeAccountCS,
+                "shopifyAllOrders",
+                this.shopifyAllOrders
+            );
             const {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
@@ -100,17 +106,11 @@ export default {
                 >
             </div>
             <div class="col-3 mt-4">
-                <Sidepanel :shopifyAllOrders="shopifyAllOrders" />
+                <Sidepanel :orders="allOrders" />
             </div>
             <div class="col-9 mt-4">
-                <Mainpanel />
+                <Mainpanel :orders="allOrders" />
             </div>
-            <loading
-                :active.sync="loadingStatus"
-                :can-cancel="false"
-                :is-full-page="true"
-                :background-color="'#2F3863'"
-            ></loading>
         </div>
 
         <b-modal

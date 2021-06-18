@@ -4,30 +4,17 @@
             Add Channels
             <i class="fas fa-plus pl-1"></i>
         </template>
-        <PlaidLink
-            clientName="Zenvision"
-            env="sandbox"
-            link_token="link-sandbox-535cde1a-1635-4e49-983c-30ccd8113aac"
-            public_key="PLAID PUBLIC KEY"
-            :products="['auth', 'transactions']"
-            :onLoad="onLoad"
-            :onSuccess="onSuccess"
-            :onExit="onExit"
-            :onEvent="onEvent"
-        >
-            <b-dropdown-item href="#" id="teller-connect">
-                <img
-                    src="/images/icons/bank-icon.svg"
-                    alt
-                    height="21"
-                    width="21"
-                    class="channel-icons"
-                />
+        <b-dropdown-item href="#" id="teller-connect">
+            <img
+                src="/images/icons/bank-icon.svg"
+                alt
+                height="21"
+                width="21"
+                class="channel-icons"
+            />
 
-                Bank accounts
-            </b-dropdown-item>
-        </PlaidLink>
-
+            Bank accounts
+        </b-dropdown-item>
         <b-dropdown-item :href="paypalUrl">
             <img
                 src="/images/icons/paypal.png"
@@ -69,20 +56,11 @@
             />
             Shopify
         </b-dropdown-item>
-        <b-modal id="plaid-connect" size="lg" centered hide-footer hide-header>
-            <BankConnect
-                :bankAccounts="plaidAccounts"
-                :bankInstitutionName="plaidInstitutionName"
-                @handle-close="$bvModal.hide('facebook-connect')"
-            />
-        </b-modal>
     </b-dropdown>
 </template>
 <script>
 import axios from "axios";
 
-import PlaidLink from "vue-plaid-link2";
-import BankConnect from "../../components/custom-components/modals/bank-account-modal.vue";
 export default {
     data() {
         return {
@@ -91,37 +69,43 @@ export default {
             )}`,
             paypalUrl: `https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal&state=mastersheet-${Math.floor(
                 Math.random() * 10000000 + 1
-            )}`,
-            plaidAccounts: [],
-            plaidPublicToken: "",
-            plaidInstitutionName: ""
+            )}`
         };
     },
-    components: { PlaidLink, BankConnect },
-    methods: {
-        onLoad() {
-            console.log("Onload event tiggered");
-        },
-        onSuccess(public_token, metadata) {
-            console.log("OnSuccess event :", { public_token, metadata });
-            const accounts = metadata.accounts.filter(
-                account => account.type === "depository"
-            );
-            this.plaidAccounts = accounts;
-            this.plaidPublicToken = public_token;
-            this.plaidInstitutionName = metadata.institution.name;
-            console.log(this.plaidInstitutionName);
-        },
-        onExit(err, metadata) {
-            console.log("OnExit : ", { err, metadata });
-        },
-        onEvent(eventName, metadata) {
-            console.log("OnEvent: ", { eventName, metadata });
-            if (eventName === "HANDOFF") {
-                this.$bvModal.show("plaid-connect");
-            }
-        }
-    },
-    created() {}
+    created() {
+        document.addEventListener("DOMContentLoaded", function() {
+            var tellerConnect = TellerConnect.setup({
+                applicationId: "app_ne846be906r2t6156a000",
+                onInit: function() {
+                    console.log("Teller Connect has initialized");
+                },
+                // Part 3. Handle a successful enrollment's accessToken
+                onSuccess: async enrollment => {
+                    console.log("User enrolled successfully", enrollment);
+
+                    try {
+                        const result = await axios.post("bankaccount", {
+                            user: enrollment.user.id,
+                            institution_name:
+                                enrollment.enrollment.institution.name,
+                            access_token: enrollment.accessToken
+                        });
+                        window.location.href = "/mastersheet";
+                    } catch (err) {
+                        console.log(err);
+                    }
+                },
+                onExit: function() {
+                    console.log("User closed Teller Connect");
+                }
+            });
+
+            // Part 4. Hook user actions to start Teller Connect
+            var el = document.getElementById("teller-connect");
+            el.addEventListener("click", function() {
+                tellerConnect.open();
+            });
+        });
+    }
 };
 </script>
