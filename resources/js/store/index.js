@@ -5,7 +5,6 @@ import dateRange from "./modules/dateRange";
 import channelStatus from "./modules/channelStatus";
 import keyPerformance from "./modules/keyPerformance";
 import StripeAccount from "./modules/stripeAccount";
-import MasterSheet from "./modules/masterSheet";
 //Load Vuex
 Vue.use(Vuex);
 
@@ -16,7 +15,6 @@ export default new Vuex.Store({
         dateRange,
         channelStatus,
         keyPerformance,
-        StripeAccount,
-        MasterSheet
+        StripeAccount
     }
 });

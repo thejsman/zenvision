@@ -1,5 +1,4 @@
 const state = {
-    loadingStatus: true,
     hasShopifyStore: false,
     hasStripeAccount: false
 };
