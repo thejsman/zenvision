@@ -320,6 +320,7 @@ export default {
                     })
                 );
             }
+            console.log("all transacitons: ", this.allTransactions);
 
             if (this.bankTransactionsLoaded) {
                 const bankTransactions = await this.getBankAccountTransactions();
@@ -385,15 +386,15 @@ export default {
             var groups = _.groupBy(this.allTransactions, function(transaction) {
                 return transaction.date;
             });
-
+            console.log({ groups });
             var ordered = {};
             _(groups)
                 .keys()
                 .sort()
                 .each(function(key) {
                     ordered[key] = groups[key];
-                })
-                .reverse();
+                });
+            console.log({ ordered });
 
             this.items = ordered;
 

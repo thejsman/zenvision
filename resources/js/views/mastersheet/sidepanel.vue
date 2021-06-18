@@ -124,9 +124,9 @@ export default {
         async getBankAccountBalance() {
             setLoadingSingle(this.statData, TOTAL_CASH);
 
-            const result = await axios.get("bankaccount-balance");
-            const balance = result.data;
-            this.totalCash += parseFloat(balance);
+            // const result = await axios.get("bankaccount-balance");
+            // const balance = result.data;
+            // this.totalCash += parseFloat(balance);
             updateData(
                 this.statData,
                 TOTAL_CASH,
