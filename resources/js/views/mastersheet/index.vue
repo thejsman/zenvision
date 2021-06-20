@@ -8,7 +8,8 @@ import ShopifyStoreIcon from "../../components/custom-components/shopifystore-ic
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
-import { mapGetters, mapActions } from "vuex";
+import Loading from "../../components/custom-components/loading-component.vue";
+import { mapGetters, mapActions, mapState } from "vuex";
 
 import { eventBus } from "../../app";
 export default {
@@ -19,9 +20,22 @@ export default {
     },
     computed: {
         ...mapGetters([
+            "shopifyStores",
             "stripeAccounts",
             "hasStripeAccountCS",
-            "shopifyAllOrders"
+            "shopifyAllOrders",
+            "loadingStatus"
+        ]),
+        ...mapState("MasterSheet", [
+            "netEquityTotal",
+            "assetsCashTotal",
+            "assetsInventoryTotal",
+            "assetsReservesTotal",
+            "debtsCreditCardTotal",
+            "debtsSupplierPayableTotal",
+            "YesterdaysNetEquityFluctuationTotal",
+            "YesterdaysProfitOrLossTotal",
+            "OtherExpensesTotal"
         ])
     },
     components: {
@@ -33,12 +47,33 @@ export default {
         ShopifyStoreIcon,
         PaypalAccountIcon,
         StripeAccount,
-        BankAccount
+        BankAccount,
+        Loading
     },
     async created() {
-        await this.getStripeAccounts();
+        await this.loadAllChannels();
+        // await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
-
+        console.log(
+            "netEquityTotal",
+            this.netEquityTotal,
+            "assetsCashTotal",
+            this.assetsCashTotal,
+            "assetsInventoryTotal",
+            this.assetsInventoryTotal,
+            "assetsReservesTotal",
+            this.assetsReservesTotal,
+            "debtsCreditCardTotal",
+            this.debtsCreditCardTotal,
+            "debtsSupplierPayableTotal",
+            this.debtsSupplierPayableTotal,
+            "YesterdaysNetEquityFluctuationTotal",
+            this.YesterdaysNetEquityFluctuationTotal,
+            "YesterdaysProfitOrLossTotal",
+            this.YesterdaysProfitOrLossTotal,
+            "OtherExpensesTotal",
+            this.OtherExpensesTotal
+        );
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
@@ -67,15 +102,15 @@ export default {
         this.getShopifyData();
     },
     methods: {
-        ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
+        ...mapActions(["getShopifyStoreAllOrders"]),
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
+
         async getShopifyData() {
             console.log(
-                "stripeAccounts",
-                this.stripeAccounts,
-                "hasStripeAccountCS",
-                this.hasStripeAccountCS,
-                "shopifyAllOrders",
-                this.shopifyAllOrders
+                "Shopify Accounts: ",
+                this.shopifyStores,
+                " and Stripe accounts are : ",
+                this.stripeAccounts
             );
             const {
                 data: { enabled_on_dashboard, orders }
@@ -168,6 +203,7 @@ export default {
                 later.
             </p>
         </b-modal>
+        <Loading :loadingStatus="loadingStatus" />
     </Layout>
 </template>
 <style>

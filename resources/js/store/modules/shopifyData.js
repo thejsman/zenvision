@@ -12,6 +12,7 @@ const getters = {
 };
 const actions = {
     getShopifyStores: async ({ commit, rootState }) => {
+        console.log("Called from MS");
         try {
             const result = await axios.get("/user/stores");
             const data = result.data;
