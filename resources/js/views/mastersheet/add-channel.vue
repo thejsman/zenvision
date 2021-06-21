@@ -7,8 +7,7 @@
         <PlaidLink
             clientName="Zenvision"
             env="sandbox"
-            link_token="link-sandbox-535cde1a-1635-4e49-983c-30ccd8113aac"
-            public_key="PLAID PUBLIC KEY"
+            :link_token="plaidLinkToken"
             :products="['auth', 'transactions']"
             :onLoad="onLoad"
             :onSuccess="onSuccess"
@@ -93,13 +92,13 @@ export default {
                 Math.random() * 10000000 + 1
             )}`,
             plaidAccounts: [],
-            plaidPublicToken: "",
+            plaidLinkToken: "",
             plaidInstitutionName: ""
         };
     },
     components: { PlaidLink, BankConnect },
     methods: {
-        onLoad() {
+        async onLoad() {
             console.log("Onload event tiggered");
         },
         onSuccess(public_token, metadata) {
@@ -120,8 +119,22 @@ export default {
             if (eventName === "HANDOFF") {
                 this.$bvModal.show("plaid-connect");
             }
+        },
+        async getPlaidLinkToken() {
+            try {
+                const result = await axios.get("bankaccount-link-token");
+                const linkToken = result.data;
+                if (linkToken) {
+                    this.plaidLinkToken = linkToken;
+                }
+                console.log("LinkToken generated: ", this.plaidLinkToken);
+            } catch (err) {
+                console.log(err);
+            }
         }
     },
-    created() {}
+    created() {
+        this.getPlaidLinkToken();
+    }
 };
 </script>
