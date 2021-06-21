@@ -17,6 +17,9 @@ import {
     TOTAL_SUPPLIER_PAYABLE
 } from "../../constants";
 import axios from "axios";
+
+import { mapGetters } from "vuex";
+
 export default {
     components: { Stat },
     data() {
@@ -73,6 +76,11 @@ export default {
                 }
             ]
         };
+    },
+
+    computed: {
+        ...mapGetters("MasterSheet", ["debtsSupplierPayableTotal"]),
+        ...mapGetters(["cogsTotal"])
     },
     props: {
         orders: {
@@ -154,11 +162,15 @@ export default {
                 TOTAL_CREDIT_CARD,
                 displayCurrency(debts_credit_card)
             );
-            updateData(
-                this.debtsData,
-                TOTAL_SUPPLIER_PAYABLE,
-                displayCurrency(debts_supplier_payable + cogs)
-            );
+            setTimeout(() => {
+                console.log("CogsTotal", this.cogsTotal);
+                updateData(
+                    this.debtsData,
+                    TOTAL_SUPPLIER_PAYABLE,
+                    displayCurrency(this.cogsTotal)
+                );
+            }, 1000);
+
             const netEquityTotal =
                 this.totalCash +
                 total_credit_card +

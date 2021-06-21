@@ -24,7 +24,8 @@ export default {
             "stripeAccounts",
             "hasStripeAccountCS",
             "shopifyAllOrders",
-            "loadingStatus"
+            "loadingStatus",
+            "cogsTotal"
         ]),
         ...mapState("MasterSheet", [
             "netEquityTotal",
@@ -54,26 +55,7 @@ export default {
         await this.loadAllChannels();
         // await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
-        console.log(
-            "netEquityTotal",
-            this.netEquityTotal,
-            "assetsCashTotal",
-            this.assetsCashTotal,
-            "assetsInventoryTotal",
-            this.assetsInventoryTotal,
-            "assetsReservesTotal",
-            this.assetsReservesTotal,
-            "debtsCreditCardTotal",
-            this.debtsCreditCardTotal,
-            "debtsSupplierPayableTotal",
-            this.debtsSupplierPayableTotal,
-            "YesterdaysNetEquityFluctuationTotal",
-            this.YesterdaysNetEquityFluctuationTotal,
-            "YesterdaysProfitOrLossTotal",
-            this.YesterdaysProfitOrLossTotal,
-            "OtherExpensesTotal",
-            this.OtherExpensesTotal
-        );
+
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
@@ -133,7 +115,6 @@ export default {
                     <ShopifyStoreIcon :disableFeature="false" />
                     <PaypalAccountIcon :disableFeature="false" />
                     <StripeAccount :disableFeature="false" />
-
                     <BankAccount />
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
@@ -141,10 +122,10 @@ export default {
                 >
             </div>
             <div class="col-3 mt-4">
-                <Sidepanel :orders="allOrders" />
+                <Sidepanel :orders="shopifyAllOrders" />
             </div>
             <div class="col-9 mt-4">
-                <Mainpanel :orders="allOrders" />
+                <Mainpanel :orders="shopifyAllOrders" />
             </div>
         </div>
 
