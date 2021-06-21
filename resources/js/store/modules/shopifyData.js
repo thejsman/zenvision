@@ -1,17 +1,21 @@
 import axios from "axios";
+import { sum, sumBy } from "lodash";
 
 const state = {
     shopifyStores: [],
     orders: [],
-    allOrders: []
+    allOrders: [],
+    cogsTotal: 0
 };
 const getters = {
     shopifyOrders: state => state.orders,
     shopifyAllOrders: state => state.allOrders,
-    shopifyStores: state => state.shopifyStores
+    shopifyStores: state => state.shopifyStores,
+    cogsTotal: state => state.cogsTotal
 };
 const actions = {
     getShopifyStores: async ({ commit, rootState }) => {
+        console.log("Called from MS");
         try {
             const result = await axios.get("/user/stores");
             const data = result.data;
@@ -53,9 +57,11 @@ const actions = {
             const response = await axios.get("shopify-allorders");
 
             commit("SET_SHOPIFY_ALL_ORDERS", response.data);
+            commit("SET_COGS_ALL_ORDERS", response.data);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ALL_ORDERS", []);
+            commit("SET_COGS_ALL_ORDERS", []);
         }
     }
 };
@@ -80,6 +86,9 @@ const mutations = {
         } else {
             state.allOrders = [];
         }
+    },
+    SET_COGS_ALL_ORDERS: (state, payload) => {
+        state.cogsTotal = sumBy(payload, order => order.total_cost);
     }
 };
 

@@ -320,9 +320,9 @@ export default {
                     })
                 );
             }
-            console.log("all transacitons: ", this.allTransactions);
 
             if (this.bankTransactionsLoaded) {
+                console.log("Bank transactions started");
                 const bankTransactions = await this.getBankAccountTransactions();
 
                 if (bankTransactions.length > 0) {
@@ -386,18 +386,18 @@ export default {
             var groups = _.groupBy(this.allTransactions, function(transaction) {
                 return transaction.date;
             });
-            console.log({ groups });
+
             var ordered = {};
             _(groups)
                 .keys()
                 .sort()
                 .each(function(key) {
                     ordered[key] = groups[key];
-                });
-            console.log({ ordered });
+                })
+                .reverse();
 
             this.items = ordered;
-
+            console.log({ ordered });
             this.loading = false;
         },
         async loadMore() {

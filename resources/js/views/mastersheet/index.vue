@@ -8,8 +8,9 @@ import ShopifyStoreIcon from "../../components/custom-components/shopifystore-ic
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
-import { mapGetters, mapActions } from "vuex";
-import Loading from "vue-loading-overlay";
+import Loading from "../../components/custom-components/loading-component.vue";
+import { mapGetters, mapActions, mapState } from "vuex";
+
 import { eventBus } from "../../app";
 export default {
     data() {
@@ -19,10 +20,23 @@ export default {
     },
     computed: {
         ...mapGetters([
+            "shopifyStores",
             "stripeAccounts",
             "hasStripeAccountCS",
             "shopifyAllOrders",
-            "loadingStatus"
+            "loadingStatus",
+            "cogsTotal"
+        ]),
+        ...mapState("MasterSheet", [
+            "netEquityTotal",
+            "assetsCashTotal",
+            "assetsInventoryTotal",
+            "assetsReservesTotal",
+            "debtsCreditCardTotal",
+            "debtsSupplierPayableTotal",
+            "YesterdaysNetEquityFluctuationTotal",
+            "YesterdaysProfitOrLossTotal",
+            "OtherExpensesTotal"
         ])
     },
     components: {
@@ -38,9 +52,10 @@ export default {
         Loading
     },
     async created() {
-        await this.getStripeAccounts();
+        await this.loadAllChannels();
+        // await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
-        console.log("All orders ", this.shopifyAllOrders);
+
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
         });
@@ -69,8 +84,16 @@ export default {
         this.getShopifyData();
     },
     methods: {
-        ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
+        ...mapActions(["getShopifyStoreAllOrders"]),
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
+
         async getShopifyData() {
+            console.log(
+                "Shopify Accounts: ",
+                this.shopifyStores,
+                " and Stripe accounts are : ",
+                this.stripeAccounts
+            );
             const {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
@@ -92,7 +115,6 @@ export default {
                     <ShopifyStoreIcon :disableFeature="false" />
                     <PaypalAccountIcon :disableFeature="false" />
                     <StripeAccount :disableFeature="false" />
-
                     <BankAccount />
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
@@ -100,17 +122,11 @@ export default {
                 >
             </div>
             <div class="col-3 mt-4">
-                <Sidepanel :shopifyAllOrders="shopifyAllOrders" />
+                <Sidepanel :orders="shopifyAllOrders" />
             </div>
             <div class="col-9 mt-4">
-                <Mainpanel />
+                <Mainpanel :orders="shopifyAllOrders" />
             </div>
-            <loading
-                :active.sync="loadingStatus"
-                :can-cancel="false"
-                :is-full-page="true"
-                :background-color="'#2F3863'"
-            ></loading>
         </div>
 
         <b-modal
@@ -168,6 +184,7 @@ export default {
                 later.
             </p>
         </b-modal>
+        <Loading :loadingStatus="loadingStatus" />
     </Layout>
 </template>
 <style>

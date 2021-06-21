@@ -18,7 +18,8 @@ import {
 } from "../../constants";
 import axios from "axios";
 
-import { mapGetters, mapState, mapMutations } from "vuex";
+import { mapGetters } from "vuex";
+
 export default {
     components: { Stat },
     data() {
@@ -30,7 +31,6 @@ export default {
             totalReserves: 0,
             totalCreditCard: 0,
             totalSupplierPayable: 0,
-            // allOrders: [],
             netEquityData: [
                 {
                     icon: "bx bx-copy-alt",
@@ -77,26 +77,22 @@ export default {
             ]
         };
     },
-    props: {},
+
     computed: {
-        ...mapGetters(["shopifyAllOrders", "cogsTotal"]),
-        ...mapState(["allOrders"])
+        ...mapGetters("MasterSheet", ["debtsSupplierPayableTotal"]),
+        ...mapGetters(["cogsTotal"])
     },
-    watch: {
-        shopifyAllOrders(newVal, oldVal) {
-            const cogs = _.sumBy(newVal, order => parseFloat(order.total_cost));
-            this.SET_COGS_TOTAL(cogs);
-            updateData(
-                this.debtsData,
-                TOTAL_SUPPLIER_PAYABLE,
-                displayCurrency(this.cogsTotal)
-            );
+    props: {
+        orders: {
+            type: Array,
+            default: () => []
         }
     },
     created() {
         eventBus.$on("stripeChannelRemoved", () => {
             this.totalCash = 0;
             setTimeout(() => {
+                console.log("check this", this.totalCash, this.netEquityData);
                 this.getMastersheetData();
                 this.getStripeBalance();
                 this.getStripeTransactions();
@@ -120,13 +116,12 @@ export default {
         this.getBankAccountBalance();
     },
     methods: {
-        ...mapMutations(["SET_COGS_TOTAL"]),
         async getBankAccountBalance() {
             setLoadingSingle(this.statData, TOTAL_CASH);
 
-            // const result = await axios.get("bankaccount-balance");
-            // const balance = result.data;
-            // this.totalCash += parseFloat(balance);
+            const result = await axios.get("bankaccount-balance");
+            const balance = result.data;
+            this.totalCash += parseFloat(balance);
             updateData(
                 this.statData,
                 TOTAL_CASH,
@@ -137,6 +132,9 @@ export default {
         async getMastersheetData() {
             setLoadingSingle(this.netEquityData, NET_EQUITY);
             const assets = await axios.get("mastersheetdata");
+            const cogs = _.sumBy(this.orders, order =>
+                parseFloat(order.total_cost)
+            );
 
             const {
                 total_credit_card,
@@ -164,11 +162,15 @@ export default {
                 TOTAL_CREDIT_CARD,
                 displayCurrency(debts_credit_card)
             );
-            // updateData(
-            //     this.debtsData,
-            //     TOTAL_SUPPLIER_PAYABLE,
-            //     displayCurrency(debts_supplier_payable + cogs)
-            // );
+            setTimeout(() => {
+                console.log("CogsTotal", this.cogsTotal);
+                updateData(
+                    this.debtsData,
+                    TOTAL_SUPPLIER_PAYABLE,
+                    displayCurrency(this.cogsTotal)
+                );
+            }, 1000);
+
             const netEquityTotal =
                 this.totalCash +
                 total_credit_card +
@@ -177,7 +179,7 @@ export default {
                 total_supplier_payable -
                 debts_credit_card -
                 debts_supplier_payable -
-                this.cogsTotal;
+                cogs;
             eventBus.$emit("netEquityTotal", netEquityTotal);
             updateData(
                 this.netEquityData,
