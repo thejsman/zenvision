@@ -129,4 +129,45 @@ class BankAccountController extends Controller
         return $response;
 
     }
+    public function generateLinkToken()
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://sandbox.plaid.com/link/token/create',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+            "client_id": "' . env('PLAID_CLIENT_ID') . '",
+            "secret": "' . env('PLAID_SECRET') . '",
+            "client_name": "' . env('PLAID_CLIENT_NAME') . '",
+            "user": { "client_user_id": "' . Auth::user()->id . '" },
+            "products": ["transactions", "auth", "identity"],
+            "country_codes": ["US"],
+            "language": "en",
+            "redirect_uri": "' . env('PLAID_REDIRECT_URI') . '"
+}',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $result = curl_exec($curl);
+        $response = json_decode($result, true);
+        curl_close($curl);
+
+        if (!isset($response['errors'])) {
+            // return response
+            return $response['link_token'];
+        } else {
+            return null;
+        }
+
+    }
 }
