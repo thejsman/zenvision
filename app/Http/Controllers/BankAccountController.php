@@ -13,7 +13,7 @@ class BankAccountController extends Controller
 
         $bankAccount = [];
         $bankAccount['user_id'] = Auth::user()->id;
-        $bankAccount['access_token'] = $request->access_token;
+        $bankAccount['access_token'] = $this->getAccessToken($request->public_token);
         $bankAccount['bank_user_id'] = $request->id;
         $bankAccount['bank_user_name'] = $request->name;
         $bankAccount['bank_type'] = $request->type;
@@ -37,24 +37,27 @@ class BankAccountController extends Controller
         $bank_accounts = Auth::user()->getBankAccounts();
         $balance = 0;
         foreach ($bank_accounts as $account) {
-            $account_info = $this->getAccountInfo($account->access_token);
-            $account_id = $account_info[0]['id'];
-            $url = 'https://api.teller.io/accounts/' . $account_id . '/balances';
-
             $curl = curl_init();
-
             curl_setopt_array($curl, array(
-                CURLOPT_URL => $url,
+                CURLOPT_URL => 'https://sandbox.plaid.com/accounts/balance/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_TIMEOUT => 0,
+                CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => '{
+                "client_id": "' . env('PLAID_CLIENT_ID') . '",
+                "secret": "' . env('PLAID_SECRET') . '",
+                "access_token": "' . $account->access_token . '",
+                "options": {
+                  "account_ids": ["' . $account->bank_user_id . '"]
+                }
+              }',
                 CURLOPT_HTTPHEADER => array(
-                    'Authorization: Basic ' . base64_encode($account->access_token . ':'),
+                    'Content-Type: application/json',
                 ),
             ));
 
@@ -62,10 +65,8 @@ class BankAccountController extends Controller
             $response = json_decode($result, true);
             curl_close($curl);
             if (!isset($response['errors'])) {
-                // return response
-                $balance += $response['available'];
+                $balance += $response['accounts'][0]['balances']['available'];
             }
-
         }
         return $balance;
     }
@@ -73,65 +74,53 @@ class BankAccountController extends Controller
     {
         $bank_accounts = Auth::user()->getBankAccounts();
         $transactions = [];
+
         foreach ($bank_accounts as $account) {
-            $account_info = $this->getAccountInfo($account->access_token);
-            $account_id = $account_info[0]['id'];
-            $url = 'https://api.teller.io/accounts/' . $account_id . '/transactions';
 
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => $url,
+                CURLOPT_URL => 'https://sandbox.plaid.com/transactions/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_TIMEOUT => 0,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_POSTFIELDS => '{
+                    "client_id": "' . env('PLAID_CLIENT_ID') . '",
+                    "secret": "' . env('PLAID_SECRET') . '",
+                    "access_token": "' . $account->access_token . '",
+                    "options": {
+                        "account_ids": ["' . $account->bank_user_id . '"],
+                        "count": 500,
+                        "offset": 0
+                    },
+                    "start_date": "2021-01-01",
+                    "end_date": "2021-06-20"
+                }',
                 CURLOPT_HTTPHEADER => array(
-                    'Authorization: Basic ' . base64_encode($account->access_token . ':'),
+                    'Content-Type: application/json',
                 ),
             ));
 
             $result = curl_exec($curl);
-            $response = json_decode($result, true);
             curl_close($curl);
-            if (!isset($response['errors'])) {
-                // return response
-                return $response;
-            }
+            $response = json_decode($result, true);
 
+            $transactions = array_merge($transactions, $response['transactions']);
         }
-
+        return $transactions;
     }
     public function getAccountInfo($access_token)
     {
 
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.teller.io/accounts',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_HTTPHEADER => array(
-                'Authorization: Basic ' . base64_encode($access_token . ':'),
-            ),
-        ));
-
-        $result = curl_exec($curl);
-        $response = json_decode($result, true);
-        curl_close($curl);
-        return $response;
-
     }
+
+    // Plaid
+
     public function generateLinkToken()
     {
         $curl = curl_init();
@@ -155,7 +144,7 @@ class BankAccountController extends Controller
             "country_codes": ["US"],
             "language": "en",
             "redirect_uri": "' . env('PLAID_REDIRECT_URI') . '"
-}',
+            }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
             ),
@@ -172,5 +161,34 @@ class BankAccountController extends Controller
             return null;
         }
 
+    }
+    protected function getAccessToken($public_token)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://sandbox.plaid.com/item/public_token/exchange',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+            "client_id": "' . env('PLAID_CLIENT_ID') . '",
+            "secret": "' . env('PLAID_SECRET') . '",
+            "public_token": "' . $public_token . '"
+        }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $result = curl_exec($curl);
+        $response = json_decode($result, true);
+        curl_close($curl);
+        return $response['access_token'];
     }
 }

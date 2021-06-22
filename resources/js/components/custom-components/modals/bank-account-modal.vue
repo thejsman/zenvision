@@ -85,6 +85,10 @@ export default {
         bankInstitutionName: {
             type: String,
             default: ""
+        },
+        plaidPublicToken: {
+            type: String,
+            default: ""
         }
     },
     created() {
@@ -95,9 +99,11 @@ export default {
     methods: {
         async handleClick(account) {
             try {
-                console.log(this.bankInstitutionName);
+                console.log(this.plaidPublicToken);
                 account.institution_name = this.bankInstitutionName;
-                const result = await axios.post("/bankaccount", account);
+                account.public_token = this.plaidPublicToken;
+                console.log("Account from bank modal is ", account);
+                await axios.post("/bankaccount", account);
                 this.showMessage = true;
                 this.updateVariant = "success";
                 this.updateResult = "Bank account added successfully";
@@ -107,9 +113,9 @@ export default {
                     this.updateResult = "";
                     this.$emit("updateData");
                     this.$emit("handle-close");
-                    console.log(this.$router);
+
                     eventBus.$emit("toggleShopifyStore");
-                    window.location.href = "/";
+                    window.location.href = "/mastersheet";
                 }, 2000);
             } catch (error) {
                 console.log(error);
