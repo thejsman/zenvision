@@ -328,6 +328,7 @@ export default {
             }
 
             if (this.bankTransactionsLoaded) {
+                console.log("Bank transactions started");
                 const bankTransactions = await this.getBankAccountTransactions();
 
                 if (bankTransactions.length > 0) {

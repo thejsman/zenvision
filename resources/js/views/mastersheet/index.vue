@@ -19,10 +19,23 @@ export default {
     },
     computed: {
         ...mapGetters([
+            "shopifyStores",
             "stripeAccounts",
             "hasStripeAccountCS",
             "shopifyAllOrders",
-            "loadingStatus"
+            "loadingStatus",
+            "cogsTotal"
+        ]),
+        ...mapState("MasterSheet", [
+            "netEquityTotal",
+            "assetsCashTotal",
+            "assetsInventoryTotal",
+            "assetsReservesTotal",
+            "debtsCreditCardTotal",
+            "debtsSupplierPayableTotal",
+            "YesterdaysNetEquityFluctuationTotal",
+            "YesterdaysProfitOrLossTotal",
+            "OtherExpensesTotal"
         ])
     },
     components: {
@@ -75,6 +88,12 @@ export default {
         ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
         async getShopifyData() {
+            console.log(
+                "Shopify Accounts: ",
+                this.shopifyStores,
+                " and Stripe accounts are : ",
+                this.stripeAccounts
+            );
             const {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
@@ -96,7 +115,6 @@ export default {
                     <ShopifyStoreIcon :disableFeature="false" />
                     <PaypalAccountIcon :disableFeature="false" />
                     <StripeAccount :disableFeature="false" />
-
                     <BankAccount />
                 </div>
                 <b-button class="border-0 mr-4 btn-export" variant="dark"
@@ -104,11 +122,12 @@ export default {
                 >
             </div>
             <div class="col-3 mt-4">
-                <Sidepanel :shopifyAllOrders="shopifyAllOrders" />
+                <Sidepanel :orders="shopifyAllOrders" />
             </div>
             <div class="col-9 mt-4">
-                <Mainpanel />
+                <Mainpanel :orders="shopifyAllOrders" />
             </div>
+
             <loading
                 :active.sync="loadingStatus"
                 :can-cancel="false"

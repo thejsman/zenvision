@@ -1,7 +1,7 @@
 const state = {
-    loadingStatus: true,
     hasShopifyStore: false,
-    hasStripeAccount: false
+    hasStripeAccount: false,
+    loadingStatus: false
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -14,6 +14,9 @@ const actions = {
     },
     toggleStripeAccountStatus: ({ commit }, payload) => {
         commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", payload);
+    },
+    toggleLoadingStatus: ({ commit }, payload) => {
+        commit("TOGGGLE_LOADING_STATUS", payload);
     }
 };
 const mutations = {
