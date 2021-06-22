@@ -94,8 +94,11 @@
                             v-for="(i, index) in itemsList"
                             :key="index"
                         >
-                            <p class="p-2 bg-light sticky">{{ index }}</p>
-                            <div v-for="item in i" :key="item.id">
+                            <p class="p-2 bg-light sticky">{{ i }}</p>
+                            <div
+                                v-for="item in groupedTransactions[i]"
+                                :key="item.id"
+                            >
                                 <div
                                     class="d-flex flex-row justify-content-start mb-1"
                                 >
@@ -117,7 +120,7 @@
                                     />
                                     <img
                                         v-if="item.type === 'bank'"
-                                        src="/images/bank-icons/Citibank.svg"
+                                        src="/images/bank-icons/Chase.svg"
                                         alt
                                         height="30"
                                         width="30"
@@ -207,6 +210,7 @@ export default {
             stripePaginatedUrl: "getStripeTransactions",
             items: [],
             allTransactions: [],
+            groupedTransactions: [],
             noTransactions: true,
             bankTransactionsLoaded: true,
             bankTransactionsArray: [],
@@ -269,6 +273,7 @@ export default {
             try {
                 const result = await axios.get("bankaccount-transactions");
                 const data = result.data;
+
                 return data;
             } catch (err) {
                 console.log(err);
@@ -279,6 +284,7 @@ export default {
             this.loading = true;
             // const paypal = await this.getPaypalTransactions();
             const stripe = await axios.get(this.stripePaginatedUrl);
+
             const stripeData = stripe.data.data;
 
             if (
@@ -329,17 +335,17 @@ export default {
                     this.noTransactions = false;
                     this.bankTransactionsArray = [...bankTransactions];
                     const arrayLenght = this.bankTransactionsArray.length;
-                    if (arrayLenght > 10) {
+                    if (arrayLenght > 20) {
                         const tempArray = this.bankTransactionsArray.splice(
                             0,
-                            10
+                            20
                         );
                         tempArray.forEach(bt =>
                             this.allTransactions.push({
                                 type: "bank",
-                                id: bt.id,
+                                id: bt.transaction_id,
                                 date: moment(bt.date).format("LL"),
-                                description: bt.description,
+                                description: bt.name,
                                 amount: displayCurrency(Math.abs(bt.amount))
                             })
                         );
@@ -347,9 +353,9 @@ export default {
                         this.bankTransactionsArray.forEach(bt =>
                             this.allTransactions.push({
                                 type: "bank",
-                                id: bt.id,
+                                id: bt.transaction_id,
                                 date: moment(bt.date).format("LL"),
-                                description: bt.description,
+                                description: bt.name,
                                 amount: displayCurrency(Math.abs(bt.amount))
                             })
                         );
@@ -358,14 +364,14 @@ export default {
                 this.bankTransactionsLoaded = false;
             } else {
                 const arrayLenght = this.bankTransactionsArray.length;
-                if (arrayLenght > 10) {
-                    const tempArray = this.bankTransactionsArray.splice(0, 10);
+                if (arrayLenght > 20) {
+                    const tempArray = this.bankTransactionsArray.splice(0, 20);
                     tempArray.forEach(bt =>
                         this.allTransactions.push({
                             type: "bank",
-                            id: bt.id,
+                            id: bt.transaction_id,
                             date: moment(bt.date).format("LL"),
-                            description: bt.description,
+                            description: bt.name,
                             amount: displayCurrency(Math.abs(bt.amount))
                         })
                     );
@@ -373,9 +379,9 @@ export default {
                     this.bankTransactionsArray.forEach(bt =>
                         this.allTransactions.push({
                             type: "bank",
-                            id: bt.id,
+                            id: bt.transaction_id,
                             date: moment(bt.date).format("LL"),
-                            description: bt.description,
+                            description: bt.name,
                             amount: displayCurrency(Math.abs(bt.amount))
                         })
                     );
@@ -386,18 +392,22 @@ export default {
             var groups = _.groupBy(this.allTransactions, function(transaction) {
                 return transaction.date;
             });
+            this.groupedTransactions = groups;
+            console.log({ groups });
+            var ordered = [];
 
-            var ordered = {};
-            _(groups)
-                .keys()
-                .sort()
-                .each(function(key) {
-                    ordered[key] = groups[key];
-                })
-                .reverse();
+            const keys = _.keys(groups);
 
-            this.items = ordered;
+            const sortedKeys = keys.sort(function(a, b) {
+                return new Date(b) - new Date(a);
+            });
+            console.log({ sortedKeys });
+            sortedKeys.forEach(key => {
+                ordered.push({ "`${key}`": groups[key] });
+            });
             console.log({ ordered });
+            this.items = sortedKeys;
+
             this.loading = false;
         },
         async loadMore() {

@@ -72,6 +72,14 @@
             />
             Shopify
         </b-dropdown-item>
+        <b-modal id="plaid-connect" size="lg" centered hide-footer hide-header>
+            <BankConnect
+                :bankAccounts="plaidAccounts"
+                :bankInstitutionName="plaidInstitutionName"
+                :plaidPublicToken="plaidPublicToken"
+                @handle-close="$bvModal.hide('facebook-connect')"
+            />
+        </b-modal>
     </b-dropdown>
 </template>
 <script>
@@ -89,23 +97,21 @@ export default {
             )}`,
             plaidAccounts: [],
             plaidLinkToken: "",
+            plaidPublicToken: "",
             plaidInstitutionName: ""
         };
     },
     components: { PlaidLink, BankConnect },
     methods: {
-        async onLoad() {
-            console.log("Onload event tiggered");
-        },
+        async onLoad() {},
         onSuccess(public_token, metadata) {
-            console.log("OnSuccess event :", { public_token, metadata });
             const accounts = metadata.accounts.filter(
                 account => account.type === "depository"
             );
+
             this.plaidAccounts = accounts;
             this.plaidPublicToken = public_token;
             this.plaidInstitutionName = metadata.institution.name;
-            console.log(this.plaidInstitutionName);
         },
         onExit(err, metadata) {
             console.log("OnExit : ", { err, metadata });
@@ -123,7 +129,6 @@ export default {
                 if (linkToken) {
                     this.plaidLinkToken = linkToken;
                 }
-                console.log("LinkToken generated: ", this.plaidLinkToken);
             } catch (err) {
                 console.log(err);
             }

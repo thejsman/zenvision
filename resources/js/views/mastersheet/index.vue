@@ -8,9 +8,8 @@ import ShopifyStoreIcon from "../../components/custom-components/shopifystore-ic
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
-import Loading from "../../components/custom-components/loading-component.vue";
-import { mapGetters, mapActions, mapState } from "vuex";
-
+import { mapGetters, mapActions, mapMutations } from "vuex";
+import Loading from "vue-loading-overlay";
 import { eventBus } from "../../app";
 export default {
     data() {
@@ -52,9 +51,11 @@ export default {
         Loading
     },
     async created() {
-        await this.loadAllChannels();
-        // await this.getStripeAccounts();
+        console.info("Check this - start");
+        await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
+        console.info("check this - end");
+        this.TOGGGLE_LOADING_STATUS(false);
 
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
@@ -84,9 +85,8 @@ export default {
         this.getShopifyData();
     },
     methods: {
-        ...mapActions(["getShopifyStoreAllOrders"]),
-        ...mapActions("MasterSheet", ["loadAllChannels"]),
-
+        ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
+        ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
         async getShopifyData() {
             console.log(
                 "Shopify Accounts: ",
@@ -127,6 +127,14 @@ export default {
             <div class="col-9 mt-4">
                 <Mainpanel :orders="shopifyAllOrders" />
             </div>
+
+            <loading
+                :active.sync="loadingStatus"
+                :can-cancel="false"
+                :is-full-page="true"
+                :background-color="'#191e2c'"
+                :opacity="0.8"
+            ></loading>
         </div>
 
         <b-modal
@@ -184,7 +192,6 @@ export default {
                 later.
             </p>
         </b-modal>
-        <Loading :loadingStatus="loadingStatus" />
     </Layout>
 </template>
 <style>
