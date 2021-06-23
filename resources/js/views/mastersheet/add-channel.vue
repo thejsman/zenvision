@@ -81,6 +81,7 @@
 <script>
 import axios from "axios";
 import PlaidLink from "vue-plaid-link2";
+import { mapMutations } from "vuex";
 import BankConnect from "../../components/custom-components/modals/bank-account-modal.vue";
 export default {
     data() {
@@ -99,6 +100,8 @@ export default {
     },
     components: { PlaidLink, BankConnect },
     methods: {
+        ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
+
         async onLoad() {},
         onSuccess(public_token, metadata) {
             const accounts = metadata.accounts.filter(
@@ -112,7 +115,6 @@ export default {
             console.log("OnExit : ", { err, metadata });
         },
         onEvent(eventName, metadata) {
-            console.log("OnEvent: ", { eventName, metadata });
             if (eventName === "HANDOFF") {
                 this.$bvModal.show("plaid-connect");
             }

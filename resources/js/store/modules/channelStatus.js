@@ -1,7 +1,7 @@
 const state = {
     hasShopifyStore: false,
     hasStripeAccount: false,
-    loadingStatus: false
+    loadingStatus: true
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,

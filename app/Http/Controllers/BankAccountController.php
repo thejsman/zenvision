@@ -20,7 +20,7 @@ class BankAccountController extends Controller
         $bankAccount['bank_subtype'] = $request->subtype;
         $bankAccount['bank_name'] = $request->institution_name;
         $bankAccount['isDeleted'] = false;
-        BankAccount::updateOrCreate(['user_id' => Auth::user()->id, 'bank_user' => $request->user, 'bank_name' => $request->institution_name], $bankAccount);
+        BankAccount::updateOrCreate(['user_id' => Auth::user()->id, 'bank_user_id' => $request->user, 'bank_user_name' => $request->institution_name], $bankAccount);
     }
     public function getBankAccounts()
     {
