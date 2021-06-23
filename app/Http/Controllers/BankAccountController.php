@@ -65,7 +65,12 @@ class BankAccountController extends Controller
             $response = json_decode($result, true);
             curl_close($curl);
             if (!isset($response['errors'])) {
-                $balance += $response['accounts'][0]['balances']['available'];
+                if (!is_null($response['accounts'][0]['balances']['available'])) {
+                    $balance += $response['accounts'][0]['balances']['available'];
+                } else {
+                    $balance += $response['accounts'][0]['balances']['current'];
+                }
+
             }
         }
         return $balance;
@@ -140,7 +145,7 @@ class BankAccountController extends Controller
             "secret": "' . env('PLAID_SECRET') . '",
             "client_name": "' . env('PLAID_CLIENT_NAME') . '",
             "user": { "client_user_id": "' . Auth::user()->id . '" },
-            "products": ["transactions", "auth", "identity"],
+            "products": ["transactions"],
             "country_codes": ["US"],
             "language": "en",
             "redirect_uri": "' . env('PLAID_REDIRECT_URI') . '"
