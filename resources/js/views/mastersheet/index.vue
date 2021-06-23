@@ -8,7 +8,7 @@ import ShopifyStoreIcon from "../../components/custom-components/shopifystore-ic
 import PaypalAccountIcon from "../../components/custom-components/paypal-icon";
 import StripeAccount from "../../components/custom-components/stripe-icon";
 import BankAccount from "../../components/custom-components/bankaccount-icon.vue";
-import { mapGetters, mapActions, mapMutations } from "vuex";
+import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
 import Loading from "vue-loading-overlay";
 import { eventBus } from "../../app";
 export default {
@@ -51,10 +51,9 @@ export default {
         Loading
     },
     async created() {
-        console.info("Check this - start");
         await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
-        console.info("check this - end");
+
         this.TOGGGLE_LOADING_STATUS(false);
 
         eventBus.$on("toggleShopifyStore", () => {
@@ -88,12 +87,6 @@ export default {
         ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
         async getShopifyData() {
-            console.log(
-                "Shopify Accounts: ",
-                this.shopifyStores,
-                " and Stripe accounts are : ",
-                this.stripeAccounts
-            );
             const {
                 data: { enabled_on_dashboard, orders }
             } = await axios.get("shopifystoredata");
