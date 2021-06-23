@@ -4,7 +4,6 @@
             Add Channels
             <i class="fas fa-plus pl-1"></i>
         </template>
-
         <PlaidLink
             clientName="Zenvision"
             env="sandbox"
@@ -28,9 +27,6 @@
             </b-dropdown-item>
         </PlaidLink>
 
-
-            Bank accounts
-        </b-dropdown-item>
         <b-dropdown-item :href="paypalUrl">
             <img
                 src="/images/icons/paypal.png"
@@ -77,14 +73,15 @@
                 :bankAccounts="plaidAccounts"
                 :bankInstitutionName="plaidInstitutionName"
                 :plaidPublicToken="plaidPublicToken"
-                @handle-close="$bvModal.hide('facebook-connect')"
+                @handle-close="$bvModal.hide('plaid-connect')"
             />
         </b-modal>
     </b-dropdown>
 </template>
 <script>
 import axios from "axios";
-
+import PlaidLink from "vue-plaid-link2";
+import BankConnect from "../../components/custom-components/modals/bank-account-modal.vue";
 export default {
     data() {
         return {
@@ -93,7 +90,6 @@ export default {
             )}`,
             paypalUrl: `https://www.paypal.com/connect/?flowEntry=static&client_id=AY8ay9apzuTb7arwPRYfLPlPN1tu9QGIKsEyhDBjLI1FGDwfrtWEvcmOEWgtjXLUrxESYB5jQFXziwlP&response_type=code&scope=openid profile&redirect_uri=https%3A%2F%2Fstaging.zenvision.io%2Fpaypal&state=mastersheet-${Math.floor(
                 Math.random() * 10000000 + 1
-
             )}`,
             plaidAccounts: [],
             plaidLinkToken: "",
@@ -108,7 +104,6 @@ export default {
             const accounts = metadata.accounts.filter(
                 account => account.type === "depository"
             );
-
             this.plaidAccounts = accounts;
             this.plaidPublicToken = public_token;
             this.plaidInstitutionName = metadata.institution.name;
@@ -136,7 +131,6 @@ export default {
     },
     created() {
         this.getPlaidLinkToken();
-
     }
 };
 </script>
