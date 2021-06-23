@@ -65,7 +65,12 @@ class BankAccountController extends Controller
             $response = json_decode($result, true);
             curl_close($curl);
             if (!isset($response['errors'])) {
-                $balance += $response['accounts'][0]['balances']['available'];
+                if (!is_null($response['accounts'][0]['balances']['available'])) {
+                    $balance += $response['accounts'][0]['balances']['available'];
+                } else {
+                    $balance += $response['accounts'][0]['balances']['current'];
+                }
+
             }
         }
         return $balance;
