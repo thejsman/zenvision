@@ -331,6 +331,7 @@ export default {
                 this.stripeChargebacks = 0;
                 this.stripeFeeTotal = 0;
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
+
                 if (status && !this.firstLoadStripe) {
                     this.getStripeTransactions();
                     this.getChargebackTotal();
@@ -342,18 +343,28 @@ export default {
                         updateDataMerchantFee(
                             this.data,
                             MERCHANT_FEE,
-                            displayCurrency(this.totalMerchantFees)
+                            this.hasStripeAccount ||
+                                this.hasShopifyAccount ||
+                                this.hasPaypalAccount
+                                ? displayCurrency(this.totalMerchantFees)
+                                : "-"
                         );
                         eventBus.$emit("stripeTransactionEvent", []);
                         eventBus.$emit("stripeChargebackEvent", []);
-                        updateDataMerchantFee(
-                            this.data,
-                            CHARGEBACKS_TOTAL,
-                            displayCurrency(this.totalChargeback)
-                        );
+
+                        if (!this.hasStripeAccount)
+                            updateDataMerchantFee(
+                                this.data,
+                                CHARGEBACKS_TOTAL,
+                                this.hasStripeAccount ||
+                                    this.hasShopifyAccount ||
+                                    this.hasPaypalAccount
+                                    ? displayCurrency(this.totalChargeback)
+                                    : "-"
+                            );
                     }
                 }
-            }, 1000);
+            }, 2000);
         });
 
         eventBus.$on("hasPaypalAccount", status => {
@@ -686,7 +697,7 @@ export default {
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                 setTimeout(() => {
                     updateData(this.data, CHARGEBACKS_TOTAL, "-");
-                }, 500);
+                }, 2000);
             }
         },
         async getMerchantfeesTotal(s_date, e_date) {
