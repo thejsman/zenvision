@@ -140,7 +140,7 @@ class BankAccountController extends Controller
             "secret": "' . env('PLAID_SECRET') . '",
             "client_name": "' . env('PLAID_CLIENT_NAME') . '",
             "user": { "client_user_id": "' . Auth::user()->id . '" },
-            "products": ["transactions", "auth", "identity"],
+            "products": ["transactions"],
             "country_codes": ["US"],
             "language": "en",
             "redirect_uri": "' . env('PLAID_REDIRECT_URI') . '"

@@ -14,7 +14,11 @@
             :onExit="onExit"
             :onEvent="onEvent"
         >
-            <b-dropdown-item href="#" id="teller-connect">
+            <b-dropdown-item
+                href="#"
+                id="teller-connect"
+                @click="handleBankAccountClick"
+            >
                 <img
                     src="/images/icons/bank-icon.svg"
                     alt
@@ -22,7 +26,6 @@
                     width="21"
                     class="channel-icons"
                 />
-
                 Bank accounts
             </b-dropdown-item>
         </PlaidLink>
@@ -47,16 +50,31 @@
             />
             Stripe
         </b-dropdown-item>
-        <b-dropdown-item href="#">
-            <img
-                src="/images/icons/creditcard-icon.svg"
-                alt
-                height="21"
-                width="21"
-                class="channel-icons"
-            />
-            Credit Card
-        </b-dropdown-item>
+        <PlaidLink
+            clientName="Zenvision"
+            env="sandbox"
+            :link_token="plaidLinkToken"
+            :products="['auth', 'transactions']"
+            :onLoad="onLoad"
+            :onSuccess="onSuccess"
+            :onExit="onExit"
+            :onEvent="onEvent"
+        >
+            <b-dropdown-item
+                href="#"
+                id="teller-connect"
+                @click="handleCreditCardClick"
+            >
+                <img
+                    src="/images/icons/creditcard-icon.svg"
+                    alt
+                    height="21"
+                    width="21"
+                    class="channel-icons"
+                />
+                Credit Card
+            </b-dropdown-item>
+        </PlaidLink>
 
         <b-dropdown-item href="#" v-b-modal.shopify-connect>
             <img
@@ -95,17 +113,34 @@ export default {
             plaidAccounts: [],
             plaidLinkToken: "",
             plaidPublicToken: "",
-            plaidInstitutionName: ""
+            plaidInstitutionName: "",
+            plaidClickType: ""
         };
     },
     components: { PlaidLink, BankConnect },
     methods: {
         ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
 
+        handleBankAccountClick() {
+            this.TOGGGLE_LOADING_STATUS(true);
+            this.plaidClickType = "depository";
+            setTimeout(() => {
+                this.TOGGGLE_LOADING_STATUS(false);
+            }, 1000);
+        },
+        handleCreditCardClick() {
+            this.TOGGGLE_LOADING_STATUS(true);
+            this.plaidClickType = "credit";
+            setTimeout(() => {
+                this.TOGGGLE_LOADING_STATUS(false);
+            }, 1000);
+        },
         async onLoad() {},
         onSuccess(public_token, metadata) {
-            const accounts = metadata.accounts.filter(
-                account => account.type === "depository"
+            const accounts = metadata.accounts.filter(account =>
+                this.plaidClickType === "depository"
+                    ? account.type === "depository"
+                    : account.type === "credit"
             );
             this.plaidAccounts = accounts;
             this.plaidPublicToken = public_token;

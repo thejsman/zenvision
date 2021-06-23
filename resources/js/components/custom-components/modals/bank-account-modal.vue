@@ -38,7 +38,7 @@
             </b-card-group>
             <div v-else>
                 <b-alert show variant="warning" class="w-100"
-                    >No Ad account found!</b-alert
+                    >No account found!</b-alert
                 >
             </div>
 
