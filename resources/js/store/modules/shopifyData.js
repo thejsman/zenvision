@@ -14,7 +14,7 @@ const getters = {
     cogsTotal: state => state.cogsTotal
 };
 const actions = {
-    getShopifyStores: async ({ commit, rootState }) => {
+    getShopifyStores: async ({ commit, dispatch }, section = "PA") => {
         console.log("Called from MS");
         try {
             const result = await axios.get("/user/stores");
@@ -25,6 +25,11 @@ const actions = {
                 const status = data.map(
                     element => element.enabled_on_dashboard
                 );
+                if (section === "MS") {
+                    dispatch("getShopifyStoreAllOrders");
+                } else {
+                    dispatch("getShopifyStoreOrders");
+                }
 
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
             } else {
@@ -53,6 +58,7 @@ const actions = {
         }
     },
     getShopifyStoreAllOrders: async ({ commit, rootState }) => {
+        console.log("Dispatch event triggered");
         try {
             const response = await axios.get("shopify-allorders");
 
