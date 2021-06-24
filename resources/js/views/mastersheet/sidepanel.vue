@@ -92,7 +92,6 @@ export default {
         eventBus.$on("stripeChannelRemoved", () => {
             this.totalCash = 0;
             setTimeout(() => {
-                console.log("check this", this.totalCash, this.netEquityData);
                 this.getMastersheetData();
                 this.getStripeBalance();
                 this.getStripeTransactions();
@@ -163,7 +162,6 @@ export default {
                 displayCurrency(debts_credit_card)
             );
             setTimeout(() => {
-                console.log("CogsTotal", this.cogsTotal);
                 updateData(
                     this.debtsData,
                     TOTAL_SUPPLIER_PAYABLE,

@@ -328,7 +328,6 @@ export default {
             }
 
             if (this.bankTransactionsLoaded) {
-                console.log("Bank transactions started");
                 const bankTransactions = await this.getBankAccountTransactions();
 
                 if (bankTransactions.length > 0) {
@@ -393,7 +392,7 @@ export default {
                 return transaction.date;
             });
             this.groupedTransactions = groups;
-            console.log({ groups });
+
             var ordered = [];
 
             const keys = _.keys(groups);
@@ -401,11 +400,11 @@ export default {
             const sortedKeys = keys.sort(function(a, b) {
                 return new Date(b) - new Date(a);
             });
-            console.log({ sortedKeys });
+
             sortedKeys.forEach(key => {
                 ordered.push({ "`${key}`": groups[key] });
             });
-            console.log({ ordered });
+
             this.items = sortedKeys;
 
             this.loading = false;

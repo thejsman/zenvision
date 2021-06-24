@@ -51,6 +51,7 @@ export default {
         Loading
     },
     async created() {
+        await this.loadAllChannels();
         await this.getStripeAccounts();
         await this.getShopifyStoreAllOrders();
 
@@ -84,6 +85,7 @@ export default {
         this.getShopifyData();
     },
     methods: {
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
         ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
         async getShopifyData() {
