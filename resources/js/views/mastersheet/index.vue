@@ -25,17 +25,6 @@ export default {
             "shopifyAllOrders",
             "loadingStatus",
             "cogsTotal"
-        ]),
-        ...mapState("MasterSheet", [
-            "netEquityTotal",
-            "assetsCashTotal",
-            "assetsInventoryTotal",
-            "assetsReservesTotal",
-            "debtsCreditCardTotal",
-            "debtsSupplierPayableTotal",
-            "YesterdaysNetEquityFluctuationTotal",
-            "YesterdaysProfitOrLossTotal",
-            "OtherExpensesTotal"
         ])
     },
     components: {
@@ -52,10 +41,6 @@ export default {
     },
     async created() {
         await this.loadAllChannels();
-        await this.getStripeAccounts();
-        await this.getShopifyStoreAllOrders();
-
-        this.TOGGGLE_LOADING_STATUS(false);
 
         eventBus.$on("toggleShopifyStore", () => {
             this.getShopifyData();
@@ -81,19 +66,12 @@ export default {
                     : this.$bvModal.show("stripe-add-account-error");
             }, 1000);
         }
-
-        this.getShopifyData();
     },
     methods: {
         ...mapActions("MasterSheet", ["loadAllChannels"]),
         ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
         ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
-        async getShopifyData() {
-            const {
-                data: { enabled_on_dashboard, orders }
-            } = await axios.get("shopifystoredata");
-            this.allOrders = orders;
-        },
+
         handleOk() {
             window.location.href = "/mastersheet";
         }
@@ -117,7 +95,7 @@ export default {
                 >
             </div>
             <div class="col-3 mt-4">
-                <Sidepanel :orders="shopifyAllOrders" />
+                <Sidepanel />
             </div>
             <div class="col-9 mt-4">
                 <Mainpanel :orders="shopifyAllOrders" />
