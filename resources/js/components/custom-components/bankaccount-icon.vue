@@ -7,7 +7,9 @@
                     v-b-tooltip.hover="account.bank_name"
                 >
                     <img
-                        :src="`/images/bank-icons/${account.bank_name}.svg`"
+                        :src="
+                            `/images/bank-icons/${account.institution_id}.png`
+                        "
                         alt
                         height="21"
                     />
