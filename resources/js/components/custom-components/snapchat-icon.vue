@@ -1,9 +1,10 @@
 <template>
     <div class="flex-start pl-1">
-        <div class="d-flex flex-row dropdown">
+        <div class="d-flex flex-row">
             <div
                 v-for="snapchatAccount in snapchatAccounts"
                 :key="snapchatAccount.id"
+                class="dropdown"
             >
                 <div
                     class="border rounded p-2 ml-2 dropbtn"

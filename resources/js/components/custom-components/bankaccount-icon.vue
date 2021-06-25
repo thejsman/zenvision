@@ -1,13 +1,19 @@
 <template>
     <div class="flex-start pl-2">
-        <div class="d-flex flex-row dropdown">
-            <div v-for="account in bankAccounts" :key="account.id">
+        <div class="d-flex flex-row">
+            <div
+                v-for="account in bankAccounts"
+                :key="account.id"
+                class="dropdown"
+            >
                 <div
                     class="border rounded p-2 dropbtn border-primary bg-white  ml-2"
                     v-b-tooltip.hover="account.bank_name"
                 >
                     <img
-                        :src="`/images/bank-icons/${account.bank_name}.svg`"
+                        :src="
+                            `/images/bank-icons/${account.institution_id}.png`
+                        "
                         alt
                         height="21"
                     />
@@ -24,12 +30,16 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "BankAccountIcon",
     data() {
         return {
-            bankAccounts: []
+            // bankAccounts: []
         };
+    },
+    computed: {
+        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"])
     },
     props: {
         disableFeature: {
@@ -41,10 +51,8 @@ export default {
         this.getBankAccounts();
     },
     methods: {
-        async getBankAccounts() {
-            const bankAccounts = await axios.get("/bankaccounts");
-            this.bankAccounts = bankAccounts.data;
-        },
+        ...mapActions("BankAccount", ["getBankAccounts"]),
+
         async handleClick(store) {
             try {
                 await axios.patch("shopifystore", store);

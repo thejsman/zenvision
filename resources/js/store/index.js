@@ -6,6 +6,7 @@ import channelStatus from "./modules/channelStatus";
 import keyPerformance from "./modules/keyPerformance";
 import StripeAccount from "./modules/stripeAccount";
 import MasterSheet from "./modules/masterSheet";
+import BankAccount from "./modules/bankAccount";
 //Load Vuex
 Vue.use(Vuex);
 
@@ -17,6 +18,7 @@ export default new Vuex.Store({
         channelStatus,
         keyPerformance,
         StripeAccount,
-        MasterSheet
+        MasterSheet,
+        BankAccount
     }
 });

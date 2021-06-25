@@ -1,9 +1,10 @@
 <template>
     <div class="flex-start pl-1">
-        <div class="d-flex flex-row dropdown">
+        <div class="d-flex flex-row">
             <div
                 v-for="tiktokAccount in tiktokAccounts"
                 :key="tiktokAccount.id"
+                class="dropdown"
             >
                 <div
                     class="border rounded p-2 ml-2 dropbtn"

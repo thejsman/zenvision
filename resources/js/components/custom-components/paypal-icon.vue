@@ -1,9 +1,13 @@
 <template>
     <div class="flex-start pl-2">
-        <div class="d-flex flex-row dropdown">
-            <div v-for="account in ppAccounts" :key="account.id">
+        <div class="d-flex flex-row">
+            <div
+                v-for="account in ppAccounts"
+                :key="account.id"
+                class="dropdown"
+            >
                 <div
-                    class="border rounded p-2 ml-1 dropbtn"
+                    class="border rounded p-2 ml-1 dropbtn ml-2"
                     :class="{ 'border-primary': account.enabled_on_dashboard }"
                     @click="disableFeature ? handleClick(account) : null"
                     v-b-tooltip.hover="account.name"

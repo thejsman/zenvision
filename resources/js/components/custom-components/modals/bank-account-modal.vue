@@ -82,9 +82,9 @@ export default {
             type: Boolean,
             default: false
         },
-        bankInstitutionName: {
-            type: String,
-            default: ""
+        bankInstitution: {
+            type: Object,
+            default: () => {}
         },
         plaidPublicToken: {
             type: String,
@@ -100,7 +100,8 @@ export default {
         async handleClick(account) {
             try {
                 console.log(this.plaidPublicToken);
-                account.institution_name = this.bankInstitutionName;
+                account.institution_name = this.bankInstitution.name;
+                account.institution_id = this.bankInstitution.institution_id;
                 account.public_token = this.plaidPublicToken;
                 console.log("Account from bank modal is ", account);
                 await axios.post("/bankaccount", account);
