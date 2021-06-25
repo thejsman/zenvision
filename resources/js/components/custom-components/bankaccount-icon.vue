@@ -1,7 +1,11 @@
 <template>
     <div class="flex-start pl-2">
-        <div class="d-flex flex-row dropdown">
-            <div v-for="account in bankAccounts" :key="account.id">
+        <div class="d-flex flex-row">
+            <div
+                v-for="account in bankAccounts"
+                :key="account.id"
+                class="dropdown"
+            >
                 <div
                     class="border rounded p-2 dropbtn border-primary bg-white  ml-2"
                     v-b-tooltip.hover="account.bank_name"

@@ -1,9 +1,9 @@
 <template>
     <div class="flex-start pl-2">
-        <div class="d-flex flex-row dropdown">
-            <div v-for="store in stores" :key="store.id">
+        <div class="d-flex flex-row">
+            <div v-for="store in stores" :key="store.id" class="dropdown">
                 <div
-                    class="border rounded p-2 dropbtn"
+                    class="border rounded p-2 dropbtn ml-2"
                     :class="{ 'border-primary': store.enabled_on_dashboard }"
                     @click="disableFeature ? handleClick(store) : null"
                     v-b-tooltip.hover="store.store_name"
