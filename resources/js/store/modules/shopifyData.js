@@ -1,5 +1,5 @@
 import axios from "axios";
-import { sum, sumBy } from "lodash";
+import { sumBy } from "lodash";
 
 const state = {
     shopifyStores: [],

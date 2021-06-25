@@ -179,7 +179,7 @@ export default {
                 total_supplier_payable -
                 debts_credit_card -
                 debts_supplier_payable -
-                cogs;
+                this.cogsTotal;
             eventBus.$emit("netEquityTotal", netEquityTotal);
             updateData(
                 this.netEquityData,

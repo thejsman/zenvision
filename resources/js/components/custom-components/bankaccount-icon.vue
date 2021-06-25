@@ -24,12 +24,16 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "BankAccountIcon",
     data() {
         return {
-            bankAccounts: []
+            // bankAccounts: []
         };
+    },
+    computed: {
+        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"])
     },
     props: {
         disableFeature: {
@@ -41,10 +45,8 @@ export default {
         this.getBankAccounts();
     },
     methods: {
-        async getBankAccounts() {
-            const bankAccounts = await axios.get("/bankaccounts");
-            this.bankAccounts = bankAccounts.data;
-        },
+        ...mapActions("BankAccount", ["getBankAccounts"]),
+
         async handleClick(store) {
             try {
                 await axios.patch("shopifystore", store);

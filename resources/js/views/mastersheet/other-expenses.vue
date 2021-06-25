@@ -120,7 +120,9 @@
                                     />
                                     <img
                                         v-if="item.type === 'bank'"
-                                        src="/images/bank-icons/Chase.svg"
+                                        :src="
+                                            `/images/bank-icons/${item.logo}.png`
+                                        "
                                         alt
                                         height="30"
                                         width="30"
@@ -158,6 +160,8 @@ import axios from "axios";
 import { displayCurrency } from "../../utils";
 import moment from "moment";
 import { eventBus } from "../../app";
+import { mapGetters } from "vuex";
+
 export default {
     props: {
         set: {
@@ -195,6 +199,7 @@ export default {
         });
     },
     computed: {
+        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"]),
         tagsLenght() {
             return this.chips.length;
         },
@@ -328,7 +333,6 @@ export default {
             }
 
             if (this.bankTransactionsLoaded) {
-                console.log("Bank transactions started");
                 const bankTransactions = await this.getBankAccountTransactions();
 
                 if (bankTransactions.length > 0) {
@@ -346,7 +350,10 @@ export default {
                                 id: bt.transaction_id,
                                 date: moment(bt.date).format("LL"),
                                 description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount))
+                                amount: displayCurrency(Math.abs(bt.amount)),
+                                logo: this.bankLogos.find(
+                                    o => (o.bank_user_id = bt.account_id)
+                                ).institution_id
                             })
                         );
                     } else {
@@ -356,7 +363,10 @@ export default {
                                 id: bt.transaction_id,
                                 date: moment(bt.date).format("LL"),
                                 description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount))
+                                amount: displayCurrency(Math.abs(bt.amount)),
+                                logo: this.bankLogos.find(
+                                    o => (o.bank_user_id = bt.account_id)
+                                ).institution_id
                             })
                         );
                     }
@@ -372,7 +382,10 @@ export default {
                             id: bt.transaction_id,
                             date: moment(bt.date).format("LL"),
                             description: bt.name,
-                            amount: displayCurrency(Math.abs(bt.amount))
+                            amount: displayCurrency(Math.abs(bt.amount)),
+                            logo: this.bankLogos.find(
+                                o => (o.bank_user_id = bt.account_id)
+                            ).institution_id
                         })
                     );
                 } else {
@@ -382,7 +395,10 @@ export default {
                             id: bt.transaction_id,
                             date: moment(bt.date).format("LL"),
                             description: bt.name,
-                            amount: displayCurrency(Math.abs(bt.amount))
+                            amount: displayCurrency(Math.abs(bt.amount)),
+                            logo: this.bankLogos.find(
+                                o => (o.bank_user_id = bt.account_id)
+                            ).institution_id
                         })
                     );
                 }
@@ -393,7 +409,7 @@ export default {
                 return transaction.date;
             });
             this.groupedTransactions = groups;
-            console.log({ groups });
+
             var ordered = [];
 
             const keys = _.keys(groups);
@@ -401,11 +417,11 @@ export default {
             const sortedKeys = keys.sort(function(a, b) {
                 return new Date(b) - new Date(a);
             });
-            console.log({ sortedKeys });
+
             sortedKeys.forEach(key => {
                 ordered.push({ "`${key}`": groups[key] });
             });
-            console.log({ ordered });
+
             this.items = sortedKeys;
 
             this.loading = false;

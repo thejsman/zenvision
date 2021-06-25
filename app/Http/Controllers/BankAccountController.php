@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\BankAccount;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BankAccountController extends Controller
 {
@@ -19,8 +20,15 @@ class BankAccountController extends Controller
         $bankAccount['bank_type'] = $request->type;
         $bankAccount['bank_subtype'] = $request->subtype;
         $bankAccount['bank_name'] = $request->institution_name;
+        $bankAccount['institution_id'] = $request->institution_id;
         $bankAccount['isDeleted'] = false;
+
         BankAccount::updateOrCreate(['user_id' => Auth::user()->id, 'bank_user_id' => $request->user, 'bank_user_name' => $request->institution_name], $bankAccount);
+
+        // Save Bank Logo
+        $blob = $this->getBankLogo($request->institution_id);
+        $this->createImageFromBase64($blob, $request->institution_id);
+
     }
     public function getBankAccounts()
     {
@@ -119,11 +127,54 @@ class BankAccountController extends Controller
         }
         return $transactions;
     }
-    public function getAccountInfo($access_token)
+    public function createImageFromBase64($blob, $name)
     {
-
+        $file_name = $name . '.png';
+        if ($blob != "") {
+            Storage::disk('bank_icons')->put($file_name, base64_decode($blob));
+        }
     }
 
+    public function getBankLogo($institution_id)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://sandbox.plaid.com/institutions/get_by_id',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+            "institution_id": "' . $institution_id . '",
+            "client_id": "' . env('PLAID_CLIENT_ID') . '",
+            "secret": "' . env('PLAID_SECRET') . '",
+            "country_codes": ["US"],
+            "options" : {
+                    "include_optional_metadata" : true
+                 }
+                }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $result = curl_exec($curl);
+        $response = json_decode($result, true);
+
+        curl_close($curl);
+
+        if (!isset($response['errors'])) {
+
+            return $response['institution']['logo'];
+        } else {
+            return null;
+        }
+    }
     // Plaid
 
     public function generateLinkToken()

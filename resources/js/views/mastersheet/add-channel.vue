@@ -89,7 +89,7 @@
         <b-modal id="plaid-connect" size="lg" centered hide-footer hide-header>
             <BankConnect
                 :bankAccounts="plaidAccounts"
-                :bankInstitutionName="plaidInstitutionName"
+                :bankInstitution="plaidInstitution"
                 :plaidPublicToken="plaidPublicToken"
                 @handle-close="$bvModal.hide('plaid-connect')"
             />
@@ -113,7 +113,7 @@ export default {
             plaidAccounts: [],
             plaidLinkToken: "",
             plaidPublicToken: "",
-            plaidInstitutionName: "",
+            plaidInstitution: "",
             plaidClickType: ""
         };
     },
@@ -137,6 +137,7 @@ export default {
         },
         async onLoad() {},
         onSuccess(public_token, metadata) {
+            console.log({ public_token, metadata });
             const accounts = metadata.accounts.filter(account =>
                 this.plaidClickType === "depository"
                     ? account.type === "depository"
@@ -144,7 +145,7 @@ export default {
             );
             this.plaidAccounts = accounts;
             this.plaidPublicToken = public_token;
-            this.plaidInstitutionName = metadata.institution.name;
+            this.plaidInstitution = metadata.institution;
         },
         onExit(err, metadata) {
             console.log("OnExit : ", { err, metadata });

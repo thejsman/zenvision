@@ -1,6 +1,7 @@
 const state = {
     hasShopifyStore: false,
     hasStripeAccount: false,
+    hasBankAccount: false,
     loadingStatus: true
 };
 const getters = {
@@ -28,6 +29,9 @@ const mutations = {
     },
     TOGGGLE_LOADING_STATUS: (state, status) => {
         state.loadingStatus = status;
+    },
+    TOGGGLE_BANK_ACCOUNT_STATUS: (state, status) => {
+        state.hasBankAccount = status;
     }
 };
 
