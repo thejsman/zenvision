@@ -70,6 +70,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsFromDb');
     Route::patch('stripeconnect', 'StripeController@toogleAccount');
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
+    Route::get('stripeaccount-transactions', 'StripeController@getStripeTransactionsDateWise');
 
     //Bank Account
     Route::post('bankaccount', 'BankAccountController@store');

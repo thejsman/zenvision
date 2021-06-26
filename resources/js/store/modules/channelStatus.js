@@ -7,6 +7,7 @@ const state = {
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
     hasStripeAccountCS: state => state.hasStripeAccount,
+    hasBankAccountCS: state => state.hasBankAccount,
     loadingStatus: state => state.loadingStatus
 };
 const actions = {

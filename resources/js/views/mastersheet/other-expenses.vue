@@ -87,6 +87,15 @@
                         >
                             <h3>
                                 No transactions to show.
+                                <span v-if="nextTransButton">
+                                    <b-button
+                                        type="submit"
+                                        variant="primary"
+                                        class="my-2"
+                                        @click="loadMoreTransactions"
+                                        >Load next 7 days transactions</b-button
+                                    >
+                                </span>
                             </h3>
                         </div>
                         <div
@@ -142,6 +151,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="text-center" v-if="!noTransactions">
+                            <b-button
+                                type="submit"
+                                variant="primary"
+                                class="my-2"
+                                @click="loadMoreTransactions"
+                                >Load more</b-button
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,7 +178,7 @@ import axios from "axios";
 import { displayCurrency } from "../../utils";
 import moment from "moment";
 import { eventBus } from "../../app";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -170,6 +188,7 @@ export default {
         }
     },
     created() {
+        this.getBankTransactions();
         eventBus.$on("stripeChannelRemoved", accountId => {
             const filteredStripeTransactions = this.allTransactions.filter(
                 e => e.stripe_user_id === accountId
@@ -199,7 +218,18 @@ export default {
         });
     },
     computed: {
-        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"]),
+        ...mapGetters("BankAccount", [
+            "bankAccounts",
+            "bankLogos",
+            "bankTransactions"
+        ]),
+        ...mapGetters([
+            "hasShopifyStoreCS",
+            "hasStripeAccountCS",
+            "hasBankAccountCS",
+            "stripeTransactions"
+        ]),
+
         tagsLenght() {
             return this.chips.length;
         },
@@ -219,6 +249,7 @@ export default {
             noTransactions: true,
             bankTransactionsLoaded: true,
             bankTransactionsArray: [],
+            nextTransButton: false,
             chips: [
                 "Shopify",
                 "Facebook",
@@ -240,14 +271,18 @@ export default {
                 listElm.scrollTop + listElm.clientHeight >=
                 listElm.scrollHeight
             ) {
-                this.loadMore();
+                // this.loadMore();
             }
         });
 
         // Initially load some items.
-        this.loadMore();
+        setTimeout(() => {
+            this.loadMore();
+        }, 3000);
     },
     methods: {
+        ...mapActions("BankAccount", ["getBankTransactions"]),
+        ...mapActions(["getStripeTransactions", "setNextDatesForTransactions"]),
         saveChip(e) {
             e.preventDefault();
             const { chips, currentInput, set } = this;
@@ -274,40 +309,38 @@ export default {
                 return [];
             }
         },
-        async getBankAccountTransactions() {
-            try {
-                const result = await axios.get("bankaccount-transactions");
-                const data = result.data;
-
-                return data;
-            } catch (err) {
-                console.log(err);
-                return [];
-            }
+        loadMoreTransactions() {
+            console.log("load more transactions");
+            //dispatch action to set next dates
+            this.setNextDatesForTransactions();
+            //call getTransactions();
+            this.getTransactions();
         },
         async getTransactions() {
+            this.nextTransButton = false;
+            console.log(
+                "Inside funciton",
+                this.hasShopifyStoreCS,
+                this.hasStripeAccountCS,
+                this.hasBankAccountCS
+            );
             this.loading = true;
-            // const paypal = await this.getPaypalTransactions();
-            const stripe = await axios.get(this.stripePaginatedUrl);
 
-            const stripeData = stripe.data.data;
-
-            if (
-                stripe.data.current_page === 1 &&
-                stripe.data.data.length === 0
-            ) {
-                this.noTransactions = true;
-                this.loading = false;
-
-                return;
-            }
-            if (
-                stripe.data.current_page !== 1 &&
-                stripe.data.next_page_url === null
-            ) {
-                return;
-            } else {
-                this.stripePaginatedUrl = stripe.data.next_page_url;
+            if (this.hasStripeAccountCS) {
+                console.log("Inside funciton-2");
+                await this.getStripeTransactions();
+                if (this.stripeTransactions.length > 0) {
+                    this.noTransactions = false;
+                    this.stripeTransactions.forEach(s =>
+                        this.allTransactions.push({
+                            type: "stripe",
+                            id: s.id,
+                            date: moment(s.created).format("LL"),
+                            description: s.description,
+                            amount: displayCurrency(s.gross)
+                        })
+                    );
+                }
             }
 
             // paypal.forEach(p =>
@@ -319,77 +352,13 @@ export default {
             //         amount: p.transaction_amount.value
             //     })
             // );
-            if (stripeData !== undefined) {
-                this.noTransactions = false;
-                stripeData.forEach(s =>
-                    this.allTransactions.push({
-                        type: "stripe",
-                        id: s.id,
-                        date: moment(s.created).format("LL"),
-                        description: s.description,
-                        amount: displayCurrency(s.gross)
-                    })
-                );
-            }
 
-            if (this.bankTransactionsLoaded) {
-                const bankTransactions = await this.getBankAccountTransactions();
-
-                if (bankTransactions.length > 0) {
+            if (this.hasBankAccountCS) {
+                console.log("Inside funciton-3");
+                await this.getBankTransactions();
+                if (this.bankTransactions.length > 0) {
                     this.noTransactions = false;
-                    this.bankTransactionsArray = [...bankTransactions];
-                    const arrayLenght = this.bankTransactionsArray.length;
-                    if (arrayLenght > 20) {
-                        const tempArray = this.bankTransactionsArray.splice(
-                            0,
-                            20
-                        );
-                        tempArray.forEach(bt =>
-                            this.allTransactions.push({
-                                type: "bank",
-                                id: bt.transaction_id,
-                                date: moment(bt.date).format("LL"),
-                                description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount)),
-                                logo: this.bankLogos.find(
-                                    o => (o.bank_user_id = bt.account_id)
-                                ).institution_id
-                            })
-                        );
-                    } else {
-                        this.bankTransactionsArray.forEach(bt =>
-                            this.allTransactions.push({
-                                type: "bank",
-                                id: bt.transaction_id,
-                                date: moment(bt.date).format("LL"),
-                                description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount)),
-                                logo: this.bankLogos.find(
-                                    o => (o.bank_user_id = bt.account_id)
-                                ).institution_id
-                            })
-                        );
-                    }
-                }
-                this.bankTransactionsLoaded = false;
-            } else {
-                const arrayLenght = this.bankTransactionsArray.length;
-                if (arrayLenght > 20) {
-                    const tempArray = this.bankTransactionsArray.splice(0, 20);
-                    tempArray.forEach(bt =>
-                        this.allTransactions.push({
-                            type: "bank",
-                            id: bt.transaction_id,
-                            date: moment(bt.date).format("LL"),
-                            description: bt.name,
-                            amount: displayCurrency(Math.abs(bt.amount)),
-                            logo: this.bankLogos.find(
-                                o => (o.bank_user_id = bt.account_id)
-                            ).institution_id
-                        })
-                    );
-                } else {
-                    this.bankTransactionsArray.forEach(bt =>
+                    this.bankTransactions.forEach(bt =>
                         this.allTransactions.push({
                             type: "bank",
                             id: bt.transaction_id,
@@ -403,6 +372,77 @@ export default {
                     );
                 }
             }
+            // if (this.bankTransactionsLoaded) {
+            //     const bankTransactions = await this.getBankAccountTransactions();
+
+            //     if (bankTransactions.length > 0) {
+            //         this.noTransactions = false;
+            //         this.bankTransactionsArray = [...bankTransactions];
+            //         const arrayLenght = this.bankTransactionsArray.length;
+            //         if (arrayLenght > 20) {
+            //             const tempArray = this.bankTransactionsArray.splice(
+            //                 0,
+            //                 20
+            //             );
+            //             tempArray.forEach(bt =>
+            //                 this.allTransactions.push({
+            //                     type: "bank",
+            //                     id: bt.transaction_id,
+            //                     date: moment(bt.date).format("LL"),
+            //                     description: bt.name,
+            //                     amount: displayCurrency(Math.abs(bt.amount)),
+            //                     logo: this.bankLogos.find(
+            //                         o => (o.bank_user_id = bt.account_id)
+            //                     ).institution_id
+            //                 })
+            //             );
+            //         } else {
+            //             this.bankTransactionsArray.forEach(bt =>
+            //                 this.allTransactions.push({
+            //                     type: "bank",
+            //                     id: bt.transaction_id,
+            //                     date: moment(bt.date).format("LL"),
+            //                     description: bt.name,
+            //                     amount: displayCurrency(Math.abs(bt.amount)),
+            //                     logo: this.bankLogos.find(
+            //                         o => (o.bank_user_id = bt.account_id)
+            //                     ).institution_id
+            //                 })
+            //             );
+            //         }
+            //     }
+            //     this.bankTransactionsLoaded = false;
+            // } else {
+            //     const arrayLenght = this.bankTransactionsArray.length;
+            //     if (arrayLenght > 20) {
+            //         const tempArray = this.bankTransactionsArray.splice(0, 20);
+            //         tempArray.forEach(bt =>
+            //             this.allTransactions.push({
+            //                 type: "bank",
+            //                 id: bt.transaction_id,
+            //                 date: moment(bt.date).format("LL"),
+            //                 description: bt.name,
+            //                 amount: displayCurrency(Math.abs(bt.amount)),
+            //                 logo: this.bankLogos.find(
+            //                     o => (o.bank_user_id = bt.account_id)
+            //                 ).institution_id
+            //             })
+            //         );
+            //     } else {
+            //         this.bankTransactionsArray.forEach(bt =>
+            //             this.allTransactions.push({
+            //                 type: "bank",
+            //                 id: bt.transaction_id,
+            //                 date: moment(bt.date).format("LL"),
+            //                 description: bt.name,
+            //                 amount: displayCurrency(Math.abs(bt.amount)),
+            //                 logo: this.bankLogos.find(
+            //                     o => (o.bank_user_id = bt.account_id)
+            //                 ).institution_id
+            //             })
+            //         );
+            //     }
+            // }
 
             //Group all transaction by date
             var groups = _.groupBy(this.allTransactions, function(transaction) {
@@ -423,11 +463,13 @@ export default {
             });
 
             this.items = sortedKeys;
-
+            if (this.items.length === 0) {
+                this.nextTransButton = true;
+            }
             this.loading = false;
         },
         async loadMore() {
-            await this.getTransactions();
+            this.getTransactions();
         },
         showName(item) {
             if (item.hasOwnProperty("transaction_subject")) {

@@ -24,11 +24,7 @@ const state = {
     assetsCashTotalLoading: true,
     assetsInventoryTotalLoading: true,
     assetsReservesTotalLoading: true,
-    transactionsArray: [],
-    transStartDate: moment()
-        .subtract(7, "days")
-        .format("YYYY-MM-DD"),
-    transEndDate: moment().format("YYYY-MM-DD")
+    transactionsArray: []
 };
 const getters = {
     transactionsStartDate: state => state.transStartDate,
@@ -53,8 +49,7 @@ const getters = {
             loading: state.assetsReservesTotalLoading
         }
     ],
-    debtsSupplierPayableTotal: (state, getters, rootState, rootGetters) => {
-        console.log({ cogsTotal: rootGetters.cogsTotal });
+    debtsSupplierPayableTotal: (state, rootGetters) => {
         state.debtsSupplierPayableTotal = rootGetters.cogsTotal;
         return rootGetters.cogsTotal;
     },
@@ -68,32 +63,17 @@ const getters = {
 const actions = {
     loadAllChannels: async ({ dispatch }) => {
         dispatch("toggleLoadingStatus", true, { root: true });
-        await dispatch("getShopifyStores", "MS", { root: true });
-        await dispatch("getStripeAccounts", null, { root: true });
+        dispatch("getShopifyStores", "MS", { root: true });
+        dispatch("getStripeAccounts", null, { root: true });
         dispatch("toggleLoadingStatus", false, { root: true });
     },
     setLoadingStatus: ({ commit }, payload) => {
         commit("TOGGLE_LOADING_STATUS", payload);
-    },
-    setNextDates: ({ commit }) => {
-        commit("SET_NEXT_DATES");
     }
 };
 const mutations = {
     TOGGLE_LOADING_STATUS: (state, { channel, status }) => {
         console.log("TOGGLE_LOADING_STATUS has been called", state);
-
-        // `${state.channel}` = status;
-    },
-    SET_NEXT_DATES: state => {
-        state.transEndDate = state.transStartDate
-            .moment()
-            .subtract(1, "days")
-            .format("YYYY-MM-DD");
-        state.transEndDate = state.transEndDate
-            .moment()
-            .subtract(7, "days")
-            .format("YYYY-MM-DD");
     }
 };
 

@@ -25,10 +25,14 @@ const actions = {
             console.log(err);
         }
     },
-    getBankTransactions: async ({ commit }) => {
-        console.log("getBankTransactions method called");
+    getBankTransactions: async ({ commit, rootGetters }) => {
         try {
-            const result = await axios.get("bankaccount-transactions");
+            const result = await axios.get("bankaccount-transactions", {
+                params: {
+                    start_date: rootGetters.transStartDate,
+                    end_date: rootGetters.transEndDate
+                }
+            });
             const data = result.data;
             commit("SET_BANK_TRANSACTIONS", data);
         } catch (err) {
