@@ -42,8 +42,8 @@ export default {
     async created() {
         await this.loadAllChannels();
 
-        eventBus.$on("toggleShopifyStore", () => {
-            this.getShopifyData();
+        eventBus.$on("toggleShopifyStore", async () => {
+            await this.loadAllChannels();
         });
 
         if (new URL(location.href).searchParams.get("shopifyAddAccount")) {

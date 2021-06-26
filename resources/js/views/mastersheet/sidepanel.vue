@@ -18,7 +18,7 @@ import {
 } from "../../constants";
 import axios from "axios";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     components: { Stat },
@@ -79,13 +79,34 @@ export default {
     },
 
     computed: {
-        ...mapGetters("MasterSheet", ["debtsSupplierPayableTotal"]),
+        ...mapGetters("MasterSheet", [
+            "debtsSupplierPayableTotal",
+            "netEquityTotal"
+        ]),
         ...mapGetters(["cogsTotal"])
     },
     props: {
         orders: {
             type: Array,
             default: () => []
+        }
+    },
+    watch: {
+        debtsSupplierPayableTotal(newVal, oldVal) {
+            updateData(
+                this.debtsData,
+                TOTAL_SUPPLIER_PAYABLE,
+                displayCurrency(this.debtsSupplierPayableTotal)
+            );
+        },
+        netEquityTotal() {
+            console.log("NetET changed");
+            eventBus.$emit("netEquityTotal", this.netEquityTotal);
+            updateData(
+                this.netEquityData,
+                NET_EQUITY,
+                displayCurrency(this.netEquityTotal)
+            );
         }
     },
     created() {
@@ -100,7 +121,8 @@ export default {
         });
         eventBus.$on("toggleShopifyStore", () => {
             this.totalCash = 0;
-            setTimeout(() => {
+            setTimeout(async () => {
+                await this.loadAllChannels();
                 setLoading(this.statData);
                 setLoading(this.netEquityData);
                 this.getMastersheetData();
@@ -115,6 +137,7 @@ export default {
         this.getBankAccountBalance();
     },
     methods: {
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
         async getBankAccountBalance() {
             setLoadingSingle(this.statData, TOTAL_CASH);
 
@@ -182,7 +205,7 @@ export default {
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(netEquityTotal)
+                displayCurrency(this.netEquityTotal)
             );
         },
         async getStripeBalance() {
