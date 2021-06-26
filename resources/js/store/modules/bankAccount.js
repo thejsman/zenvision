@@ -1,10 +1,12 @@
 const state = {
     bankAccountArray: [],
-    bankLogoArray: []
+    bankLogoArray: [],
+    bankTransactionsArray: []
 };
 const getters = {
     bankAccounts: state => state.bankAccountArray,
-    bankLogos: state => state.bankLogoArray
+    bankLogos: state => state.bankLogoArray,
+    bankTransactions: state => state.bankTransactionsArray
 };
 const actions = {
     getBankAccounts: async ({ commit }) => {
@@ -22,17 +24,28 @@ const actions = {
             commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
             console.log(err);
         }
+    },
+    getBankTransactions: async ({ commit }) => {
+        console.log("getBankTransactions method called");
+        try {
+            const result = await axios.get("bankaccount-transactions");
+            const data = result.data;
+            commit("SET_BANK_TRANSACTIONS", data);
+        } catch (err) {
+            console.log(err);
+        }
     }
 };
 const mutations = {
     SET_BANK_ACCOUNT: (state, payload) => (state.bankAccountArray = payload),
-    SET_BANK_LOGO: (state, payload) => {
-        state.bankAccountArray.forEach((account, index) => {
+    SET_BANK_LOGO: state => {
+        state.bankAccountArray.forEach(account => {
             const { bank_user_id, institution_id } = account;
-
             state.bankLogoArray.push({ bank_user_id, institution_id });
         });
-    }
+    },
+    SET_BANK_TRANSACTIONS: (state, payload) =>
+        (state.bankTransactionsArray = payload)
 };
 export default {
     namespaced: true,

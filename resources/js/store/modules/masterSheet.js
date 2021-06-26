@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 import {
     NET_EQUITY,
     TOTAL_CASH,
@@ -8,6 +9,7 @@ import {
     TOTAL_SUPPLIER_PAYABLE
 } from "../../constants";
 import { displayCurrency } from "../../utils";
+
 const state = {
     assetsData: [],
     netEquityTotal: 0,
@@ -21,9 +23,16 @@ const state = {
     OtherExpensesTotal: 0,
     assetsCashTotalLoading: true,
     assetsInventoryTotalLoading: true,
-    assetsReservesTotalLoading: true
+    assetsReservesTotalLoading: true,
+    transactionsArray: [],
+    transStartDate: moment()
+        .subtract(7, "days")
+        .format("YYYY-MM-DD"),
+    transEndDate: moment().format("YYYY-MM-DD")
 };
 const getters = {
+    transactionsStartDate: state => state.transStartDate,
+    transactionsEndDate: state => state.transEndDate,
     assetsDataArray: state => [
         {
             icon: "bx bx-copy-alt",
@@ -65,6 +74,9 @@ const actions = {
     },
     setLoadingStatus: ({ commit }, payload) => {
         commit("TOGGLE_LOADING_STATUS", payload);
+    },
+    setNextDates: ({ commit }) => {
+        commit("SET_NEXT_DATES");
     }
 };
 const mutations = {
@@ -72,6 +84,16 @@ const mutations = {
         console.log("TOGGLE_LOADING_STATUS has been called", state);
 
         // `${state.channel}` = status;
+    },
+    SET_NEXT_DATES: state => {
+        state.transEndDate = state.transStartDate
+            .moment()
+            .subtract(1, "days")
+            .format("YYYY-MM-DD");
+        state.transEndDate = state.transEndDate
+            .moment()
+            .subtract(7, "days")
+            .format("YYYY-MM-DD");
     }
 };
 
