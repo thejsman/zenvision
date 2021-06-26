@@ -226,7 +226,23 @@ class ShopifyStoreController extends Controller
             $response = CustomRequests::postRequest($curl_url, $curl_data, $access_token);
         }
     }
+    public static function getShopifyStoreBalance($user = null)
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        $store_balance = 0;
+        foreach ($enabled_on_dashboard as $store_id) {
 
+            $store = ShopifyStore::find($store_id)->getStoreDetails();
+            $url = "https://" . $store['store_url'] . "/admin/api/2021-04/shopify_payments/balance.json";
+            $access_token = $store['api_token'];
+            $response = CustomRequests::getRequest($url, [], $access_token);
+            if (!isset($response['errors'])) {
+                $store_balance += array_column($response['balance'], 'amount')[0];
+            }
+        }
+        return $store_balance;
+    }
     public function getDisputes()
     {
         $user = Auth::user();
