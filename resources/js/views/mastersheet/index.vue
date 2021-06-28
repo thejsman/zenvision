@@ -40,10 +40,11 @@ export default {
         Loading
     },
     async created() {
-        await this.loadAllChannels();
+        this.toggleCurrentChannel("MS");
+        this.loadAllChannels();
 
         eventBus.$on("toggleShopifyStore", async () => {
-            await this.loadAllChannels();
+            this.loadAllChannels();
         });
 
         if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
@@ -69,8 +70,11 @@ export default {
     },
     methods: {
         ...mapActions("MasterSheet", ["loadAllChannels"]),
-        ...mapActions(["getStripeAccounts", "getShopifyStoreAllOrders"]),
-        ...mapMutations(["TOGGGLE_LOADING_STATUS"]),
+        ...mapActions([
+            "getStripeAccounts",
+            "getShopifyStoreAllOrders",
+            "toggleCurrentChannel"
+        ]),
 
         handleOk() {
             window.location.href = "/mastersheet";
