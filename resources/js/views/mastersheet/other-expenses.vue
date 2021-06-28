@@ -7,7 +7,7 @@
                 </span>
                 <span class="d-none d-sm-inline-block">Other Expenses</span>
             </template>
-            <div class="row align-items-center">
+            <!-- <div class="row align-items-center">
                 <div class="col-sm-12 col-md-10">
                     <form class="app-search d-none d-lg-block">
                         <div class="position-relative">
@@ -68,7 +68,7 @@
                         </b-dropdown-form>
                     </b-dropdown>
                 </div>
-            </div>
+            </div> -->
         </b-tab>
 
         <div class="row">
@@ -81,13 +81,32 @@
                         </div>
                     </transition>
                     <div class="list-group" id="infinite-list">
+                        <div v-if="!noAccount"></div>
                         <div
-                            v-if="noTransactions"
-                            class="d-flex justify-content-center"
+                            v-if="!loading && noTransactions && noAccount"
+                            class="d-flex flex-column justify-content-center"
                         >
-                            <h3>
-                                No transactions to show.
-                            </h3>
+                            <p class="text-center">
+                                No transactions in between
+                                <span class="font-weight-bold">
+                                    {{ transEndDate }}</span
+                                >
+                                and
+                                <span class="font-weight-bold">{{
+                                    transStartDate
+                                }}</span
+                                >, load next 7 days transactions
+                            </p>
+
+                            <div class="text-center">
+                                <b-button
+                                    type="submit"
+                                    variant="primary"
+                                    class="my-2"
+                                    @click="loadMoreTransactions"
+                                    >Load more</b-button
+                                >
+                            </div>
                         </div>
                         <div
                             v-else
@@ -142,6 +161,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div
+                            class="text-center"
+                            v-if="!loading && !noTransactions"
+                        >
+                            <b-button
+                                type="submit"
+                                variant="primary"
+                                class="my-2"
+                                @click="loadMoreTransactions"
+                                >Load more</b-button
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,7 +191,7 @@ import axios from "axios";
 import { displayCurrency } from "../../utils";
 import moment from "moment";
 import { eventBus } from "../../app";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -170,36 +201,107 @@ export default {
         }
     },
     created() {
+        this.getBankTransactions();
         eventBus.$on("stripeChannelRemoved", accountId => {
+            this.loading = true;
+
             const filteredStripeTransactions = this.allTransactions.filter(
-                e => e.stripe_user_id === accountId
+                e => e.type !== "stripe" && e.stripe_user_id !== accountId
             );
-            var ordered = {};
+
+            this.allTransactions = [...filteredStripeTransactions];
             if (filteredStripeTransactions.length > 0) {
                 //Group all transaction by date
+
                 var groups = _.groupBy(filteredStripeTransactions, function(
                     transaction
                 ) {
                     return transaction.date;
                 });
+                this.groupedTransactions = groups;
 
-                _(groups)
-                    .keys()
-                    .sort()
-                    .each(function(key) {
-                        ordered[key] = groups[key];
-                    })
-                    .reverse();
+                var ordered = [];
 
-                this.items = ordered;
+                const keys = _.keys(groups);
+
+                const sortedKeys = keys.sort(function(a, b) {
+                    return new Date(b) - new Date(a);
+                });
+
+                sortedKeys.forEach(key => {
+                    ordered.push({ "`${key}`": groups[key] });
+                });
+
+                this.items = sortedKeys;
+                if (this.items.length === 0) {
+                    this.nextTransButton = true;
+                }
+                this.loading = false;
             } else {
                 this.noTransactions = true;
                 this.items = ordered;
+                this.loading = false;
+            }
+        });
+        eventBus.$on("bankAccountRemoved", accountId => {
+            this.loading = true;
+
+            const filteredTransactions = this.allTransactions.filter(
+                e => e.type !== "bank" && e.account_id !== accountId
+            );
+
+            this.allTransactions = [...filteredTransactions];
+            if (filteredTransactions.length > 0) {
+                //Group all transaction by date
+
+                var groups = _.groupBy(filteredTransactions, function(
+                    transaction
+                ) {
+                    return transaction.date;
+                });
+                this.groupedTransactions = groups;
+
+                var ordered = [];
+
+                const keys = _.keys(groups);
+
+                const sortedKeys = keys.sort(function(a, b) {
+                    return new Date(b) - new Date(a);
+                });
+
+                sortedKeys.forEach(key => {
+                    ordered.push({ "`${key}`": groups[key] });
+                });
+
+                this.items = sortedKeys;
+                if (this.items.length === 0) {
+                    this.nextTransButton = true;
+                }
+                this.loading = false;
+            } else {
+                this.noTransactions = true;
+                this.items = ordered;
+                this.loading = false;
             }
         });
     },
     computed: {
-        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"]),
+        ...mapGetters("BankAccount", [
+            "bankAccounts",
+            "bankLogos",
+            "bankTransactions"
+        ]),
+        ...mapGetters([
+            "hasShopifyStoreCS",
+            "hasStripeAccountCS",
+            "hasBankAccountCS",
+            "stripeTransactions",
+            "transStartDate",
+            "transEndDate"
+        ]),
+        noAccount() {
+            return this.hasStripeAccountCS || this.hasBankAccountCS;
+        },
         tagsLenght() {
             return this.chips.length;
         },
@@ -210,15 +312,16 @@ export default {
 
     data() {
         return {
-            loading: false,
+            loading: true,
             message: "loading",
-            stripePaginatedUrl: "getStripeTransactions",
+
             items: [],
             allTransactions: [],
             groupedTransactions: [],
             noTransactions: true,
             bankTransactionsLoaded: true,
             bankTransactionsArray: [],
+            nextTransButton: false,
             chips: [
                 "Shopify",
                 "Facebook",
@@ -240,14 +343,18 @@ export default {
                 listElm.scrollTop + listElm.clientHeight >=
                 listElm.scrollHeight
             ) {
-                this.loadMore();
+                // this.loadMore();
             }
         });
 
         // Initially load some items.
-        this.loadMore();
+        setTimeout(() => {
+            this.loadMore();
+        }, 3000);
     },
     methods: {
+        ...mapActions("BankAccount", ["getBankTransactions"]),
+        ...mapActions(["getStripeTransactions", "setNextDatesForTransactions"]),
         saveChip(e) {
             e.preventDefault();
             const { chips, currentInput, set } = this;
@@ -274,40 +381,31 @@ export default {
                 return [];
             }
         },
-        async getBankAccountTransactions() {
-            try {
-                const result = await axios.get("bankaccount-transactions");
-                const data = result.data;
+        loadMoreTransactions() {
+            this.setNextDatesForTransactions();
 
-                return data;
-            } catch (err) {
-                console.log(err);
-                return [];
-            }
+            this.getTransactions();
         },
         async getTransactions() {
+            this.nextTransButton = false;
+
             this.loading = true;
-            // const paypal = await this.getPaypalTransactions();
-            const stripe = await axios.get(this.stripePaginatedUrl);
 
-            const stripeData = stripe.data.data;
-
-            if (
-                stripe.data.current_page === 1 &&
-                stripe.data.data.length === 0
-            ) {
-                this.noTransactions = true;
-                this.loading = false;
-
-                return;
-            }
-            if (
-                stripe.data.current_page !== 1 &&
-                stripe.data.next_page_url === null
-            ) {
-                return;
-            } else {
-                this.stripePaginatedUrl = stripe.data.next_page_url;
+            if (this.hasStripeAccountCS) {
+                await this.getStripeTransactions();
+                if (this.stripeTransactions.length > 0) {
+                    this.noTransactions = false;
+                    this.stripeTransactions.forEach(s =>
+                        this.allTransactions.push({
+                            type: "stripe",
+                            id: s.id,
+                            stripe_user_id: s.stripe_user_id,
+                            date: moment(s.created).format("LL"),
+                            description: s.description,
+                            amount: displayCurrency(s.gross)
+                        })
+                    );
+                }
             }
 
             // paypal.forEach(p =>
@@ -319,64 +417,13 @@ export default {
             //         amount: p.transaction_amount.value
             //     })
             // );
-            if (stripeData !== undefined) {
-                this.noTransactions = false;
-                stripeData.forEach(s =>
-                    this.allTransactions.push({
-                        type: "stripe",
-                        id: s.id,
-                        date: moment(s.created).format("LL"),
-                        description: s.description,
-                        amount: displayCurrency(s.gross)
-                    })
-                );
-            }
 
-            if (this.bankTransactionsLoaded) {
-                const bankTransactions = await this.getBankAccountTransactions();
+            if (this.hasBankAccountCS) {
+                await this.getBankTransactions();
 
-                if (bankTransactions.length > 0) {
+                if (this.bankTransactions.length > 0) {
                     this.noTransactions = false;
-                    this.bankTransactionsArray = [...bankTransactions];
-                    const arrayLenght = this.bankTransactionsArray.length;
-                    if (arrayLenght > 20) {
-                        const tempArray = this.bankTransactionsArray.splice(
-                            0,
-                            20
-                        );
-                        tempArray.forEach(bt =>
-                            this.allTransactions.push({
-                                type: "bank",
-                                id: bt.transaction_id,
-                                date: moment(bt.date).format("LL"),
-                                description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount)),
-                                logo: this.bankLogos.find(
-                                    o => (o.bank_user_id = bt.account_id)
-                                ).institution_id
-                            })
-                        );
-                    } else {
-                        this.bankTransactionsArray.forEach(bt =>
-                            this.allTransactions.push({
-                                type: "bank",
-                                id: bt.transaction_id,
-                                date: moment(bt.date).format("LL"),
-                                description: bt.name,
-                                amount: displayCurrency(Math.abs(bt.amount)),
-                                logo: this.bankLogos.find(
-                                    o => (o.bank_user_id = bt.account_id)
-                                ).institution_id
-                            })
-                        );
-                    }
-                }
-                this.bankTransactionsLoaded = false;
-            } else {
-                const arrayLenght = this.bankTransactionsArray.length;
-                if (arrayLenght > 20) {
-                    const tempArray = this.bankTransactionsArray.splice(0, 20);
-                    tempArray.forEach(bt =>
+                    this.bankTransactions.forEach(bt =>
                         this.allTransactions.push({
                             type: "bank",
                             id: bt.transaction_id,
@@ -384,21 +431,9 @@ export default {
                             description: bt.name,
                             amount: displayCurrency(Math.abs(bt.amount)),
                             logo: this.bankLogos.find(
-                                o => (o.bank_user_id = bt.account_id)
-                            ).institution_id
-                        })
-                    );
-                } else {
-                    this.bankTransactionsArray.forEach(bt =>
-                        this.allTransactions.push({
-                            type: "bank",
-                            id: bt.transaction_id,
-                            date: moment(bt.date).format("LL"),
-                            description: bt.name,
-                            amount: displayCurrency(Math.abs(bt.amount)),
-                            logo: this.bankLogos.find(
-                                o => (o.bank_user_id = bt.account_id)
-                            ).institution_id
+                                o => o.bank_user_id === bt.account_id
+                            ).institution_id,
+                            account_id: bt.account_id
                         })
                     );
                 }
@@ -423,11 +458,14 @@ export default {
             });
 
             this.items = sortedKeys;
-
+            if (this.items.length === 0) {
+                this.nextTransButton = true;
+            }
             this.loading = false;
+            console.log("All Transactions: ", this.allTransactions);
         },
         async loadMore() {
-            await this.getTransactions();
+            this.getTransactions();
         },
         showName(item) {
             if (item.hasOwnProperty("transaction_subject")) {

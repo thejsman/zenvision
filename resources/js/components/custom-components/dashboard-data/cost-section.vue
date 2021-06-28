@@ -856,7 +856,9 @@ export default {
                             stripeTransactions
                         );
                         stripeTransactions.forEach(sTransaction => {
-                            this.stripeFeeTotal += parseFloat(sTransaction.fee);
+                            this.stripeFeeTotal += parseFloat(
+                                sTransaction.fee / 100
+                            );
                         });
                     }
 

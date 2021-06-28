@@ -83,7 +83,7 @@ class BankAccountController extends Controller
         }
         return $balance;
     }
-    public function getAccountTransactions()
+    public function getAccountTransactions(Request $request)
     {
         $bank_accounts = Auth::user()->getBankAccounts();
         $transactions = [];
@@ -111,8 +111,8 @@ class BankAccountController extends Controller
                         "count": 500,
                         "offset": 0
                     },
-                    "start_date": "2021-01-01",
-                    "end_date": "2021-06-20"
+                    "start_date": "' . $request->start_date . '",
+                    "end_date": "' . $request->end_date . '"
                 }',
                 CURLOPT_HTTPHEADER => array(
                     'Content-Type: application/json',

@@ -111,6 +111,23 @@ class StripeController extends Controller
         }
         return ['stripeTransactions' => $stripeTransactions];
     }
+    public function getStripeTransactionsDateWise(Request $request)
+    {
+
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripeTransactions = [];
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                // $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get();
+                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get();
+                return $stripeTransactions;
+            }
+
+        }
+        return ['stripeTransactions' => $stripeTransactions];
+    }
     public function toogleAccount(Request $request)
     {
         $account = StripeAccount::find($request->id);

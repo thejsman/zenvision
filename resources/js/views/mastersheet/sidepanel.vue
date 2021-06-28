@@ -18,14 +18,14 @@ import {
 } from "../../constants";
 import axios from "axios";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     components: { Stat },
     data() {
         return {
             showModal: false,
-            totalCash: 0,
+
             totalInventory: 0,
             totalCash: 0,
             totalReserves: 0,
@@ -79,8 +79,11 @@ export default {
     },
 
     computed: {
-        ...mapGetters("MasterSheet", ["debtsSupplierPayableTotal"]),
-        ...mapGetters(["cogsTotal"])
+        ...mapGetters("MasterSheet", [
+            "debtsSupplierPayableTotal",
+            "netEquityTotal"
+        ]),
+        ...mapGetters(["cogsTotal", "stripeAccountsBalance"])
     },
     props: {
         orders: {
@@ -88,11 +91,28 @@ export default {
             default: () => []
         }
     },
+    watch: {
+        debtsSupplierPayableTotal(newVal, oldVal) {
+            updateData(
+                this.debtsData,
+                TOTAL_SUPPLIER_PAYABLE,
+                displayCurrency(this.debtsSupplierPayableTotal)
+            );
+        },
+        netEquityTotal(newVal, oldVal) {
+            console.log("NetET changed", newVal, oldVal);
+            eventBus.$emit("netEquityTotal", this.netEquityTotal);
+            updateData(
+                this.netEquityData,
+                NET_EQUITY,
+                displayCurrency(this.netEquityTotal + this.totalCash)
+            );
+        }
+    },
     created() {
         eventBus.$on("stripeChannelRemoved", () => {
             this.totalCash = 0;
             setTimeout(() => {
-                console.log("check this", this.totalCash, this.netEquityData);
                 this.getMastersheetData();
                 this.getStripeBalance();
                 this.getStripeTransactions();
@@ -101,7 +121,8 @@ export default {
         });
         eventBus.$on("toggleShopifyStore", () => {
             this.totalCash = 0;
-            setTimeout(() => {
+            setTimeout(async () => {
+                await this.loadAllChannels();
                 setLoading(this.statData);
                 setLoading(this.netEquityData);
                 this.getMastersheetData();
@@ -116,6 +137,7 @@ export default {
         this.getBankAccountBalance();
     },
     methods: {
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
         async getBankAccountBalance() {
             setLoadingSingle(this.statData, TOTAL_CASH);
 
@@ -163,7 +185,6 @@ export default {
                 displayCurrency(debts_credit_card)
             );
             setTimeout(() => {
-                console.log("CogsTotal", this.cogsTotal);
                 updateData(
                     this.debtsData,
                     TOTAL_SUPPLIER_PAYABLE,
@@ -180,16 +201,17 @@ export default {
                 debts_credit_card -
                 debts_supplier_payable -
                 this.cogsTotal;
-            eventBus.$emit("netEquityTotal", netEquityTotal);
+            eventBus.$emit("netEquityTotal", this.netEquityTotal);
+            console.log("Net equityTotal is ", this.netEquityTotal);
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(netEquityTotal)
+                displayCurrency(this.netEquityTotal + this.totalCash)
             );
         },
         async getStripeBalance() {
             try {
-                const result = await axios.get("getstripeaccountsbalance");
+                const result = await axios.get("stripeaccont-balance");
 
                 const stripeData = result.data;
 
@@ -199,7 +221,7 @@ export default {
                         stripeBalance += parseFloat(element.amount / 100);
                     });
                 }
-
+                console.log({ stripeBalance });
                 this.totalCash += stripeBalance;
             } catch (err) {
                 console.log(err);

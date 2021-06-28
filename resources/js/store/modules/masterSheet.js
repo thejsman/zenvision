@@ -1,5 +1,17 @@
 import _ from "lodash";
+import moment from "moment";
+import {
+    NET_EQUITY,
+    TOTAL_CASH,
+    TOTAL_INVENTORY,
+    TOTAL_RESERVES,
+    TOTAL_CREDIT_CARD,
+    TOTAL_SUPPLIER_PAYABLE
+} from "../../constants";
+import { displayCurrency } from "../../utils";
+
 const state = {
+    assetsData: [],
     netEquityTotal: 0,
     assetsCashTotal: 0,
     assetsInventoryTotal: 0,
@@ -8,35 +20,62 @@ const state = {
     debtsSupplierPayableTotal: 0,
     YesterdaysNetEquityFluctuationTotal: 0,
     YesterdaysProfitOrLossTotal: 0,
-    OtherExpensesTotal: 0
+    OtherExpensesTotal: 0,
+    assetsCashTotalLoading: true,
+    assetsInventoryTotalLoading: true,
+    assetsReservesTotalLoading: true,
+    transactionsArray: []
 };
 const getters = {
-    debtsSupplierPayableTotal: (state, getters, rootState, rootGetters) => {
-        // const cogsTotal = _.sumBy(rootState.getters.allOrders, order =>
-        //     parseFloat(order.total_cost)
-        // );
-
-        const { shopifyData } = rootState;
-        const { allOrders } = shopifyData;
-        setTimeout(() => {
-            console.log({ "Check this": rootGetters.shopifyAllOrders });
-        }, 1000);
-
-        // rootState.shopifyData.allOrders.map(order => console.log(order));
-        // state.debtsSupplierPayableTotal = cogsTotal;
-        // console.log({ cogsTotal });
-        return 123;
-    }
+    transactionsStartDate: state => state.transStartDate,
+    transactionsEndDate: state => state.transEndDate,
+    assetsCashTotal: (state, getters, rootState) =>
+        parseFloat(rootState.StripeAccount.stripeAccountsBalance / 100),
+    assetsDataArray: state => [
+        {
+            icon: "bx bx-copy-alt",
+            title: TOTAL_CASH,
+            value: displayCurrency(state.assetsCashTotal),
+            loading: state.assetsCashTotalLoading
+        },
+        {
+            icon: "bx bx-archive-in",
+            title: TOTAL_INVENTORY,
+            value: displayCurrency(state.assetsInventoryTotal),
+            loading: state.assetsInventoryTotalLoading
+        },
+        {
+            icon: "bx bx-purchase-tag-alt",
+            title: TOTAL_RESERVES,
+            value: displayCurrency(state.assetsReservesTotal),
+            loading: state.assetsReservesTotalLoading
+        }
+    ],
+    debtsSupplierPayableTotal: (state, getters, rootState) =>
+        rootState.shopifyData.cogsTotal,
+    netEquityTotal: (state, getters, rootState) =>
+        state.assetsCashTotal +
+        state.assetsInventoryTotal +
+        state.assetsReservesTotal -
+        state.debtsCreditCardTotal -
+        rootState.shopifyData.cogsTotal
 };
 const actions = {
-    loadAllChannels: async context => {
-        context.dispatch("toggleLoadingStatus", true, { root: true });
-        await context.dispatch("getShopifyStores", null, { root: true });
-        await context.dispatch("getStripeAccounts", null, { root: true });
-        context.dispatch("toggleLoadingStatus", false, { root: true });
+    loadAllChannels: async ({ dispatch }) => {
+        dispatch("toggleLoadingStatus", true, { root: true });
+        dispatch("getShopifyStores", "MS", { root: true });
+        dispatch("getStripeAccounts", null, { root: true });
+        dispatch("toggleLoadingStatus", false, { root: true });
+    },
+    setLoadingStatus: ({ commit }, payload) => {
+        commit("TOGGLE_LOADING_STATUS", payload);
     }
 };
-const mutations = {};
+const mutations = {
+    TOGGLE_LOADING_STATUS: (state, { channel, status }) => {
+        console.log("TOGGLE_LOADING_STATUS has been called", state);
+    }
+};
 
 export default {
     namespaced: true,
