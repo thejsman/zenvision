@@ -29,7 +29,7 @@ const actions = {
     },
     getStripeBalance: async ({ commit }) => {
         try {
-            const { data } = await axios.get("stripeaccont-balance");
+            const { data } = await axios.get("stripeaccount-balance");
             let balance = 0;
             if (data.length) {
                 balance += _.sumBy(data, "amount");
