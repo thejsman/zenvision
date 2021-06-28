@@ -19,7 +19,6 @@ const actions = {
         commit("TOGGGLE_LOADING_STATUS", payload);
     },
     toggleCurrentChannel: ({ commit }, payload) => {
-        console.log("Channel Status change", payload);
         commit("TOGGGLE_CURRENT_CHANNEL", payload);
     }
 };

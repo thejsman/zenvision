@@ -15,7 +15,6 @@ const getters = {
 };
 const actions = {
     getShopifyStores: async ({ commit, dispatch }, section = "PA") => {
-        console.log("Called from MS");
         try {
             const result = await axios.get("/user/stores");
             const data = result.data;
@@ -58,7 +57,6 @@ const actions = {
         }
     },
     getShopifyStoreAllOrders: async ({ commit, rootState }) => {
-        console.log("Dispatch event triggered");
         try {
             const response = await axios.get("shopify-allorders");
 

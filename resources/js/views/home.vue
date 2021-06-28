@@ -178,18 +178,10 @@ export default {
         async getShopifyStoreData() {
             await this.getShopifyStores();
             await this.getShopifyStoreOrders();
-            console.log("This is from store: ", this.shopifyStores);
-            console.log("This is from orders: ", this.shopifyOrders);
-            console.log(
-                "This is from hasShopifyStore1: ",
-                this.hasShopifyStoreCS
-            );
-
             try {
                 const orders = this.shopifyOrders;
                 //assign values
                 this.allOrders = _.sortBy(orders, "created_on_shopify");
-                console.log("All orders from the api is ", this.allOrders);
             } catch (error) {
                 console.log(error);
             }

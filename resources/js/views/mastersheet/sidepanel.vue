@@ -100,7 +100,6 @@ export default {
             );
         },
         netEquityTotal(newVal, oldVal) {
-            console.log("NetET changed", newVal, oldVal);
             eventBus.$emit("netEquityTotal", this.netEquityTotal);
             updateData(
                 this.netEquityData,
@@ -202,7 +201,7 @@ export default {
                 debts_supplier_payable -
                 this.cogsTotal;
             eventBus.$emit("netEquityTotal", this.netEquityTotal);
-            console.log("Net equityTotal is ", this.netEquityTotal);
+
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
@@ -221,7 +220,7 @@ export default {
                         stripeBalance += parseFloat(element.amount / 100);
                     });
                 }
-                console.log({ stripeBalance });
+
                 this.totalCash += stripeBalance;
             } catch (err) {
                 console.log(err);
