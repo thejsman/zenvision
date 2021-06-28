@@ -90,7 +90,7 @@ export default {
                 )
                 .then(value => {
                     this.boxOne = value;
-                    console.log("Yes", value);
+
                     if (value) {
                         this.removeChannel(account);
                     }

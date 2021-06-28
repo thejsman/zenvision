@@ -137,7 +137,6 @@ export default {
         },
         async onLoad() {},
         onSuccess(public_token, metadata) {
-            console.log({ public_token, metadata });
             const accounts = metadata.accounts.filter(account =>
                 this.plaidClickType === "depository"
                     ? account.type === "depository"

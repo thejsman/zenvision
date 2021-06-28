@@ -103,7 +103,7 @@ export default {
                 account.institution_name = this.bankInstitution.name;
                 account.institution_id = this.bankInstitution.institution_id;
                 account.public_token = this.plaidPublicToken;
-                console.log("Account from bank modal is ", account);
+
                 await axios.post("/bankaccount", account);
                 this.showMessage = true;
                 this.updateVariant = "success";

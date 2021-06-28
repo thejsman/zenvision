@@ -310,7 +310,6 @@ export default {
         },
         onRowSelected(items) {
             this.selected = items;
-            console.log(this.selected);
         },
         selectAllRows() {
             this.$refs.cogsTable.selectAllRows();
@@ -326,7 +325,7 @@ export default {
         async getCogsData() {
             try {
                 const result = await axios.get("cogs");
-                console.log("Check this", { result });
+
                 this.items = result.data.products;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));

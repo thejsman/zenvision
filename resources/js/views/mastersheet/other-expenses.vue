@@ -462,7 +462,6 @@ export default {
                 this.nextTransButton = true;
             }
             this.loading = false;
-            console.log("All Transactions: ", this.allTransactions);
         },
         async loadMore() {
             this.getTransactions();

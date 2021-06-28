@@ -111,7 +111,7 @@ export default {
                     this.updateResult = "";
                     this.$emit("updateData");
                     this.$emit("handle-close");
-                    console.log(this.$router);
+
                     eventBus.$emit("toggleShopifyStore");
                     window.location.href = "/";
                 }, 2000);
