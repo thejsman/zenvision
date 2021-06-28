@@ -297,7 +297,7 @@ export default {
                 cs[1] -= _.sumBy(this.stripeTransactionArray, stripeTrans =>
                     moment(stripeTrans.available_on).format("YYYY-MM-DD") ===
                     moment(cs[0]).format("YYYY-MM-DD")
-                        ? parseFloat(stripeTrans.fee)
+                        ? parseFloat(stripeTrans.fee / 100)
                         : 0
                 );
             });
