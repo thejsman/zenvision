@@ -38,6 +38,9 @@ const actions = {
         } catch (err) {
             console.log(err);
         }
+    },
+    removeBankAccount: async ({ commit }, account) => {
+        commit("REMOVE_BANK_ACCOUNT", account);
     }
 };
 const mutations = {
@@ -49,7 +52,12 @@ const mutations = {
         });
     },
     SET_BANK_TRANSACTIONS: (state, payload) =>
-        (state.bankTransactionsArray = payload)
+        (state.bankTransactionsArray = payload),
+    REMOVE_BANK_ACCOUNT: (state, payload) => {
+        state.bankAccountArray = state.bankAccountArray.filter(
+            account => account.id !== payload.id
+        );
+    }
 };
 export default {
     namespaced: true,

@@ -1,21 +1,42 @@
+import _ from "lodash";
+
 const state = {
+    hasStripeAccount: false,
     stripeAccounts: [],
-    stripePaginatedUrl: "getStripeTransactions",
+    stripeAccountsBalance: 0,
     stripeTransactionsArray: []
 };
 const getters = {
+    hasStripeAccountCS: state => state.hasStripeAccount,
     stripeAccounts: state => state.stripeAccounts,
-    stripeTransactions: state => state.stripeTransactionsArray
+    stripeTransactions: state => state.stripeTransactionsArray,
+    stripeAccountsBalance: state => state.stripeAccountsBalance
 };
 const actions = {
-    getStripeAccounts: async ({ commit }) => {
+    toggleStripeAccountStatus: ({ commit }, payload) => {
+        commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", payload);
+    },
+    getStripeAccounts: async ({ commit, dispatch }) => {
         const result = await axios.get("getstripeaccounts");
         if (result.data.length > 0) {
             commit("SET_STRIPE_ACCOUNT", result.data);
+            dispatch("getStripeBalance");
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", true, { root: true });
         } else {
             commit("SET_STRIPE_ACCOUNT", []);
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false, { root: true });
+        }
+    },
+    getStripeBalance: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("stripeaccont-balance");
+            let balance = 0;
+            if (data.length) {
+                balance += _.sumBy(data, "amount");
+            }
+            commit("SET_STRIPE_ACCOUNT_BALANCE", balance);
+        } catch (err) {
+            console.log(err);
         }
     },
     getStripeTransactions: async ({
@@ -36,14 +57,39 @@ const actions = {
         if (stripeTransactions.length > 0) {
             commit("SET_STRIPE_TRANSACTIONS", stripeTransactions);
         }
+    },
+    removeStripeAccount: async ({ commit }, account) => {
+        commit("REMOVE_STRIPE_ACCOUNT", account);
     }
 };
 const mutations = {
+    TOGGGLE_STRIPE_ACCOUNT_STATUS: (state, status) => {
+        state.hasStripeAccount = status;
+    },
     SET_STRIPE_ACCOUNT: (state, payload) => {
         state.stripeAccounts = payload;
     },
+
     SET_STRIPE_TRANSACTIONS: (state, payload) =>
-        (state.stripeTransactionsArray = payload)
+        (state.stripeTransactionsArray = payload),
+
+    SET_STRIPE_ACCOUNT_BALANCE: (state, payload) =>
+        (state.stripeAccountsBalance = payload),
+    REMOVE_STRIPE_ACCOUNT: (state, payload) => {
+        const filteredAccounts = state.stripeAccounts.filter(
+            account => account.stripe_user_id !== payload.stripe_user_id
+        );
+
+        state.stripeAccounts = [...filteredAccounts];
+        if (filteredAccounts.length === 0) {
+            state.hasStripeAccount = false;
+            state.stripeTransactionsArray = [];
+        } else {
+            state.stripeTransactionsArray = state.stripeTransactionsArray.filter(
+                st => st.stripe_user_id !== payload.stripe_user_id
+            );
+        }
+    }
 };
 
 export default {

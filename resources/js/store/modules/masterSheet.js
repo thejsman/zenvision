@@ -29,6 +29,8 @@ const state = {
 const getters = {
     transactionsStartDate: state => state.transStartDate,
     transactionsEndDate: state => state.transEndDate,
+    assetsCashTotal: (state, getters, rootState) =>
+        parseFloat(rootState.StripeAccount.stripeAccountsBalance / 100),
     assetsDataArray: state => [
         {
             icon: "bx bx-copy-alt",
@@ -49,16 +51,14 @@ const getters = {
             loading: state.assetsReservesTotalLoading
         }
     ],
-    debtsSupplierPayableTotal: (state, rootGetters) => {
-        state.debtsSupplierPayableTotal = rootGetters.cogsTotal;
-        return rootGetters.cogsTotal;
-    },
-    netEquityTotal: state =>
+    debtsSupplierPayableTotal: (state, getters, rootState) =>
+        rootState.shopifyData.cogsTotal,
+    netEquityTotal: (state, getters, rootState) =>
         state.assetsCashTotal +
         state.assetsInventoryTotal +
         state.assetsReservesTotal -
         state.debtsCreditCardTotal -
-        state.debtsSupplierPayableTotal
+        rootState.shopifyData.cogsTotal
 };
 const actions = {
     loadAllChannels: async ({ dispatch }) => {

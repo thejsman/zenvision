@@ -40,6 +40,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapActions } from "vuex";
 export default {
     name: "StripeAccount",
     data() {
@@ -56,7 +57,9 @@ export default {
     created() {
         this.getStripeAccounts();
     },
+
     methods: {
+        ...mapActions(["removeStripeAccount"]),
         async getStripeAccounts() {
             try {
                 const result = await axios.get("getstripeaccounts");
@@ -110,6 +113,7 @@ export default {
                 eventBus.$emit("setLoadingTrue");
                 eventBus.$emit("stripeChannelRemoved", account.stripe_user_id);
                 await axios.patch("stripeconnectdelete", account);
+                await this.removeStripeAccount(account);
                 await this.getStripeAccounts();
                 eventBus.$emit("setLoadingFalse");
             } catch (error) {

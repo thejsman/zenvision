@@ -51,7 +51,7 @@ export default {
         this.getBankAccounts();
     },
     methods: {
-        ...mapActions("BankAccount", ["getBankAccounts"]),
+        ...mapActions("BankAccount", ["getBankAccounts", "removeBankAccount"]),
 
         async handleClick(store) {
             try {
@@ -66,6 +66,8 @@ export default {
             try {
                 // eventBus.$emit("removeShopifyaccount", account.id);
                 await axios.patch("bankaccountdelete", account);
+                await this.removeBankAccount(account);
+                eventBus.$emit("bankAccountRemoved", account.bank_user_id);
                 eventBus.$emit("toggleShopifyStore");
                 this.getBankAccounts();
             } catch (error) {

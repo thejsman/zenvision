@@ -25,7 +25,7 @@ export default {
     data() {
         return {
             showModal: false,
-            totalCash: 0,
+
             totalInventory: 0,
             totalCash: 0,
             totalReserves: 0,
@@ -83,7 +83,7 @@ export default {
             "debtsSupplierPayableTotal",
             "netEquityTotal"
         ]),
-        ...mapGetters(["cogsTotal"])
+        ...mapGetters(["cogsTotal", "stripeAccountsBalance"])
     },
     props: {
         orders: {
@@ -99,13 +99,13 @@ export default {
                 displayCurrency(this.debtsSupplierPayableTotal)
             );
         },
-        netEquityTotal() {
-            console.log("NetET changed");
+        netEquityTotal(newVal, oldVal) {
+            console.log("NetET changed", newVal, oldVal);
             eventBus.$emit("netEquityTotal", this.netEquityTotal);
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(this.netEquityTotal)
+                displayCurrency(this.netEquityTotal + this.totalCash)
             );
         }
     },
@@ -201,16 +201,17 @@ export default {
                 debts_credit_card -
                 debts_supplier_payable -
                 this.cogsTotal;
-            eventBus.$emit("netEquityTotal", netEquityTotal);
+            eventBus.$emit("netEquityTotal", this.netEquityTotal);
+            console.log("Net equityTotal is ", this.netEquityTotal);
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(this.netEquityTotal)
+                displayCurrency(this.netEquityTotal + this.totalCash)
             );
         },
         async getStripeBalance() {
             try {
-                const result = await axios.get("getstripeaccountsbalance");
+                const result = await axios.get("stripeaccont-balance");
 
                 const stripeData = result.data;
 
@@ -220,7 +221,7 @@ export default {
                         stripeBalance += parseFloat(element.amount / 100);
                     });
                 }
-
+                console.log({ stripeBalance });
                 this.totalCash += stripeBalance;
             } catch (err) {
                 console.log(err);
