@@ -147,7 +147,7 @@
             </div>
             <div class="col-md-12 mt-5 pt-5">
                 <p class="text-center text-white">
-                    Add a <strong>Bank Account, Credit Card </strong> or
+                    Add a <strong>Bank Account, Credit Card, Stripe</strong> or
                     <strong>Paypal </strong> to see transactions
                 </p>
             </div>
