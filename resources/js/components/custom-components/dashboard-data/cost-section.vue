@@ -267,7 +267,7 @@ export default {
 
             // setLoading(this.data);
 
-            // this.getMerchantfeesTotal(s_date, e_date);
+            // this.getMerchantfeesTotal();
             this.checkAndShowAdAccountsData(s_date, e_date);
         });
 
@@ -397,10 +397,10 @@ export default {
                 this.getCogsData(orders, refundTotal);
 
                 this.getSubscriptionData();
-                // this.getChargebackTotal();
+                this.getChargebackTotal();
             }, 1000);
 
-            // this.getMerchantfeesTotal(s_date, e_date);
+            this.getMerchantfeesTotal(this.startDateS, this.endDateS);
         },
 
         handleSubscriptionClick() {
@@ -629,6 +629,7 @@ export default {
             }
         },
         async getChargebackTotal() {
+            this.totalChargeback = 0;
             try {
                 //Shopify Chargebacks
                 if (this.hasShopifyAccount) {
@@ -668,6 +669,8 @@ export default {
                     );
 
                     if (stripeChargebacks.length > 0) {
+                        this.stripeChargebackTotal = 0;
+
                         eventBus.$emit(
                             "stripeChargebackEvent",
                             stripeChargebacks
@@ -690,7 +693,7 @@ export default {
                             ? displayCurrency(this.totalChargeback)
                             : "-"
                     );
-                }, 2500);
+                }, 1500);
             } catch (err) {
                 console.log(err);
                 this.totalChargeback = 0;
@@ -707,7 +710,10 @@ export default {
                 }
             });
             if (this.hasPaypalAccount) {
-                await this.getPaypalTransactionsTotal(s_date, e_date);
+                await this.getPaypalTransactionsTotal(
+                    this.startDateS,
+                    this.endDateS
+                );
             }
 
             if (this.hasStripeAccount && !this.firstLoadStripe) {
@@ -838,12 +844,8 @@ export default {
                         "stripeconnect-merchantfee",
                         {
                             params: {
-                                s_date: moment(this.startDate).format(
-                                    "YYYY-MM-DD"
-                                ),
-                                e_date: moment(this.endDate).format(
-                                    "YYYY-MM-DD"
-                                )
+                                s_date: `${this.startDateS} 00:00:00`,
+                                e_date: `${this.endDateS} 23:59:59`
                             }
                         }
                     );
