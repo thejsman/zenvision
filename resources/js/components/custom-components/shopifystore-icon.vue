@@ -29,6 +29,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapActions } from "vuex";
 export default {
     name: "StoreIcon",
     data() {
@@ -48,6 +49,7 @@ export default {
         this.getStores();
     },
     methods: {
+        ...mapActions(["removeShopifyAccount"]),
         async getStores() {
             try {
                 const result = await axios.get("/user/stores");
@@ -82,6 +84,7 @@ export default {
             try {
                 eventBus.$emit("setLoadingTrue");
                 await axios.patch("shopifystoredelete", store);
+                this.removeShopifyAccount(store);
                 eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("setLoadingFalse");
                 this.getStores();

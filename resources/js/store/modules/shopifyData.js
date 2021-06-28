@@ -2,18 +2,23 @@ import axios from "axios";
 import { sumBy } from "lodash";
 
 const state = {
+    hasShopifyStore: false,
     shopifyStores: [],
     orders: [],
     allOrders: [],
     cogsTotal: 0
 };
 const getters = {
+    hasShopifyStoreCS: state => state.hasShopifyStore,
     shopifyOrders: state => state.orders,
     shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores,
     cogsTotal: state => state.cogsTotal
 };
 const actions = {
+    toggleShopifyStoreStatus: ({ commit }, payload) => {
+        commit("TOGGGLE_SHOPIFY_STORE_STATUS", payload);
+    },
     getShopifyStores: async ({ commit, dispatch }, section = "PA") => {
         try {
             const result = await axios.get("/user/stores");
@@ -67,9 +72,15 @@ const actions = {
             commit("SET_SHOPIFY_ALL_ORDERS", []);
             commit("SET_COGS_ALL_ORDERS", []);
         }
+    },
+    removeShopifyAccount: async ({ commit }, account) => {
+        commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
 };
 const mutations = {
+    TOGGGLE_SHOPIFY_STORE_STATUS: (state, status) => {
+        state.hasShopifyStore = status;
+    },
     SET_SHOPIFY_STORES: (state, payload) => {
         if (payload.length > 0) {
             state.shopifyStores = payload;
@@ -93,6 +104,17 @@ const mutations = {
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
         state.cogsTotal = sumBy(payload, order => order.total_cost);
+    },
+    REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
+        state.shopifyStores = state.shopifyStores.filter(
+            account => account.id !== payload.id
+        );
+        if (state.shopifyStores.length === 0) {
+            state.hasShopifyStore = false;
+            state.orders = [];
+            state.allOrders = [];
+            state.cogsTotal = 0;
+        }
     }
 };
 
