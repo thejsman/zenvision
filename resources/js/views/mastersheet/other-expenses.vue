@@ -245,9 +245,8 @@ export default {
         });
         eventBus.$on("bankAccountRemoved", accountId => {
             this.loading = true;
-
             const filteredTransactions = this.allTransactions.filter(
-                e => e.type !== "bank" && e.account_id !== accountId
+                e => e.account_id !== accountId && e.type === "bank"
             );
 
             this.allTransactions = [...filteredTransactions];

@@ -210,7 +210,7 @@ export default {
         },
         async getStripeBalance() {
             try {
-                const result = await axios.get("stripeaccont-balance");
+                const result = await axios.get("stripeaccount-balance");
 
                 const stripeData = result.data;
 
