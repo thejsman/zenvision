@@ -6,14 +6,16 @@ const state = {
     shopifyStores: [],
     orders: [],
     allOrders: [],
-    cogsTotal: 0
+    cogsTotal: 0,
+    storeBalance: 0
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
     shopifyOrders: state => state.orders,
     shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores,
-    cogsTotal: state => state.cogsTotal
+    cogsTotal: state => state.cogsTotal,
+    storeBalance: state => state.storeBalance
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -31,6 +33,7 @@ const actions = {
                 );
                 if (section === "MS") {
                     dispatch("getShopifyStoreAllOrders");
+                    dispatch("getShopifyStoreBalance");
                 } else {
                     dispatch("getShopifyStoreOrders");
                 }
@@ -73,6 +76,15 @@ const actions = {
             commit("SET_COGS_ALL_ORDERS", []);
         }
     },
+    getShopifyStoreBalance: async ({ commit, rootState }) => {
+        try {
+            const response = await axios.get("shopify-balance");
+            commit("SET_SHOPIFY_BALANCE", response.data);
+        } catch (err) {
+            console.log(err);
+            commit("SET_SHOPIFY_BALANCE", 0);
+        }
+    },
     removeShopifyAccount: async ({ commit }, account) => {
         commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
@@ -105,6 +117,9 @@ const mutations = {
     SET_COGS_ALL_ORDERS: (state, payload) => {
         state.cogsTotal = sumBy(payload, order => order.total_cost);
     },
+    SET_SHOPIFY_BALANCE: (state, payload) => {
+        state.storeBalance = payload;
+    },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
             account => account.id !== payload.id
@@ -114,6 +129,7 @@ const mutations = {
             state.orders = [];
             state.allOrders = [];
             state.cogsTotal = 0;
+            state.storeBalance = 0;
         }
     }
 };

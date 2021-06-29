@@ -30,7 +30,10 @@ const getters = {
     transactionsStartDate: state => state.transStartDate,
     transactionsEndDate: state => state.transEndDate,
     assetsCashTotal: (state, getters, rootState) =>
-        parseFloat(rootState.StripeAccount.stripeAccountsBalance / 100),
+        parseFloat(
+            rootState.StripeAccount.stripeAccountsBalance / 100 +
+                rootState.shopifyData.storeBalance
+        ),
     assetsDataArray: state => [
         {
             icon: "bx bx-copy-alt",

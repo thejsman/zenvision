@@ -49,7 +49,11 @@ export default {
         this.getStores();
     },
     methods: {
-        ...mapActions(["removeShopifyAccount"]),
+        ...mapActions([
+            "removeShopifyAccount",
+            "getShopifyStores",
+            "toggleLoadingStatus"
+        ]),
         async getStores() {
             try {
                 const result = await axios.get("/user/stores");
@@ -82,12 +86,15 @@ export default {
         },
         async removeChannel(store, event) {
             try {
+                this.toggleLoadingStatus(true);
                 eventBus.$emit("setLoadingTrue");
                 await axios.patch("shopifystoredelete", store);
-                this.removeShopifyAccount(store);
+                await this.removeShopifyAccount(store);
+                await this.getShopifyStores("MS");
                 eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("setLoadingFalse");
                 this.getStores();
+                this.toggleLoadingStatus(false);
             } catch (error) {
                 eventBus.$emit("setLoadingFalse");
                 console.log(error);
