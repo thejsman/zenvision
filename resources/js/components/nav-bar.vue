@@ -113,4 +113,7 @@ export default {
 .inactive {
     opacity: 0.5;
 }
+.inactive:hover {
+    opacity: 1;
+}
 </style>
