@@ -106,17 +106,18 @@ export default {
                             v-b-tooltip.hover="tooltip"
                             class="fas fas fa-info-circle"
                         ></i>
-                        <i v-else class="fas fa-angle-down"></i>
                     </div>
-                    <div class="mb-0 mt-1" v-if="loading">
-                        <b-skeleton animation="wave" width="30%"></b-skeleton>
-                    </div>
-
-                    <div v-else>
-                        <h4 class="mb-0 mx-auto">{{ value }}</h4>
+                    <div class="mb-3 mt-1">
+                        <b-skeleton
+                            v-if="loading"
+                            animation="wave"
+                            width="30%"
+                            class="skeleton-loading"
+                        ></b-skeleton>
+                        <h4 v-else class="mx-auto">{{ value }}</h4>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <div class="rectangle mt-3" v-if="loading">
+                        <!-- <div class="rectangle mt-3" v-if="loading">
                             <b-skeleton
                                 animation="wave"
                                 width="100%"
@@ -124,7 +125,7 @@ export default {
                         </div>
                         <div class="rectangle mt-3" v-else>
                             <h4 class="mb-0 mx-auto">0%</h4>
-                        </div>
+                        </div> -->
 
                         <apexchart
                             v-if="showGraph"
@@ -162,5 +163,8 @@ export default {
 }
 .apexcharts-tooltip {
     color: #191e2c;
+}
+.skeleton-loading {
+    padding: 12px;
 }
 </style>

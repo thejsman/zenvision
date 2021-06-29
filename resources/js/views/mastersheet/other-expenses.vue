@@ -95,7 +95,7 @@
                                 <span class="font-weight-bold">{{
                                     transStartDate
                                 }}</span
-                                >, load next 7 days transactions
+                                >, load next 14 days transactions
                             </p>
 
                             <div class="text-center">

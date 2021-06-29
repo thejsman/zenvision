@@ -94,9 +94,6 @@ export default {
                     <StripeAccount :disableFeature="false" />
                     <BankAccount />
                 </div>
-                <b-button class="border-0 mr-4 btn-export" variant="dark"
-                    >Export</b-button
-                >
             </div>
             <div class="col-3 mt-4">
                 <Sidepanel />
