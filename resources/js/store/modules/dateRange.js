@@ -6,7 +6,7 @@ const state = {
         .format("YYYY-MM-DD"),
     endDateS: moment().format("YYYY-MM-DD"),
     transStartDate: moment()
-        .subtract(7, "days")
+        .subtract(14, "days")
         .format("YYYY-MM-DD"),
     transEndDate: moment().format("YYYY-MM-DD")
 };
@@ -36,7 +36,7 @@ const mutations = {
             .format("YYYY-MM-DD");
         state.transStartDate = moment(state.transEndDate)
             .clone()
-            .subtract(7, "days")
+            .subtract(14, "days")
             .format("YYYY-MM-DD");
     }
 };
