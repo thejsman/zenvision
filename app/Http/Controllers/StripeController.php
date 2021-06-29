@@ -122,13 +122,12 @@ class StripeController extends Controller
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
-                // $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get();
-                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get();
-                return $stripeTransactions;
+                $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get()->toArray();
+                $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
             }
 
         }
-        return ['stripeTransactions' => $stripeTransactions];
+        return $stripeTransactions;
     }
     public function toogleAccount(Request $request)
     {
