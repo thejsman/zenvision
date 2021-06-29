@@ -88,12 +88,14 @@ class StripeController extends Controller
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
-                $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->whereBetween('available_on', [$request->s_date, $request->e_date])->select('available_on', 'fee')->get();
-                return $stripeTransactions;
+                if ($account->enabled_on_dashboard) {
+                    $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('available_on', [$request->s_date, $request->e_date])->select('available_on', 'fee')->get()->toArray();
+                    $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
+                }
             }
 
         }
-        return ['stripeTransactions' => $stripeTransactions];
+        return $stripeTransactions;
     }
 
     public function getStripeTransactionsFromDb(Request $request)
@@ -346,20 +348,22 @@ class StripeController extends Controller
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
-                $stripe = new \Stripe\StripeClient(
-                    $account->access_token
-                );
-                $disputes = $stripe->disputes->all([
-                    'limit' => 100,
-                    'created' => array(
-                        'gte' => strtotime($request->s_date),
-                        'lte' => strtotime($request->e_date),
-                    ),
-                ]);
-
-                foreach ($disputes->autoPagingIterator() as $dispute) {
-                    array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
+                if ($account->enabled_on_dashboard) {
+                    $stripe = new \Stripe\StripeClient(
+                        $account->access_token
+                    );
+                    $disputes = $stripe->disputes->all([
+                        'limit' => 100,
+                        'created' => array(
+                            'gte' => strtotime($request->s_date),
+                            'lte' => strtotime($request->e_date),
+                        ),
+                    ]);
+                    foreach ($disputes->autoPagingIterator() as $dispute) {
+                        array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
+                    }
                 }
+
             }
 
             return $stripe_chargebacks;
