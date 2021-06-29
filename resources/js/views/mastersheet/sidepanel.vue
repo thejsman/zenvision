@@ -81,9 +81,10 @@ export default {
     computed: {
         ...mapGetters("MasterSheet", [
             "debtsSupplierPayableTotal",
-            "netEquityTotal"
+            "netEquityTotal",
+            "assetsCashTotal"
         ]),
-        ...mapGetters(["cogsTotal", "stripeAccountsBalance"])
+        ...mapGetters(["cogsTotal", "stripeAccountsBalance", "storeBalance"])
     },
     props: {
         orders: {
@@ -104,7 +105,24 @@ export default {
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(this.netEquityTotal + this.totalCash)
+                displayCurrency(
+                    this.netEquityTotal + this.totalCash + this.storeBalance
+                )
+            );
+        },
+        storeBalance(newVal, oldVal) {
+            console.log(newVal, oldVal);
+            updateData(
+                this.statData,
+                TOTAL_CASH,
+                displayCurrency(this.totalCash + this.storeBalance)
+            );
+            updateData(
+                this.netEquityData,
+                NET_EQUITY,
+                displayCurrency(
+                    this.netEquityTotal + this.totalCash + this.storeBalance
+                )
             );
         }
     },
@@ -146,7 +164,7 @@ export default {
             updateData(
                 this.statData,
                 TOTAL_CASH,
-                displayCurrency(this.totalCash)
+                displayCurrency(this.totalCash + this.storeBalance)
             );
         },
 
@@ -205,7 +223,9 @@ export default {
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(this.netEquityTotal + this.totalCash)
+                displayCurrency(
+                    this.netEquityTotal + this.totalCash + this.storeBalance
+                )
             );
         },
         async getStripeBalance() {
