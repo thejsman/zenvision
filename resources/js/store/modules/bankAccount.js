@@ -1,7 +1,8 @@
 const state = {
     bankAccountArray: [],
     bankLogoArray: [],
-    bankTransactionsArray: []
+    bankTransactionsArray: [],
+    creditCardLiabilities: 0
 };
 const getters = {
     bankAccounts: state => state.bankAccountArray,
@@ -9,19 +10,41 @@ const getters = {
     bankTransactions: state => state.bankTransactionsArray
 };
 const actions = {
-    getBankAccounts: async ({ commit }) => {
+    getBankAccounts: async ({ commit, dispatch }) => {
         try {
             const bankAccounts = await axios.get("/bankaccounts");
             const data = bankAccounts.data;
             if (data.length > 0) {
                 commit("SET_BANK_ACCOUNT", data);
+                dispatch("getCreditCardBalance");
                 commit("TOGGGLE_BANK_ACCOUNT_STATUS", true, { root: true });
                 commit("SET_BANK_LOGO");
             } else {
                 commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
+                commit("MasterSheet/SET_DEBTS_CREDIT_CARD_TOTAL", 0, {
+                    root: true
+                });
+                commit("SET_CREDIT_CARD_LIABILITIES", 0);
+                commit("SET_BANK_TRANSACTIONS", []);
             }
         } catch (err) {
             commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
+            console.log(err);
+        }
+    },
+    getCreditCardBalance: async ({ commit }) => {
+        try {
+            const result = await axios.get("creditcard-liabilities");
+            const liabilities = result.data;
+            commit("MasterSheet/SET_DEBTS_CREDIT_CARD_TOTAL", liabilities, {
+                root: true
+            });
+            commit("SET_CREDIT_CARD_LIABILITIES", liabilities);
+        } catch (err) {
+            commit("MasterSheet/SET_DEBTS_CREDIT_CARD_TOTAL", 0, {
+                root: true
+            });
+            commit("SET_CREDIT_CARD_LIABILITIES", 0);
             console.log(err);
         }
     },
@@ -39,8 +62,9 @@ const actions = {
             console.log(err);
         }
     },
-    removeBankAccount: async ({ commit }, account) => {
+    removeBankAccount: async ({ commit, dispatch }, account) => {
         commit("REMOVE_BANK_ACCOUNT", account);
+        dispatch("getBankAccounts");
     }
 };
 const mutations = {
@@ -53,6 +77,9 @@ const mutations = {
     },
     SET_BANK_TRANSACTIONS: (state, payload) =>
         (state.bankTransactionsArray = payload),
+    SET_CREDIT_CARD_LIABILITIES: (state, payload) => {
+        state.creditCardLiabilities = payload;
+    },
     REMOVE_BANK_ACCOUNT: (state, payload) => {
         state.bankAccountArray = state.bankAccountArray.filter(
             account => account.id !== payload.id

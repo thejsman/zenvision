@@ -56,6 +56,7 @@ const getters = {
     ],
     debtsSupplierPayableTotal: (state, getters, rootState) =>
         rootState.shopifyData.cogsTotal,
+    debtsCreditCardTotal: state => state.debtsCreditCardTotal,
     netEquityTotal: (state, getters, rootState) =>
         state.assetsCashTotal +
         state.assetsInventoryTotal +
@@ -77,7 +78,9 @@ const actions = {
 const mutations = {
     TOGGLE_LOADING_STATUS: (state, { channel, status }) => {
         console.log("TOGGLE_LOADING_STATUS has been called", state);
-    }
+    },
+    SET_DEBTS_CREDIT_CARD_TOTAL: (state, payload) =>
+        (state.debtsCreditCardTotal = payload)
 };
 
 export default {

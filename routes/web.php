@@ -81,6 +81,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('bankaccount-transactions', 'BankAccountController@getAccountTransactions');
     Route::get('bankaccount-link-token', 'BankAccountController@generateLinkToken');
 
+    //Credit Card
+    Route::get('creditcard-liabilities', 'CreditCardController@getCreditCardliabilities');
+
     // Route::get('getStripeTransactions', 'StripeController@getStripeTransactionsSdk');
 
     Route::get('stripe-report-balancetransaction', 'StripeController@createBalanceTransactionReport');
