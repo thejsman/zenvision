@@ -38,8 +38,9 @@ class CreditCardController extends Controller
 
             $result = curl_exec($curl);
             $response = json_decode($result, true);
+
             curl_close($curl);
-            if (!isset($response['errors'])) {
+            if (!isset($response['error_code'])) {
                 if (!is_null($response['liabilities']['credit'][0]['last_statement_balance'])) {
                     $liabilities += $response['liabilities']['credit'][0]['last_statement_balance'];
                 }

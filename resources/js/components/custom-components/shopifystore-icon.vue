@@ -3,7 +3,7 @@
         <div class="d-flex flex-row">
             <div v-for="store in stores" :key="store.id" class="dropdown">
                 <div
-                    class="border rounded p-2 dropbtn ml-2"
+                    class="border rounded p-2 dropbtn ml-2 bg-white"
                     :class="{ 'border-primary': store.enabled_on_dashboard }"
                     @click="disableFeature ? handleClick(store) : null"
                     v-b-tooltip.hover="store.store_name"
