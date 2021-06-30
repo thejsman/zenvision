@@ -80,6 +80,7 @@ export default {
 
     computed: {
         ...mapGetters("MasterSheet", [
+            "debtsCreditCardTotal",
             "debtsSupplierPayableTotal",
             "netEquityTotal",
             "assetsCashTotal"
@@ -124,6 +125,14 @@ export default {
                     this.netEquityTotal + this.totalCash + this.storeBalance
                 )
             );
+        },
+        debtsCreditCardTotal(newVal, oldVal) {
+            console.log("debtsCreditCardTotal value changed", newVal, oldVal);
+            updateData(
+                this.debtsData,
+                TOTAL_CREDIT_CARD,
+                displayCurrency(this.debtsCreditCardTotal)
+            );
         }
     },
     created() {
@@ -132,7 +141,7 @@ export default {
             setTimeout(() => {
                 this.getMastersheetData();
                 this.getStripeBalance();
-                this.getStripeTransactions();
+                // this.getStripeTransactions();
                 this.getBankAccountBalance();
             }, 1000);
         });
@@ -144,13 +153,13 @@ export default {
                 setLoading(this.netEquityData);
                 this.getMastersheetData();
                 this.getStripeBalance();
-                this.getStripeTransactions();
+                // this.getStripeTransactions();
                 this.getBankAccountBalance();
             }, 1000);
         });
         this.getMastersheetData();
         this.getStripeBalance();
-        this.getStripeTransactions();
+        // this.getStripeTransactions();
         this.getBankAccountBalance();
     },
     methods: {
@@ -194,12 +203,10 @@ export default {
                 displayCurrency(total_reserves)
             );
 
-            const debts = await axios.get("msdebts");
-            const { debts_credit_card, debts_supplier_payable } = debts.data;
             updateData(
                 this.debtsData,
                 TOTAL_CREDIT_CARD,
-                displayCurrency(debts_credit_card)
+                displayCurrency(this.debtsCreditCardTotal)
             );
             setTimeout(() => {
                 updateData(
@@ -209,15 +216,6 @@ export default {
                 );
             }, 1000);
 
-            const netEquityTotal =
-                this.totalCash +
-                total_credit_card +
-                total_inventory +
-                total_reserves +
-                total_supplier_payable -
-                debts_credit_card -
-                debts_supplier_payable -
-                this.cogsTotal;
             eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
             updateData(
