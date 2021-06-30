@@ -2,7 +2,6 @@
 
 namespace App;
 
-
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -81,6 +80,10 @@ class User extends Authenticatable
     public function getBankAccounts()
     {
         return $this->hasMany(BankAccount::class, 'user_id')->where('isDeleted', false)->get();
+    }
+    public function getCreditCardAccounts()
+    {
+        return $this->hasMany(BankAccount::class, 'user_id')->where('isDeleted', false)->where('bank_type', 'credit')->get();
     }
     public function getStripeAccountConnectIds()
     {
