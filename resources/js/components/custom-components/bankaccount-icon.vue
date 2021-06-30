@@ -80,9 +80,9 @@ export default {
                 // eventBus.$emit("removeShopifyaccount", account.id);
                 await axios.patch("bankaccountdelete", account);
                 await this.removeBankAccount(account);
+                this.getBankAccounts();
                 eventBus.$emit("bankAccountRemoved", account.bank_user_id);
                 eventBus.$emit("toggleShopifyStore");
-                this.getBankAccounts();
             } catch (error) {
                 console.log(error);
             }

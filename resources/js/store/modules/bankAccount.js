@@ -21,6 +21,11 @@ const actions = {
                 commit("SET_BANK_LOGO");
             } else {
                 commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
+                commit("MasterSheet/SET_DEBTS_CREDIT_CARD_TOTAL", 0, {
+                    root: true
+                });
+                commit("SET_CREDIT_CARD_LIABILITIES", 0);
+                commit("SET_BANK_TRANSACTIONS", []);
             }
         } catch (err) {
             commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
@@ -36,6 +41,10 @@ const actions = {
             });
             commit("SET_CREDIT_CARD_LIABILITIES", liabilities);
         } catch (err) {
+            commit("MasterSheet/SET_DEBTS_CREDIT_CARD_TOTAL", 0, {
+                root: true
+            });
+            commit("SET_CREDIT_CARD_LIABILITIES", 0);
             console.log(err);
         }
     },
@@ -53,8 +62,9 @@ const actions = {
             console.log(err);
         }
     },
-    removeBankAccount: async ({ commit }, account) => {
+    removeBankAccount: async ({ commit, dispatch }, account) => {
         commit("REMOVE_BANK_ACCOUNT", account);
+        dispatch("getBankAccounts");
     }
 };
 const mutations = {
