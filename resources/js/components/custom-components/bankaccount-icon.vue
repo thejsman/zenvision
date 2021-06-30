@@ -8,7 +8,7 @@
             >
                 <div
                     class="border rounded p-2 dropbtn border-primary bg-white  ml-2"
-                    v-b-tooltip.hover="account.bank_name"
+                    v-b-tooltip.hover="bankName(account)"
                 >
                     <img
                         :src="
@@ -39,7 +39,13 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"])
+        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"]),
+        bankName() {
+            return account =>
+                this.titleCase(
+                    `${account.bank_name} - ${account.bank_subtype}`
+                );
+        }
     },
     props: {
         disableFeature: {
@@ -53,6 +59,13 @@ export default {
     methods: {
         ...mapActions("BankAccount", ["getBankAccounts", "removeBankAccount"]),
 
+        titleCase(str) {
+            str = str.toLowerCase().split(" ");
+            for (var i = 0; i < str.length; i++) {
+                str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+            }
+            return str.join(" ");
+        },
         async handleClick(store) {
             try {
                 await axios.patch("shopifystore", store);
