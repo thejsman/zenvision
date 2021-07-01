@@ -252,7 +252,7 @@ export default {
             <div
                 v-for="stat of statData"
                 :key="stat.icon"
-                class="col-md-4 my-2"
+                class="col-md-12 col-lg-4 my-2"
             >
                 <Stat
                     :icon="stat.icon"

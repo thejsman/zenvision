@@ -1,11 +1,5 @@
 <script>
-/**
- * Stat component -- specify the widget icon, title and value.
- */
-import PlaceholderLoader from "../../components/custom-components/placeholder-loader.vue";
-
 export default {
-    components: { PlaceholderLoader },
     props: {
         title: {
             type: String,
@@ -95,7 +89,6 @@ export default {
 
 <template>
     <div class="card mini-stats-wid">
-        <!-- <PlaceholderLoader v-if="loading" /> -->
         <div class="card-body">
             <div class="media">
                 <div class="media-body">
@@ -130,7 +123,7 @@ export default {
                         <apexchart
                             v-if="showGraph"
                             class="apex-charts"
-                            :height="50"
+                            :height="30"
                             :width="120"
                             :options="chartOptions"
                             :series="series"
