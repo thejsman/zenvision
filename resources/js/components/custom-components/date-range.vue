@@ -87,4 +87,14 @@ export default {
 .daterangepicker td.off {
     visibility: hidden;
 }
+
+.daterangepicker .calendar-table .next span,
+.daterangepicker .calendar-table .prev span {
+    color: #fff;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    border-radius: 0;
+    display: inline-block;
+    padding: 3px;
+}
 </style>
