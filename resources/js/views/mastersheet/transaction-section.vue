@@ -8,7 +8,7 @@ export default {
 </script>
 
 <template>
-    <div class="mt-4">
+    <div class="mt-2">
         <div class="d-flex">
             <h4>
                 Transactions
@@ -21,7 +21,7 @@ export default {
             ></i>
         </div>
 
-        <div class="col-md-12 p-0">
+        <div class="col mt-1 p-0">
             <div>
                 <b-card no-body>
                     <b-tabs

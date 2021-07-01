@@ -3,7 +3,7 @@
         <b-tab active>
             <template v-slot:title>
                 <span class="d-inline-block d-sm-none">
-                    <i class="fas fa-home"></i>
+                    Other Expenses
                 </span>
                 <span class="d-none d-sm-inline-block">Other Expenses</span>
             </template>
