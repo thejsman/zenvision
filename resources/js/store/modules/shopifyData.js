@@ -7,7 +7,8 @@ const state = {
     orders: [],
     allOrders: [],
     cogsTotal: 0,
-    storeBalance: 0
+    storeBalance: 0,
+    storeReserves: 0
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -15,7 +16,8 @@ const getters = {
     shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores,
     cogsTotal: state => state.cogsTotal,
-    storeBalance: state => state.storeBalance
+    storeBalance: state => state.storeBalance,
+    storeReserves: state => state.storeReserves
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -34,10 +36,10 @@ const actions = {
                 if (section === "MS") {
                     dispatch("getShopifyStoreAllOrders");
                     dispatch("getShopifyStoreBalance");
+                    dispatch("getShopifyStoreReserves");
                 } else {
                     dispatch("getShopifyStoreOrders");
                 }
-
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
             } else {
                 commit("SET_SHOPIFY_STORES", []);
@@ -76,13 +78,30 @@ const actions = {
             commit("SET_COGS_ALL_ORDERS", []);
         }
     },
-    getShopifyStoreBalance: async ({ commit, rootState }) => {
+
+    getShopifyStoreBalance: async ({ commit }) => {
         try {
             const response = await axios.get("shopify-balance");
             commit("SET_SHOPIFY_BALANCE", response.data);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_BALANCE", 0);
+        }
+    },
+    getShopifyStoreReserves: async ({ commit }) => {
+        try {
+            const response = await axios.get("shopify-reserves");
+            commit("SET_SHOPIFY_RESERVES", response.data);
+
+            commit("MasterSheet/SET_ASSETS_RESERVES_TOTAL", response.data, {
+                root: true
+            });
+        } catch (err) {
+            console.log(err);
+            commit("SET_SHOPIFY_RESERVES", 0);
+            commit("MasterSheet/SET_ASSETS_RESERVES_TOTAL", 0, {
+                root: true
+            });
         }
     },
     removeShopifyAccount: async ({ commit }, account) => {
@@ -120,6 +139,9 @@ const mutations = {
     SET_SHOPIFY_BALANCE: (state, payload) => {
         state.storeBalance = payload;
     },
+    SET_SHOPIFY_RESERVES: (state, payload) => {
+        state.storeReserves = payload;
+    },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
             account => account.id !== payload.id
@@ -130,6 +152,7 @@ const mutations = {
             state.allOrders = [];
             state.cogsTotal = 0;
             state.storeBalance = 0;
+            state.storeReserves = 0;
         }
     }
 };
