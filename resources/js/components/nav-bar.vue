@@ -53,14 +53,8 @@ export default {
     <header id="page-topbar">
         <div class="navbar-header">
             <div class="d-flex">
-                <button
-                    id="vertical-menu-btn"
-                    type="button"
-                    class="btn btn-sm px-4 font-size-16 header-item"
-                    @click="toggleMenu"
-                >
-                    <i class="fa fa-fw fa-bars"></i>
-                </button>
+                <div class="px-2 d-none d-lg-block"></div>
+
                 <!-- LOGO -->
                 <div class="px-4">
                     <a href="/" class="logo">
