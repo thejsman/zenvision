@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 ml-2 dropbtn"
+                    class="border p-2 ml-2 dropbtn bg-white"
                     :class="{
                         'border-primary': googleAccount.enabled_on_dashboard
                     }"
