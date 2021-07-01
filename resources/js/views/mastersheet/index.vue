@@ -99,7 +99,7 @@ export default {
                 <Sidepanel />
             </div>
             <div class="col-md-9 mt-4">
-                <Mainpanel :orders="shopifyAllOrders" />
+                <Mainpanel />
             </div>
 
             <loading

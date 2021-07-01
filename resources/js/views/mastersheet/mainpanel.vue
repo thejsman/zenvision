@@ -83,13 +83,13 @@ export default {
         // });
         this.getProfitLoss();
     },
-    props: {
-        orders: {
-            type: Array,
-            default: () => []
+    watch: {
+        shopifyAllOrders(newVal, oldVal) {
+            this.getProfitLoss();
         }
     },
     computed: {
+        ...mapGetters(["shopifyAllOrders"]),
         yesterday() {
             const today = new Date();
             const previous_day = new Date(today);
@@ -119,7 +119,7 @@ export default {
         yesterdayProfitLoss() {
             let yesterdaysOrder = 0;
 
-            this.orders.forEach(order => {
+            this.shopifyAllOrders.forEach(order => {
                 if (
                     moment(order.created_on_shopify).format("MM-DD-YYYY") ===
                     this.yesterday
@@ -137,7 +137,7 @@ export default {
         profitLossGraphData() {
             return this.lastSevenDaysArray.map(day => {
                 return parseFloat(
-                    _.sumBy(this.orders, order => {
+                    _.sumBy(this.shopifyAllOrders, order => {
                         if (
                             moment(order.created_on_shopify).format(
                                 "MM-DD-YYYY"
@@ -184,7 +184,7 @@ export default {
                     ),
                     this.otherExpensesData
                 );
-            }, 2000);
+            }, 10);
         },
         async yesterdaysNetEquityFluctuation() {
             try {
