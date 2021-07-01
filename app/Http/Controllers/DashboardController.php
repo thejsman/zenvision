@@ -132,13 +132,13 @@ class DashboardController extends Controller
         $store_balance = 0;
         foreach ($enabled_on_dashboard as $store_id) {
 
-            // Commented for Development: to save network requests
-
-            // $store = ShopifyStore::find($store_id)->getStoreDetails();
-            // $url = "https://" . $store['store_url'] . "/admin/api/2021-01/shopify_payments/balance.json";
-            // $access_token = $store['api_token'];
-            // $response = CustomRequests::getRequest($url, [], $access_token);
-            // $store_balance +=  array_column($response['balance'], 'amount')[0];
+            $store = ShopifyStore::find($store_id)->getStoreDetails();
+            $url = "https://" . $store['store_url'] . "/admin/api/2021-04/shopify_payments/balance.json";
+            $access_token = $store['api_token'];
+            $response = CustomRequests::getRequest($url, [], $access_token);
+            if (!isset($response['errors'])) {
+                $store_balance += array_column($response['balance'], 'amount')[0];
+            }
         }
         return $store_balance;
     }
