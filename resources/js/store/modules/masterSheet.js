@@ -34,6 +34,7 @@ const getters = {
             rootState.StripeAccount.stripeAccountsBalance / 100 +
                 rootState.shopifyData.storeBalance
         ),
+    assetsReservesTotal: state => state.assetsReservesTotal,
     assetsDataArray: state => [
         {
             icon: "bx bx-copy-alt",
@@ -80,7 +81,9 @@ const mutations = {
         console.log("TOGGLE_LOADING_STATUS has been called", state);
     },
     SET_DEBTS_CREDIT_CARD_TOTAL: (state, payload) =>
-        (state.debtsCreditCardTotal = payload)
+        (state.debtsCreditCardTotal = payload),
+    SET_ASSETS_RESERVES_TOTAL: (state, payload) =>
+        (state.assetsReservesTotal = payload)
 };
 
 export default {

@@ -243,6 +243,32 @@ class ShopifyStoreController extends Controller
         }
         return $store_balance;
     }
+    public static function getShopifyStoreReserves($user = null)
+    {
+        $user = Auth::user();
+        $date_max = date("Y-m-d", strtotime('-90 days'));
+        $payout_status = array("scheduled", "in_transit", "paid", "failed");
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+        $store_reserves = 0;
+        foreach ($enabled_on_dashboard as $store_id) {
+
+            $store = ShopifyStore::find($store_id)->getStoreDetails();
+            $url = "https://" . $store['store_url'] . "/admin/api/2021-01/shopify_payments/payouts.json?date_max=" . $date_max;
+            $access_token = $store['api_token'];
+            $response = CustomRequests::getRequest($url, [], $access_token);
+            if (!isset($response['errors'])) {
+                if (isset($response['payouts'])) {
+                    foreach ($response['payouts'] as $payout) {
+                        if (in_array($payout->status, $payout_status)) {
+                            $store_reserves += $payout['summary']->reserved_funds_gross_amount;
+                        }
+                    }
+                }
+            }
+        }
+        return $store_reserves;
+    }
+
     public function getDisputes()
     {
         $user = Auth::user();

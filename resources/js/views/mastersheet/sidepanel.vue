@@ -83,7 +83,8 @@ export default {
             "debtsCreditCardTotal",
             "debtsSupplierPayableTotal",
             "netEquityTotal",
-            "assetsCashTotal"
+            "assetsCashTotal",
+            "assetsReservesTotal"
         ]),
         ...mapGetters(["cogsTotal", "stripeAccountsBalance", "storeBalance"])
     },
@@ -127,11 +128,17 @@ export default {
             );
         },
         debtsCreditCardTotal(newVal, oldVal) {
-            console.log("debtsCreditCardTotal value changed", newVal, oldVal);
             updateData(
                 this.debtsData,
                 TOTAL_CREDIT_CARD,
                 displayCurrency(this.debtsCreditCardTotal)
+            );
+        },
+        assetsReservesTotal(newVal, oldVal) {
+            updateData(
+                this.statData,
+                TOTAL_RESERVES,
+                displayCurrency(this.assetsReservesTotal)
             );
         }
     },
@@ -200,7 +207,7 @@ export default {
             updateData(
                 this.statData,
                 TOTAL_RESERVES,
-                displayCurrency(total_reserves)
+                displayCurrency(this.assetsReservesTotal)
             );
 
             updateData(
