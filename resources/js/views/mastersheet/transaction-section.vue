@@ -25,7 +25,7 @@ export default {
             <div>
                 <b-card no-body>
                     <b-tabs
-                        nav-class="nav-tabs-custom m-2 p-3"
+                        nav-class="nav-tabs-custom m-2 pt-2"
                         content-class="p-3 text-muted"
                     >
                         <OtherExpenses />
