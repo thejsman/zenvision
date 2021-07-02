@@ -1,6 +1,6 @@
 <template>
     <div class="ml-auto d-inline-flex">
-        <p class="mt-2 mr-2">Date Range:</p>
+        <p class="mt-2 mr-2 date-range">Date Range:</p>
         <DateRangePicker
             ref="picker"
             :opens="opens"
