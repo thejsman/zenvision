@@ -86,7 +86,7 @@
             />
             Shopify
         </b-dropdown-item>
-        <b-modal id="plaid-connect" size="lg" centered hide-footer hide-header>
+        <b-modal id="plaid-connect" centered hide-footer hide-header>
             <BankConnect
                 :bankAccounts="plaidAccounts"
                 :bankInstitution="plaidInstitution"

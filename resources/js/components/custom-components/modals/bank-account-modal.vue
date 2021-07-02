@@ -1,62 +1,70 @@
 <template>
     <div>
-        <div v-if="!bankError" class="m-4 d-flex flex-column">
+        <div class="account-modal">
             <div class="font-weight-bold font-size-14 text-white">
                 Bank Accounts
             </div>
-            <p class="mt-4 mb-4 text-white">Please select one account</p>
-
-            <b-card-group class="flex justify-content-center" v-if="!noAccount">
-                <div
-                    v-for="account of bankAccounts"
-                    :key="account.id"
-                    class="d-flex justify-content-center d-flex flex-row"
+            <p class="mt-2 mb-4 text-white">Please select one account</p>
+            <div v-if="bankError" class="d-flex flex-column">
+                <b-alert show variant="danger" class="w-100">
+                    Error fetching the details, please try later</b-alert
                 >
-                    <b-card
-                        bg-variant="light"
-                        :header="`Account Name: ` + account.name"
-                        class="m-2 fb-card"
+            </div>
+            <div v-if="!bankError">
+                <div v-if="noAccount">
+                    <b-alert show variant="warning" class="w-100"
+                        >No account found!</b-alert
                     >
-                        <b-card-text>
-                            <p class="fb-text">
-                                Account number : ****{{ account.mask }}
-                            </p>
-                            <p class="fb-text">
-                                Account Type: {{ account.subtype }}
-                            </p>
-
+                </div>
+                <div v-if="!noAccount">
+                    <b-card-group
+                        deck
+                        v-for="account of bankAccounts"
+                        :key="account.id"
+                    >
+                        <b-card class="mt-2">
+                            <b-card-text>
+                                <span class="text-muted"> Account Name: </span>
+                                <span class="font-weight-bold">
+                                    {{ account.name }}
+                                </span>
+                            </b-card-text>
+                            <b-card-text>
+                                <span class="text-muted">
+                                    Account number:
+                                </span>
+                                <span class="font-weight-bold">
+                                    {{ account.mask }}
+                                </span>
+                            </b-card-text>
+                            <b-card-text>
+                                <span class="text-muted"> Account Type: </span>
+                                <span class="font-weight-bold">
+                                    {{ account.subtype }}
+                                </span>
+                            </b-card-text>
                             <b-button
                                 block
                                 class="btn btn-primary"
                                 variant="primary"
                                 @click="handleClick(account)"
-                                >Select this account</b-button
+                                >Select</b-button
                             >
-                        </b-card-text>
-                    </b-card>
+                        </b-card>
+                    </b-card-group>
                 </div>
-            </b-card-group>
-            <div v-else>
-                <b-alert show variant="warning" class="w-100"
-                    >No account found!</b-alert
+                <div class="mt-2">
+                    <b-alert :show="showMessage" :variant="updateVariant">{{
+                        updateResult
+                    }}</b-alert>
+                </div>
+                <b-button
+                    block
+                    class="btn btn-cancel text-center"
+                    @click="$emit('handle-close')"
+                    >Cancel</b-button
                 >
             </div>
-
-            <div>
-                <b-alert :show="showMessage" :variant="updateVariant">{{
-                    updateResult
-                }}</b-alert>
-            </div>
-            <b-button
-                variant="primary"
-                class="btn btn-cancel align-self-end"
-                @click="$emit('handle-close')"
-                >Cancel</b-button
-            >
-        </div>
-
-        <div v-else class="m-4 d-flex flex-column">
-            <p>Error fetching the details, please try later</p>
         </div>
     </div>
 </template>
@@ -130,25 +138,11 @@ export default {
                     this.$emit("handle-close");
                 }, 2000);
             }
-        },
-        alreadyAdded(id) {
-            return this.adAccounts.some(
-                account => account.ad_account_id === id
-            );
         }
     }
 };
 </script>
 <style>
-.fb-card {
-    min-width: 500px;
-}
-.fb-text,
-.card-header {
-    font-size: 15px;
-    font-weight: 400;
-    color: white;
-}
 button:disabled {
     cursor: not-allowed;
     pointer-events: all !important;
