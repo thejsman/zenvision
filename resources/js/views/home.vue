@@ -334,13 +334,7 @@ export default {
         >
             <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
         </b-modal>
-        <b-modal
-            id="facebook-connect"
-            size="lg"
-            centered
-            hide-footer
-            hide-header
-        >
+        <b-modal id="facebook-connect" centered hide-footer hide-header>
             <FacebookConnect
                 :facebookData="facebookData"
                 :facebookError="facebookError"
