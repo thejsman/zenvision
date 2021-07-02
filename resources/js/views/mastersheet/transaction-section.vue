@@ -35,7 +35,7 @@ export default {
                 <div class="text-center text-muted mt-2">
                     <p class="align-items-center">
                         <i
-                            class="fas fas fa-info-circle"
+                            class="fas fas fa-info-circle learn-more"
                             v-b-tooltip.hover="
                                 'Learn more about the Mastersheet page...'
                             "
