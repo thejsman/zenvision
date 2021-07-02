@@ -145,10 +145,6 @@ export default {
 };
 </script>
 <style>
-.fb-card {
-    min-width: 500px;
-}
-
 button:disabled {
     cursor: not-allowed;
     pointer-events: all !important;

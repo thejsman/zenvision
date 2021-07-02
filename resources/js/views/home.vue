@@ -343,27 +343,21 @@ export default {
                 @handle-close="$bvModal.hide('facebook-connect')"
             />
         </b-modal>
-        <b-modal
-            id="snapchat-connect"
-            size="lg"
-            centered
-            hide-footer
-            hide-header
-        >
+        <b-modal id="snapchat-connect" centered hide-footer hide-header>
             <SnapchatConnect
                 :snapchatData="snapchatAdAccounts"
                 :snapchatError="snapchatError"
                 @handle-close="$bvModal.hide('snapchat-connect')"
             />
         </b-modal>
-        <b-modal id="google-connect" size="lg" centered hide-footer hide-header>
+        <b-modal id="google-connect" centered hide-footer hide-header>
             <GoogleConnect
                 :googleData="googleAdAccounts"
                 :googleError="googleError"
                 @handle-close="$bvModal.hide('google-connect')"
             />
         </b-modal>
-        <b-modal id="tiktok-connect" size="lg" centered hide-footer hide-header>
+        <b-modal id="tiktok-connect" centered hide-footer hide-header>
             <TiktokConnect
                 :tiktokData="tiktokAdAccounts"
                 :tiktokError="tiktokError"

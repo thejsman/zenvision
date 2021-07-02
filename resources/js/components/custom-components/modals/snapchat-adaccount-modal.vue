@@ -1,33 +1,46 @@
 <template>
-    <div class="row">
-        <div v-if="!snapchatError" class="m-4 d-flex flex-column">
+    <div>
+        <div class="account-modal">
             <div class="font-weight-bold font-size-14 text-white">
                 Snapchat Ad Accounts
             </div>
-            <p class="mt-4 mb-4 text-white">Please select one Ad account</p>
-
-            <b-card-group class="flex justify-content-center flex-row">
-                <div
-                    v-for="snapchatAdAccount of snapchatData"
-                    :key="snapchatAdAccount.id"
-                    class="d-flex justify-content-between d-flex flex-row"
+            <p class="mt-2 mb-4 text-white">Please select one Ad account</p>
+            <div v-if="snapchatError" class="d-flex flex-column">
+                <b-alert show variant="danger" class="w-100">
+                    Error fetching the details, please try later</b-alert
                 >
-                    <b-card
-                        bg-variant="light"
-                        :header="
-                            `Account Name: ` + snapchatAdAccount.adaccount.name
-                        "
-                        class="m-2 fb-card"
+            </div>
+            <div v-if="!snapchatError">
+                <div v-if="noAccount">
+                    <b-alert show variant="warning" class="w-100"
+                        >No Ad account found!</b-alert
                     >
-                        <b-card-text>
-                            <p class="fb-text">
-                                Currency:
-                                {{ snapchatAdAccount.adaccount.currency }}
-                            </p>
-                            <p class="fb-text">
-                                Status: {{ snapchatAdAccount.adaccount.status }}
-                            </p>
-
+                </div>
+                <div v-if="!noAccount">
+                    <b-card-group
+                        deck
+                        v-for="snapchatAdAccount of snapchatData"
+                        :key="snapchatAdAccount.id"
+                    >
+                        <b-card class="mt-2">
+                            <b-card-text>
+                                <span class="text-muted"> Account Name: </span>
+                                <span class="font-weight-bold">
+                                    {{ snapchatAdAccount.adaccount.name }}
+                                </span>
+                            </b-card-text>
+                            <b-card-text>
+                                <span class="text-muted"> Currency: </span>
+                                <span class="font-weight-bold">
+                                    {{ snapchatAdAccount.adaccount.currency }}
+                                </span>
+                            </b-card-text>
+                            <b-card-text>
+                                <span class="text-muted"> Status: </span>
+                                <span class="font-weight-bold">
+                                    {{ snapchatAdAccount.adaccount.status }}
+                                </span>
+                            </b-card-text>
                             <b-button
                                 block
                                 class="btn btn-primary"
@@ -44,31 +57,26 @@
                                     handleClick(snapchatAdAccount.adaccount)
                                 "
                                 >{{
-                                    alreadyAdded(snapchatAdAccount.adaccount.id)
+                                    alreadyAdded(snapchatAdAccount.id)
                                         ? "Account alreay added"
-                                        : "Select this account"
+                                        : "Select"
                                 }}</b-button
                             >
-                        </b-card-text>
-                    </b-card>
+                        </b-card>
+                    </b-card-group>
                 </div>
-            </b-card-group>
-
-            <div>
-                <b-alert :show="showMessage" :variant="updateVariant">{{
-                    updateResult
-                }}</b-alert>
+                <div class="mt-2">
+                    <b-alert :show="showMessage" :variant="updateVariant">{{
+                        updateResult
+                    }}</b-alert>
+                </div>
+                <b-button
+                    block
+                    class="btn btn-cancel text-center"
+                    @click="$emit('handle-close')"
+                    >Cancel</b-button
+                >
             </div>
-            <b-button
-                variant="primary"
-                class="btn btn-cancel align-self-end"
-                @click="$emit('handle-close')"
-                >Cancel</b-button
-            >
-        </div>
-
-        <div v-else class="m-4 d-flex flex-column">
-            <p>Error fetching the details, please try later</p>
         </div>
     </div>
 </template>
@@ -81,7 +89,8 @@ export default {
         return {
             showMessage: true,
             updateResult: "",
-            updateVariant: ""
+            updateVariant: "",
+            noAccount: false
         };
     },
     props: {
@@ -98,7 +107,11 @@ export default {
             default: () => []
         }
     },
-    created() {},
+    created() {
+        if (this.snapchatData.length < 1) {
+            this.noAccount = true;
+        }
+    },
     methods: {
         async handleClick(adaccount) {
             try {
