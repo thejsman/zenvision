@@ -84,7 +84,7 @@
                         <div v-if="!noAccount"></div>
                         <div
                             v-if="!loading && noTransactions && noAccount"
-                            class="d-flex flex-column justify-content-center"
+                            class="d-flex flex-column justify-content-center w-100"
                         >
                             <p class="text-center">
                                 No transactions in between
@@ -176,7 +176,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12 mt-5 pt-5">
+            <div class="col mt-3 pt-3">
                 <p class="text-center text-white">
                     Add a <strong>Bank Account, Credit Card, Stripe</strong> or
                     <strong>Paypal </strong> to see transactions
@@ -477,53 +477,6 @@ export default {
 </script>
 
 <style lang="scss">
-.app-search .form-control {
-    background: #32384c;
-}
-.app-search span {
-    line-height: 48px;
-}
-.chip-container {
-    width: 450px;
-    min-height: 34px;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: space-between;
-    align-items: center;
-
-    .chip {
-        margin: 7px;
-        background: #ffaa61;
-        padding: 10px 15px;
-        font-weight: bold;
-        color: white;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        i {
-            cursor: pointer;
-            opacity: 0.56;
-            margin-left: 8px;
-        }
-    }
-}
-.chip-input {
-    width: 120px;
-    //   height: 40px;
-    margin-top: 15px !important;
-    border: 2px dashed #989ba5;
-    padding: 4px;
-    border-radius: 10px;
-    background-color: transparent;
-}
-.list-group {
-    overflow: auto;
-    height: 400px;
-    width: 1100px;
-}
-.list-group p {
-    font-size: 16px;
-}
 .loading {
     text-align: center;
     position: absolute;
@@ -564,4 +517,56 @@ export default {
     top: 0;
     width: 100%;
 }
+.list-group-wrapper {
+    overflow: auto;
+    height: 562px;
+}
+// Chip
+// .app-search .form-control {
+//     background: #32384c;
+// }
+// .app-search span {
+//     line-height: 48px;
+// }
+// .chip-container {
+//     width: 450px;
+//     min-height: 34px;
+//     display: flex;
+//     flex-wrap: wrap;
+//     align-content: space-between;
+//     align-items: center;
+
+//     .chip {
+//         margin: 7px;
+//         background: #ffaa61;
+//         padding: 10px 15px;
+//         font-weight: bold;
+//         color: white;
+//         border-radius: 5px;
+//         display: flex;
+//         align-items: center;
+//         i {
+//             cursor: pointer;
+//             opacity: 0.56;
+//             margin-left: 8px;
+//         }
+//     }
+// }
+// .chip-input {
+//     width: 120px;
+//     //   height: 40px;
+//     margin-top: 15px !important;
+//     border: 2px dashed #989ba5;
+//     padding: 4px;
+//     border-radius: 10px;
+//     background-color: transparent;
+// }
+// .list-group {
+//     overflow: auto;
+//     height: 400px;
+//     // width: 1100px;
+// }
+// .list-group p {
+//     font-size: 16px;
+// }
 </style>

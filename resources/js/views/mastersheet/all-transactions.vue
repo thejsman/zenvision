@@ -6,7 +6,6 @@
             </span>
             <span class="d-none d-sm-inline-block">All Transactions</span>
         </template>
-        <p>All Transactions</p>
     </b-tab>
 </template>
 
