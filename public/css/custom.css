@@ -691,3 +691,8 @@ body::-webkit-scrollbar {
 .d-sm-inline-block {
   padding-bottom: 20px;
 }
+
+
+.fa-info-circle {
+  padding-left: 10px;
+}
