@@ -9,9 +9,9 @@
     display: none;
     position: absolute;
     top: 48px;
-    right: -27px;
+    right: -21px;
     background-color: #2e3549;
-    min-width: 100px;
+    min-width: 80px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: 8px;
@@ -20,8 +20,8 @@
 /* Links inside the dropdown */
 .dropdown-content a {
     color: white;
-    padding: 12px 16px;
-
+    padding: 10px 16px;
+    text-align: center;
     text-decoration: none;
     display: block;
 }
@@ -45,5 +45,5 @@
     border-style: solid;
     border-color: transparent transparent #2e3549 transparent;
     top: -18px;
-    left: 38px;
+    left: 32px;
 }
