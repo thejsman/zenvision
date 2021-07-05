@@ -98,7 +98,7 @@ export default {
                         ></i>
                         Profile
                     </a>
-                    <a class="dropdown-item" href="#">
+                    <a class="dropdown-item" href="mailto:support@zenvision.io">
                         <i
                             class="bx bx-support font-size-16 align-middle mr-1 text-danger"
                         ></i>
