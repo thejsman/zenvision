@@ -27,6 +27,7 @@ import FacebookConnect from "../components/custom-components/modals/facebook-ada
 import SnapchatConnect from "../components/custom-components/modals/snapchat-adaccount-modal";
 import GoogleConnect from "../components/custom-components/modals/google-adaccount-modal";
 import TiktokConnect from "../components/custom-components/modals/tiktok-adaccount-modal";
+import Profile from "../components/custom-components/modals/profile-modal.vue";
 import moment from "moment";
 import { mapState, mapGetters, mapActions } from "vuex";
 
@@ -59,7 +60,8 @@ export default {
         GoogleConnect,
         GoogleAccount,
         TiktokConnect,
-        Loading
+        Loading,
+        Profile
     },
     data() {
         return {
@@ -333,6 +335,9 @@ export default {
             hide-header
         >
             <ShopifyConnect @handle-close="$bvModal.hide('shopify-connect')" />
+        </b-modal>
+        <b-modal id="profile-update" size="xl" centered hide-footer hide-header>
+            <Profile @handle-close="$bvModal.hide('profile-update')" />
         </b-modal>
         <b-modal id="facebook-connect" centered hide-footer hide-header>
             <FacebookConnect
