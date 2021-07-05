@@ -115,7 +115,7 @@ export default {
                 await axios.post("/bankaccount", account);
                 this.showMessage = true;
                 this.updateVariant = "success";
-                this.updateResult = "Bank account added successfully";
+                this.updateResult = "Account added successfully";
                 setTimeout(() => {
                     this.showMessage = false;
                     this.updateVariant = "";

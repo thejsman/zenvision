@@ -32,7 +32,7 @@
 
         <b-dropdown-item :href="paypalUrl">
             <img
-                src="/images/icons/paypal.png"
+                src="/images/icons/paypal-icon.svg"
                 alt
                 height="21"
                 width="21"

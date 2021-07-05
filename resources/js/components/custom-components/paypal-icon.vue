@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-start pl-2">
+    <div class="flex-start">
         <div class="d-flex flex-row">
             <div
                 v-for="account in ppAccounts"
@@ -7,12 +7,12 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2  dropbtn ml-2 bg-white"
+                    class="border rounded p-2  dropbtn mx-1 bg-white"
                     :class="{ 'border-primary': account.enabled_on_dashboard }"
                     @click="disableFeature ? handleClick(account) : null"
                     v-b-tooltip.hover="account.name"
                 >
-                    <img src="/images/icons/paypal.png" alt height="21" />
+                    <img src="/images/icons/paypal-icon.svg" alt height="21" />
                 </div>
                 <div class="dropdown-content">
                     <a
