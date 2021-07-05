@@ -92,6 +92,18 @@ export default {
                             </button>
                         </div>
                     </template>
+                    <a class="dropdown-item" href="#" v-b-modal.profile-update>
+                        <i
+                            class="bx bx-user font-size-16 align-middle mr-1 text-danger"
+                        ></i>
+                        Profile
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i
+                            class="bx bx-support font-size-16 align-middle mr-1 text-danger"
+                        ></i>
+                        Support
+                    </a>
                     <a class="dropdown-item" href="/logout">
                         <i
                             class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"
