@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-start pl-1">
+    <div class="flex-start">
         <div class="d-flex flex-row">
             <div
                 v-for="snapchatAccount in snapchatAccounts"
@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 ml-2 dropbtn bg-white"
+                    class="border rounded p-2 mx-1 dropbtn bg-white"
                     :class="{
                         'border-primary': snapchatAccount.enabled_on_dashboard
                     }"

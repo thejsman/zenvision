@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-start pl-2">
+    <div class="flex-start">
         <div class="d-flex flex-row">
             <div
                 v-for="account in bankAccounts"
@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 dropbtn border-primary bg-white  ml-2"
+                    class="border rounded p-2 mx-1 dropbtn border-primary bg-white"
                     v-b-tooltip.hover="bankName(account)"
                 >
                     <img

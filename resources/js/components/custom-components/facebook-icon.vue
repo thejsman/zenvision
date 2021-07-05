@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-start pl-1">
+    <div class="flex-start">
         <div class="d-flex flex-row">
             <div
                 v-for="facebookAccount in facebookAccounts"
@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 ml-2 dropbtn bg-white"
+                    class="border rounded p-2 dropbtn bg-white mx-1"
                     :class="{
                         'border-primary': facebookAccount.enabled_on_dashboard
                     }"

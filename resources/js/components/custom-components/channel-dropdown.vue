@@ -1,5 +1,5 @@
 <template>
-    <b-dropdown variant="primary" class="m-2">
+    <b-dropdown variant="primary" class="m-2 mr-3">
         <template v-slot:button-content>
             Add Channels
             <i class="fas fa-plus pl-1"></i>
@@ -33,7 +33,7 @@
         </b-dropdown-item>
         <b-dropdown-item :href="paypalUrl">
             <img
-                src="/images/icons/paypal.png"
+                src="/images/icons/paypal-icon.svg"
                 alt
                 height="21"
                 class="channel-icons"
