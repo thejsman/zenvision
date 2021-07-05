@@ -91,6 +91,7 @@
                 :bankAccounts="plaidAccounts"
                 :bankInstitution="plaidInstitution"
                 :plaidPublicToken="plaidPublicToken"
+                :plaidClickType="plaidClickType"
                 @handle-close="$bvModal.hide('plaid-connect')"
             />
         </b-modal>

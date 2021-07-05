@@ -2,9 +2,11 @@
     <div>
         <div class="account-modal">
             <div class="font-weight-bold font-size-14 text-white">
-                Bank Accounts
+                {{ channelType }} Accounts
             </div>
-            <p class="mt-2 mb-4 text-white">Please select one account</p>
+            <p class="mt-2 mb-4 text-white">
+                Please select one {{ channelType }} account
+            </p>
             <div v-if="bankError" class="d-flex flex-column">
                 <b-alert show variant="danger" class="w-100">
                     Error fetching the details, please try later</b-alert
@@ -81,6 +83,13 @@ export default {
             noAccount: false
         };
     },
+    computed: {
+        channelType() {
+            return this.plaidClickType === "depository"
+                ? "Bank"
+                : "Credit Card";
+        }
+    },
     props: {
         bankAccounts: {
             type: Array,
@@ -97,6 +106,10 @@ export default {
         plaidPublicToken: {
             type: String,
             default: ""
+        },
+        plaidClickType: {
+            type: String,
+            default: "depository"
         }
     },
     created() {
