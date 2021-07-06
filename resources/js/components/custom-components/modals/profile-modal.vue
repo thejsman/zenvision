@@ -3,7 +3,11 @@
         <div>
             <h4 class="my-2">Profile</h4>
             <b-card bg-variant="light" text-variant="white">
-                <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+                <b-form
+                    @submit="updateUserProfile"
+                    @reset="onReset"
+                    v-if="show"
+                >
                     <div class="row">
                         <div class="col">
                             <b-form-group
@@ -46,7 +50,14 @@
                                     placeholder="Email"
                                     type="email"
                                     required
+                                    @focus="emailFocus = false"
+                                    @blur="emailFocus = true"
                                 ></b-form-input>
+                                <b-form-invalid-feedback
+                                    :state="emailFocus ? emailState : true"
+                                >
+                                    Please provide a valid email.
+                                </b-form-invalid-feedback>
                             </b-form-group>
                         </div>
                     </div>
@@ -62,8 +73,16 @@
                                     v-model="formProfile.phoneNumber"
                                     placeholder="Phone Number"
                                     type="tel"
+                                    @focus="phoneFocus = false"
+                                    @blur="phoneFocus = true"
                                     required
                                 ></b-form-input>
+                                <b-form-invalid-feedback
+                                    :state="phoneFocus ? phoneState : true"
+                                    id="phone-feedback"
+                                    >Phone number should be a 10 digit
+                                    number</b-form-invalid-feedback
+                                >
                             </b-form-group>
                             <b-button type="submit" variant="success"
                                 >Save</b-button
@@ -77,7 +96,7 @@
         <div class="pt-5">
             <h4 class="my-2">Change Password</h4>
             <b-card bg-variant="light" text-variant="white">
-                <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+                <b-form @submit="changePassword" @reset="onReset" v-if="show">
                     <div class="row">
                         <div class="col-4">
                             <b-form-group
@@ -90,8 +109,18 @@
                                     v-model="formPassword.password"
                                     type="password"
                                     placeholder="Password"
+                                    @focus="passwordFocus = false"
+                                    @blur="passwordFocus = true"
                                     required
                                 ></b-form-input>
+                                <b-form-invalid-feedback
+                                    id="password-feeback"
+                                    :state="
+                                        passwordFocus ? passwordState : true
+                                    "
+                                    >Password must be at least 6 character
+                                    long</b-form-invalid-feedback
+                                >
                             </b-form-group>
                         </div>
                         <div class="col-4">
@@ -120,23 +149,35 @@
                 </b-form>
             </b-card>
         </div>
-        <b-card class="mt-3 d-none" header="Will be removed">
-            <b-alert :show="showMessage" :variant="updateVariant">{{
-                updateResult
-            }}</b-alert>
-            <pre class="m-0">{{ formProfile }}</pre>
+        <b-card class="mt-3">
+            <b-alert
+                dismissible
+                :show="showMessage"
+                :variant="messageVariant"
+                >{{ updateResult }}</b-alert
+            >
+            <!-- <pre class="m-0">{{ formProfile }}</pre> -->
         </b-card>
+        <loading
+            :active.sync="loadingStatus"
+            :can-cancel="false"
+            :is-full-page="true"
+            :background-color="'#191e2c'"
+            :opacity="0.8"
+        ></loading>
     </div>
 </template>
 <script>
 import axios from "axios";
+import Loading from "vue-loading-overlay";
 
 export default {
     name: "Profile",
-
+    components: { Loading },
     data() {
         return {
             formProfile: {
+                id: null,
                 email: "",
                 firstName: "",
                 lastName: "",
@@ -148,11 +189,98 @@ export default {
             },
             show: true,
             showMessage: false,
-            updateVariant: "success",
-            updateResult: ""
+            messageVariant: "success",
+            updateResult: "",
+            loadingStatus: false,
+            phoneFocus: false,
+            passwordFocus: false,
+            emailFocus: false
         };
     },
+
+    computed: {
+        phoneState() {
+            return this.formProfile.phoneNumber.length > 9 ? true : false;
+        },
+        passwordState() {
+            return this.formPassword.password.length > 5 ? true : false;
+        },
+        emailState() {
+            const email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+            if (email_regex.test(this.formProfile.email)) return true;
+            else return false;
+        }
+    },
+    created() {
+        this.getUserProfile();
+    },
     methods: {
+        async getUserProfile() {
+            try {
+                this.loadingStatus = true;
+                const { data } = await axios.get("/user");
+                const { id, firstname, lastname, email, phone } = data;
+                console.log({ id, firstname, lastname, email, phone });
+                this.formProfile.id = id;
+                this.formProfile.firstName = firstname;
+                this.formProfile.lastName = lastname;
+                this.formProfile.email = email;
+                this.formProfile.phoneNumber = phone;
+
+                this.loadingStatus = false;
+            } catch (err) {
+                console.log("err", err);
+                this.formProfile.firstName = "";
+                this.formProfile.lastName = "";
+                this.formProfile.email = "";
+                this.formProfile.phoneNumber = "";
+                this.loadingStatus = false;
+            }
+        },
+
+        async updateUserProfile(event) {
+            event.preventDefault();
+            try {
+                this.loadingStatus = true;
+                const result = await axios.patch("/user", this.formProfile);
+                console.log({ result });
+                this.messageVariant = "success";
+                this.updateResult = "Profile updated successfully";
+                this.showMessage = true;
+                this.loadingStatus = false;
+            } catch (err) {
+                this.messageVariant = "danger";
+                this.updateResult = "Something went wrong, please try later";
+                this.showMessage = true;
+                this.loadingStatus = false;
+                console.log({ err });
+            }
+        },
+        async changePassword(event) {
+            event.preventDefault();
+            try {
+                this.loadingStatus = true;
+                if (
+                    this.formPassword.password ===
+                    this.formPassword.repeatPassword
+                ) {
+                    const result = await axios.patch(
+                        "changepassword",
+                        this.formPassword
+                    );
+                    this.messageVariant = "success";
+                    this.updateResult = "Password updated successfully";
+                    this.showMessage = true;
+                    this.loadingStatus = false;
+                }
+            } catch (err) {
+                this.messageVariant = "danger";
+                this.updateResult = "Something went wrong, please try later";
+                this.showMessage = true;
+                this.loadingStatus = false;
+                console.log(err);
+            }
+        },
         onSubmit(event) {
             event.preventDefault();
             // alert(JSON.stringify(this.form));
