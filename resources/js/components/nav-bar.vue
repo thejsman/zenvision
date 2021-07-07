@@ -92,7 +92,7 @@ export default {
                             </button>
                         </div>
                     </template>
-                    <a class="dropdown-item" href="#" v-b-modal.profile-update>
+                    <a class="dropdown-item"  href="/profile">
                         <i
                             class="bx bx-user font-size-16 align-middle mr-1 text-danger"
                         ></i>

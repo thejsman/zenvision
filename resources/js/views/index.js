@@ -5,6 +5,7 @@ import Vue from "vue";
 
 Vue.component("home", require("./home").default);
 Vue.component("mastersheet", require("./mastersheet").default);
+Vue.component("profile", require("./profile-page").default);
 Vue.component("pages-404", require("./utility/404").default);
 
 Vue.component("login", require("./account/login").default);
