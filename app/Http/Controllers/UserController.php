@@ -22,21 +22,32 @@ class UserController extends Controller
         return $user;
     }
     public function edit(Request $request) {
-
         $user = Auth::user();
-        if($user->id == $request->id) {
-            $user->firstname = $request->firstName;
-            $user->lastname = $request->lastName;
-            $user->email = $request->email;
-            $user->phone = $request->phoneNumber;
-            $user->save();
-            return $user;
-        } else {
-            return [];
-        }
+      $validator =   $this->validate($request, [
+            'firstName' => ['required', 'string', 'max:255'],
+            'lastName' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email,'.$user->id],
+            'phoneNumber' => ['required', 'string', 'max:255'],
+        ]);
+      
+            if($user->id == $request->id) {
+                $user->firstname = $request->firstName;
+                $user->lastname = $request->lastName;
+                $user->email = $request->email;
+                $user->phone = $request->phoneNumber;
+                $user->save();
+                return $user;
+            } else {
+                return [];
+            }
+     
+       
     }
     public function changePassword(Request $request) {
         $user = Auth::user();
+        $this->validate($request, [
+            'password' => ['required', 'string', 'min:6',]
+        ]);
         $user->password = Hash::make($request->password);
         $user->save();
 
