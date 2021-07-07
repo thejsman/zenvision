@@ -2,9 +2,9 @@
     <Layout>
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div class="my-3">
+                <div class="my-2">
                     <div>
-                        <h4 class="my-4">Profile</h4>
+                        <h4 class="my-3">Profile</h4>
                         <b-card bg-variant="light" text-variant="white">
                             <b-form
                                 @submit="updateUserProfile"
@@ -100,6 +100,9 @@
                                         <b-button
                                             type="submit"
                                             variant="success"
+                                            :disabled="
+                                                !phoneState || !emailState
+                                            "
                                             >Save</b-button
                                         >
                                     </div>
@@ -157,8 +160,25 @@
                                                 "
                                                 type="password"
                                                 placeholder="Repeat New Password"
+                                                @focus="
+                                                    repeatPasswordFocus = false
+                                                "
+                                                @blur="
+                                                    repeatPasswordFocus = true
+                                                "
                                                 required
                                             ></b-form-input>
+                                            <b-form-invalid-feedback
+                                                id="password-feeback"
+                                                :state="
+                                                    repeatPasswordFocus
+                                                        ? repeatPasswordState
+                                                        : true
+                                                "
+                                                >The password confirmation does
+                                                not
+                                                match.</b-form-invalid-feedback
+                                            >
                                         </b-form-group>
                                     </div>
                                 </div>
@@ -167,6 +187,10 @@
                                         <b-button
                                             type="submit"
                                             variant="success"
+                                            :disabled="
+                                                !passwordState ||
+                                                    !repeatPasswordState
+                                            "
                                             >Save</b-button
                                         >
                                     </div>
@@ -220,8 +244,9 @@ export default {
             updateResult: "",
             loadingStatus: false,
             phoneFocus: false,
+            emailFocus: false,
             passwordFocus: false,
-            emailFocus: false
+            repeatPasswordFocus: false
         };
     },
 
@@ -236,6 +261,11 @@ export default {
             const email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
             if (email_regex.test(this.formProfile.email)) return true;
             else return false;
+        },
+        repeatPasswordState() {
+            return (
+                this.formPassword.password === this.formPassword.repeatPassword
+            );
         }
     },
     created() {
@@ -256,7 +286,7 @@ export default {
 
                 this.loadingStatus = false;
             } catch (err) {
-                console.log("err", err);
+                console.log({ err });
                 this.formProfile.firstName = "";
                 this.formProfile.lastName = "";
                 this.formProfile.email = "";
@@ -276,8 +306,18 @@ export default {
                 this.showMessage = true;
                 this.loadingStatus = false;
             } catch (err) {
+                if (Object.keys(err.response.data.errors).length > 0) {
+                    Object.entries(err.response.data.errors).forEach(
+                        ([k, v]) => {
+                            this.updateResult = v[0];
+                        }
+                    );
+                } else {
+                    this.updateResult =
+                        "Something went wrong, please try later";
+                }
                 this.messageVariant = "danger";
-                this.updateResult = "Something went wrong, please try later";
+
                 this.showMessage = true;
                 this.loadingStatus = false;
                 console.log({ err });
@@ -301,8 +341,18 @@ export default {
                     this.loadingStatus = false;
                 }
             } catch (err) {
+                if (Object.keys(err.response.data.errors).length > 0) {
+                    Object.entries(err.response.data.errors).forEach(
+                        ([k, v]) => {
+                            this.updateResult = v[0];
+                        }
+                    );
+                } else {
+                    this.updateResult =
+                        "Something went wrong, please try later";
+                }
                 this.messageVariant = "danger";
-                this.updateResult = "Something went wrong, please try later";
+
                 this.showMessage = true;
                 this.loadingStatus = false;
                 console.log(err);
