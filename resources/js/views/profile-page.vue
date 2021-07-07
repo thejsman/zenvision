@@ -201,7 +201,7 @@
                     <div class="mt-3">
                         <b-alert
                             dismissible
-                            :show="showMessage"
+                            v-model="showMessage"
                             :variant="messageVariant"
                             >{{ updateResult }}</b-alert
                         >
@@ -277,7 +277,7 @@ export default {
                 this.loadingStatus = true;
                 const { data } = await axios.get("/user");
                 const { id, firstname, lastname, email, phone } = data;
-                console.log({ id, firstname, lastname, email, phone });
+
                 this.formProfile.id = id;
                 this.formProfile.firstName = firstname;
                 this.formProfile.lastName = lastname;
@@ -286,7 +286,6 @@ export default {
 
                 this.loadingStatus = false;
             } catch (err) {
-                console.log({ err });
                 this.formProfile.firstName = "";
                 this.formProfile.lastName = "";
                 this.formProfile.email = "";
@@ -300,7 +299,7 @@ export default {
             try {
                 this.loadingStatus = true;
                 const result = await axios.patch("/user", this.formProfile);
-                console.log({ result });
+
                 this.messageVariant = "success";
                 this.updateResult = "Profile updated successfully";
                 this.showMessage = true;
@@ -320,7 +319,6 @@ export default {
 
                 this.showMessage = true;
                 this.loadingStatus = false;
-                console.log({ err });
             }
         },
         async changePassword(event) {
@@ -355,7 +353,6 @@ export default {
 
                 this.showMessage = true;
                 this.loadingStatus = false;
-                console.log(err);
             }
         },
         onSubmit(event) {
