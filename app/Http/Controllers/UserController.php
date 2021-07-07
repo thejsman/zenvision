@@ -9,10 +9,15 @@ use Auth;
 
 class UserController extends Controller
 {
+    public function index() {
+        return view('profile', [
+            'component' => 'profile'
+        ]);
+    }
     public function getStores(User $user) {
         return $user->stores;
     }
-    public function index() {
+    public function getUser() {
         $user = Auth::user();
         return $user;
     }

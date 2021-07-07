@@ -20,7 +20,8 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/mastersheet', 'MastersheetController@index')->name('mastersheet');
 Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 
-Route::get('/user', 'UserController@index');
+Route::get('/profile', 'UserController@index');
+Route::get('/user', 'UserController@getUser');
 Route::patch('/user', 'UserController@edit');
 Route::patch('/changepassword', 'UserController@changePassword');
 

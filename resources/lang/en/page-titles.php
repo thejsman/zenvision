@@ -13,5 +13,6 @@ return [
     'login' => 'Login',
     'register' => 'Register',
     'reset' => 'Reset Password',
-    'mastersheet' => 'Mastersheet'
+    'mastersheet' => 'Mastersheet',
+    'profile' => 'Profile'
 ];
