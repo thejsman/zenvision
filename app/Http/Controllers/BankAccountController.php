@@ -45,6 +45,7 @@ class BankAccountController extends Controller
         $bank_accounts = Auth::user()->getBankAccounts();
         $balance = 0;
         foreach ($bank_accounts as $account) {
+          if($account->bank_type == "depository") {
             $curl = curl_init();
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://sandbox.plaid.com/accounts/balance/get',
@@ -78,8 +79,8 @@ class BankAccountController extends Controller
                 } else {
                     $balance += $response['accounts'][0]['balances']['current'];
                 }
-
             }
+          }          
         }
         return $balance;
     }

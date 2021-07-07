@@ -10,11 +10,12 @@ class CreditCardController extends Controller
     {
         $cc_accounts = Auth::user()->getCreditCardAccounts();
 
-        $liabilities = 0;
+        $balance = 0;
+        $limit = 0;
         foreach ($cc_accounts as $account) {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://sandbox.plaid.com/liabilities/get',
+                CURLOPT_URL => 'https://sandbox.plaid.com/accounts/balance/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -40,12 +41,25 @@ class CreditCardController extends Controller
             $response = json_decode($result, true);
 
             curl_close($curl);
-            if (!isset($response['error_code'])) {
-                if (!is_null($response['liabilities']['credit'][0]['last_statement_balance'])) {
-                    $liabilities += $response['liabilities']['credit'][0]['last_statement_balance'];
+
+            //Change logic
+            
+            // if (!isset($response['error_code'])) {
+            //     if (!is_null($response['liabilities']['credit'][0]['last_statement_balance'])) {
+            //         $liabilities += $response['liabilities']['credit'][0]['last_statement_balance'];
+            //     }
+            // }
+
+            if (!isset($response['errors'])) {
+                if (!is_null($response['accounts'][0]['balances']['available'])) {
+                    $balance += $response['accounts'][0]['balances']['available'];
+                } else {
+                    $balance += $response['accounts'][0]['balances']['current'];
                 }
+                $limit += $response['accounts'][0]['balances']['limit'];
+
             }
         }
-        return $liabilities;
+        return $limit - $balance;
     }
 }
