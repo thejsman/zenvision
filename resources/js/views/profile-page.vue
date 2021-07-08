@@ -4,7 +4,7 @@
             <div class="col-md-8 offset-md-2">
                 <div class="my-2">
                     <div>
-                        <h4 class="my-3">Profile</h4>
+                        <h3 class="my-3">Profile</h3>
                         <b-card bg-variant="light" text-variant="white">
                             <b-form
                                 @submit="updateUserProfile"
@@ -100,6 +100,7 @@
                                         <b-button
                                             type="submit"
                                             variant="success"
+                                            class="button-profile"
                                             :disabled="
                                                 !phoneState || !emailState
                                             "
@@ -112,7 +113,7 @@
                     </div>
                     <!-- Change password -->
                     <div class="mt-5">
-                        <h4 class="my-4">Change Password</h4>
+                        <h3 class="my-4">Change Password</h3>
                         <b-card bg-variant="light" text-variant="white">
                             <b-form
                                 @submit="changePassword"
@@ -187,6 +188,7 @@
                                         <b-button
                                             type="submit"
                                             variant="success"
+                                            class="button-profile"
                                             :disabled="
                                                 !passwordState ||
                                                     !repeatPasswordState

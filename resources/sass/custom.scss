@@ -39,10 +39,6 @@ strong {
     transition: 0.3s;
 }
 
-.form-control:hover {
-    background-color: #333c4e;
-}
-
 .btn-success {
     color: #fff;
     background-color: #34c38f;
@@ -715,4 +711,27 @@ body::-webkit-scrollbar {
 
 .date-range {
   padding: 5px 5px 0px 0px;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+.button-profile {
+  margin-top: 20px;
+}
+
+.form-control:hover {
+    background-color: #232b3c;
+}
+
+.form-control:focus {
+    color: #fefefe;
+    background-color: #232b3c;
+    border-color: #232b3c;
+    outline: 0;
+    box-shadow: none;
 }
