@@ -12,7 +12,7 @@
                                 v-if="show"
                             >
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-lg">
                                         <b-form-group
                                             id="firstNameGroup"
                                             label="First Name:"
@@ -27,7 +27,7 @@
                                             ></b-form-input>
                                         </b-form-group>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-lg">
                                         <b-form-group
                                             id="lastNameGroup"
                                             label="Last Name:"
@@ -41,7 +41,7 @@
                                             ></b-form-input>
                                         </b-form-group>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-lg">
                                         <b-form-group
                                             id="emailGroup"
                                             label="Email"
@@ -69,7 +69,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-md-12">
                                         <b-form-group
                                             id="phoneNumberGroup"
                                             label="Phone Number"
@@ -120,7 +120,7 @@
                                 v-if="show"
                             >
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-md-12">
                                         <b-form-group
                                             id="passwordGroup"
                                             label="Password"
@@ -147,7 +147,7 @@
                                             >
                                         </b-form-group>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-md-12">
                                         <b-form-group
                                             id="repeatPasswordGroup"
                                             label="Repeat New Password"
