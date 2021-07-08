@@ -41,6 +41,16 @@ class ShopifyStore extends Model
         }
         return $orders;
     }
+    public function getAllOrdersCogs()
+    {
+        $cogs = 0;
+        $orders = $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->get();
+
+        foreach ($orders as $order) {
+            $cogs += $order->getCogs();
+        }
+        return $cogs;
+    }
 
     public function getStoreDetails()
     {
