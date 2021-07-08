@@ -40,9 +40,12 @@ class BankAccountController extends Controller
         $account->isDeleted = true;
         $account->save();
     }
-    public function getAccountBalance()
+    public static function getAccountBalance($user = null)
     {
-        $bank_accounts = Auth::user()->getBankAccounts();
+        if($user == null) {
+            $user = Auth::user();
+        }
+        $bank_accounts = $user->getBankAccounts();
         $balance = 0;
         foreach ($bank_accounts as $account) {
           if($account->bank_type == "depository") {

@@ -9,6 +9,9 @@ use App\ShopifyStore;
 use Auth;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\CreditCardController;
+
 class DashboardController extends Controller
 {
     //Function to get store sata
@@ -90,19 +93,22 @@ class DashboardController extends Controller
         $total_cash = 0;
         $total_inventory = 0;
         $total_reserves = 0;
-        $total_credit_card = 0;
-        $total_supplier_payable = 0;
+        $total_credit_card = CreditCardController::getCreditCardliabilities($user);
+        $total_supplier_payable = self::getTotalCogs($user);
 
         //Funciton to get Shopify store balance
         $shopify_balance = self::getShopifyStoreBalance($user);
+
         // will call a funciton to get available bank cash
-        $cash_bank_account = 0;
+        $cash_bank_account = BankAccountController::getAccountBalance($user);
+
+
         // will call a funciton to get available paypal balance
         $cash_paypal = 0;
         // will call a funciton to get available stripe balance
-        $cash_stripe = 0;
+        $cash_stripe = self::getStripeBalance($user);;
 
-        $total_cash += $shopify_balance + $cash_bank_account + $cash_paypal + $cash_stripe;
+        $total_cash = $shopify_balance + $cash_bank_account + $cash_paypal + $cash_stripe;
 
         return [
             'total_cash' => $total_cash,
@@ -155,5 +161,51 @@ class DashboardController extends Controller
         } else {
             return 0;
         }
+    }
+
+
+    public static function getStripeBalance($user)
+    {
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+        $availableBalance = 0;
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/balance');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                //Windows Dev system disable SSL
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $headers = array(
+                    'Stripe-Account:' . $account->stripe_user_id,
+                    'Authorization: Bearer ' . $account->access_token,
+                );
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                    return [];
+                }
+                curl_close($ch);
+                $response = json_decode($result, true);
+                $availableBalance += $response['available'][0]['amount'] / 100;
+            }
+            return $availableBalance;
+        } else {
+            return $availableBalance;
+        }
+    }
+
+    public static function getTotalCogs($user)
+    {
+        $cogsTotal = 0;
+
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+
+        foreach ($enabled_on_dashboard as $store_id) {
+            $store = ShopifyStore::find($store_id);
+            $cogsTotal += $store->getAllOrdersCogs();
+        }
+        return $cogsTotal;
     }
 }

@@ -6,9 +6,12 @@ use Auth;
 
 class CreditCardController extends Controller
 {
-    public function getCreditCardliabilities()
+    public static function getCreditCardliabilities($user = null)
     {
-        $cc_accounts = Auth::user()->getCreditCardAccounts();
+        if($user == null) {
+          $user =  Auth::user();
+        }
+        $cc_accounts = $user->getCreditCardAccounts();
 
         $balance = 0;
         $limit = 0;
