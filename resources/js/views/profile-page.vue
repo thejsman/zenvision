@@ -222,6 +222,7 @@
 import axios from "axios";
 import Loading from "vue-loading-overlay";
 import Layout from "../layouts/main";
+import { mapActions } from "vuex";
 export default {
     name: "Profile",
     components: { Loading, Layout },
@@ -269,9 +270,11 @@ export default {
         }
     },
     created() {
+        this.toggleCurrentChannel("Profile");
         this.getUserProfile();
     },
     methods: {
+        ...mapActions(["toggleCurrentChannel"]),
         async getUserProfile() {
             try {
                 this.loadingStatus = true;
