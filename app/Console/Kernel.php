@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('netEquity:daily')->everyTenMinutes();
+        $schedule->command('netEquity:daily')->daily();
     }
 
     /**

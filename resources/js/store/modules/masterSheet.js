@@ -29,11 +29,14 @@ const state = {
 const getters = {
     transactionsStartDate: state => state.transStartDate,
     transactionsEndDate: state => state.transEndDate,
-    assetsCashTotal: (state, getters, rootState) =>
-        parseFloat(
-            rootState.StripeAccount.stripeAccountsBalance / 100 +
-                rootState.shopifyData.storeBalance
-        ),
+    assetsCashTotal: (state, getters, rootState, rootGetters) => {
+        console.log({ rootGetters });
+        return parseFloat(
+            rootGetters["shopifyStoreBalance"] +
+                rootGetters["stripeAccountsBalance"] +
+                rootGetters["BankAccount/bankAccountBalance"]
+        );
+    },
     assetsReservesTotal: state => state.assetsReservesTotal,
     assetsDataArray: state => [
         {
@@ -55,15 +58,20 @@ const getters = {
             loading: state.assetsReservesTotalLoading
         }
     ],
-    debtsSupplierPayableTotal: (state, getters, rootState) =>
-        rootState.shopifyData.cogsTotal,
-    debtsCreditCardTotal: state => state.debtsCreditCardTotal,
-    netEquityTotal: (state, getters, rootState) =>
-        state.assetsCashTotal +
-        state.assetsInventoryTotal +
-        state.assetsReservesTotal -
-        state.debtsCreditCardTotal -
-        rootState.shopifyData.cogsTotal
+    debtsSupplierPayableTotal: (state, getters, rootState, rootGetters) =>
+        rootGetters["ShopifyCogsTotal"],
+    debtsCreditCardTotal: (state, getters, rootState, rootGetters) =>
+        rootGetters["BankAccount/creditCardLiabilities"],
+    netEquityTotal: (state, getters, rootState, rootGetters) =>
+        parseFloat(
+            rootGetters["shopifyStoreBalance"] +
+                rootGetters["stripeAccountsBalance"] +
+                rootGetters["BankAccount/bankAccountBalance"] +
+                state.assetsInventoryTotal +
+                state.assetsReservesTotal -
+                rootGetters["BankAccount/creditCardLiabilities"] -
+                rootGetters["ShopifyCogsTotal"]
+        )
 };
 const actions = {
     loadAllChannels: async ({ dispatch }) => {

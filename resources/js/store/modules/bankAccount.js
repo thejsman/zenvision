@@ -1,13 +1,16 @@
 const state = {
     bankAccountArray: [],
     bankLogoArray: [],
+    bankBalance: 0,
     bankTransactionsArray: [],
     creditCardLiabilities: 0
 };
 const getters = {
     bankAccounts: state => state.bankAccountArray,
     bankLogos: state => state.bankLogoArray,
-    bankTransactions: state => state.bankTransactionsArray
+    bankTransactions: state => state.bankTransactionsArray,
+    bankAccountBalance: state => state.bankBalance,
+    creditCardLiabilities: state => state.creditCardLiabilities
 };
 const actions = {
     getBankAccounts: async ({ commit, dispatch }) => {
@@ -30,6 +33,15 @@ const actions = {
         } catch (err) {
             commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
             console.log(err);
+        }
+    },
+    getBankAccountBalance: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("bankaccount-balance");
+            console.log("Check this", data);
+            commit("SET_BANK_ACCOUNT_BALANCE", data);
+        } catch (err) {
+            console.log({ err });
         }
     },
     getCreditCardBalance: async ({ commit }) => {
@@ -79,6 +91,9 @@ const mutations = {
         (state.bankTransactionsArray = payload),
     SET_CREDIT_CARD_LIABILITIES: (state, payload) => {
         state.creditCardLiabilities = payload;
+    },
+    SET_BANK_ACCOUNT_BALANCE: (state, payload) => {
+        state.bankBalance = payload;
     },
     REMOVE_BANK_ACCOUNT: (state, payload) => {
         state.bankAccountArray = state.bankAccountArray.filter(
