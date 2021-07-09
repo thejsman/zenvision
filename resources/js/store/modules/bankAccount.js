@@ -38,7 +38,6 @@ const actions = {
     getBankAccountBalance: async ({ commit }) => {
         try {
             const { data } = await axios.get("bankaccount-balance");
-            console.log("Check this", data);
             commit("SET_BANK_ACCOUNT_BALANCE", data);
         } catch (err) {
             console.log({ err });

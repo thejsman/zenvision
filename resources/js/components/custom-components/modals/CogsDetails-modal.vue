@@ -329,7 +329,6 @@ export default {
                 this.items = result.data.products;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
-                console.log(this.items);
             } catch (error) {
                 console.log({ error });
                 this.products = [];

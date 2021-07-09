@@ -30,7 +30,6 @@ const getters = {
     transactionsStartDate: state => state.transStartDate,
     transactionsEndDate: state => state.transEndDate,
     assetsCashTotal: (state, getters, rootState, rootGetters) => {
-        console.log({ rootGetters });
         return parseFloat(
             rootGetters["shopifyStoreBalance"] +
                 rootGetters["stripeAccountsBalance"] +
