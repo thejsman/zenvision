@@ -78,18 +78,27 @@ export default {
             setLoading(this.statData);
             this.getProfitLoss();
         });
-        // eventBus.$on("netEquityTotal", (value) => {
-        //   this.yesterDaysNetEquityTotal = value;
-        // });
+
         this.getProfitLoss();
     },
     watch: {
         shopifyAllOrders(newVal, oldVal) {
             this.getProfitLoss();
+        },
+        netEquityTotal(newVal, oldVal) {
+            updateGraphData(
+                this.statData,
+                YESTERDAYS_NET_EQUITY_FLUCTUATION,
+                displayCurrency(
+                    this.netEquityTotal - this.yesterDaysNetEquityTotal
+                ),
+                this.netEquityArray
+            );
         }
     },
     computed: {
         ...mapGetters(["shopifyAllOrders"]),
+        ...mapGetters("MasterSheet", ["netEquityTotal"]),
         yesterday() {
             const today = new Date();
             const previous_day = new Date(today);
@@ -118,7 +127,6 @@ export default {
         },
         yesterdayProfitLoss() {
             let yesterdaysOrder = 0;
-
             this.shopifyAllOrders.forEach(order => {
                 if (
                     moment(order.created_on_shopify).format("MM-DD-YYYY") ===
@@ -130,7 +138,6 @@ export default {
                         order.total_discounts;
                 }
             });
-
             return parseFloat(yesterdaysOrder);
         },
 
@@ -155,6 +162,7 @@ export default {
                 ).toFixed(2);
             });
         },
+
         otherExpensesData() {
             let otherExpArray = [0, 0, 0, 0, 0, 0, 0];
             for (let i = 0; i <= 6; i++) {
@@ -196,10 +204,12 @@ export default {
                         moment.utc(e.created_at).format("MM-DD-YYYY") ===
                         this.yesterday
                 );
+
                 const graphData = this.lastSevenDaysArray.map(day => {
                     const foundObject = _.find(dailyEquityArray, function(e) {
                         return (
-                            moment(e.created_at).format("MM-DD-YYYY") === day
+                            moment.utc(e.created_at).format("MM-DD-YYYY") ===
+                            day
                         );
                     });
                     if (foundObject) {
@@ -215,9 +225,12 @@ export default {
                     updateGraphData(
                         this.statData,
                         YESTERDAYS_NET_EQUITY_FLUCTUATION,
-                        displayCurrency(yesterdaysData.net_equity),
+                        displayCurrency(
+                            this.netEquityTotal - yesterdaysData.net_equity
+                        ),
                         graphData
                     );
+
                     this.yesterDaysNetEquityTotal = yesterdaysData.net_equity;
                 } else {
                     updateGraphData(
@@ -252,7 +265,7 @@ export default {
             <div
                 v-for="stat of statData"
                 :key="stat.icon"
-                class="col-md-12 col-lg-4 my-2"
+                class="col-lg-4 col-md-12 my-2"
             >
                 <Stat
                     :icon="stat.icon"

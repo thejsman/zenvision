@@ -120,7 +120,6 @@ export default {
     methods: {
         async handleClick(account) {
             try {
-                console.log(this.plaidPublicToken);
                 account.institution_name = this.bankInstitution.name;
                 account.institution_id = this.bankInstitution.institution_id;
                 account.public_token = this.plaidPublicToken;
