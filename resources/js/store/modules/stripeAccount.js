@@ -10,7 +10,7 @@ const getters = {
     hasStripeAccountCS: state => state.hasStripeAccount,
     stripeAccounts: state => state.stripeAccounts,
     stripeTransactions: state => state.stripeTransactionsArray,
-    stripeAccountsBalance: state => state.stripeAccountsBalance
+    stripeAccountsBalance: state => state.stripeAccountsBalance / 100
 };
 const actions = {
     toggleStripeAccountStatus: ({ commit }, payload) => {

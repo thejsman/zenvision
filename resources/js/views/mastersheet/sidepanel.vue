@@ -83,17 +83,13 @@ export default {
             "debtsCreditCardTotal",
             "debtsSupplierPayableTotal",
             "netEquityTotal",
-            "assetsCashTotal",
-            "assetsReservesTotal"
+            "assetsReservesTotal",
+            "assetsCashTotal"
         ]),
-        ...mapGetters(["cogsTotal", "stripeAccountsBalance", "storeBalance"])
+        ...mapGetters(["ShopifyCogsTotal"]),
+        ...mapGetters("BankAccount", ["bankAccountBalance"])
     },
-    props: {
-        orders: {
-            type: Array,
-            default: () => []
-        }
-    },
+
     watch: {
         debtsSupplierPayableTotal(newVal, oldVal) {
             updateData(
@@ -107,26 +103,10 @@ export default {
             updateData(
                 this.netEquityData,
                 NET_EQUITY,
-                displayCurrency(
-                    this.netEquityTotal + this.totalCash + this.storeBalance
-                )
+                displayCurrency(this.netEquityTotal)
             );
         },
-        storeBalance(newVal, oldVal) {
-            console.log(newVal, oldVal);
-            updateData(
-                this.statData,
-                TOTAL_CASH,
-                displayCurrency(this.totalCash + this.storeBalance)
-            );
-            updateData(
-                this.netEquityData,
-                NET_EQUITY,
-                displayCurrency(
-                    this.netEquityTotal + this.totalCash + this.storeBalance
-                )
-            );
-        },
+
         debtsCreditCardTotal(newVal, oldVal) {
             updateData(
                 this.debtsData,
@@ -140,127 +120,73 @@ export default {
                 TOTAL_RESERVES,
                 displayCurrency(this.assetsReservesTotal)
             );
+        },
+        assetsCashTotal(newVal, oldVal) {
+            updateData(
+                this.statData,
+                TOTAL_CASH,
+                displayCurrency(this.assetsCashTotal)
+            );
         }
     },
-    created() {
-        eventBus.$on("stripeChannelRemoved", () => {
-            this.totalCash = 0;
-            setTimeout(() => {
-                this.getMastersheetData();
-                this.getStripeBalance();
-                // this.getStripeTransactions();
-                this.getBankAccountBalance();
-            }, 1000);
+    async created() {
+        eventBus.$on("stripeChannelRemoved", async () => {
+            await this.loadAllChannels();
         });
         eventBus.$on("toggleShopifyStore", () => {
-            this.totalCash = 0;
             setTimeout(async () => {
                 await this.loadAllChannels();
                 setLoading(this.statData);
                 setLoading(this.netEquityData);
                 this.getMastersheetData();
-                this.getStripeBalance();
-                // this.getStripeTransactions();
+
                 this.getBankAccountBalance();
             }, 1000);
         });
         this.getMastersheetData();
-        this.getStripeBalance();
-        // this.getStripeTransactions();
-        this.getBankAccountBalance();
+
+        await this.getBankAccountBalance();
     },
     methods: {
         ...mapActions("MasterSheet", ["loadAllChannels"]),
-        async getBankAccountBalance() {
-            setLoadingSingle(this.statData, TOTAL_CASH);
-
-            const result = await axios.get("bankaccount-balance");
-            const balance = result.data;
-            this.totalCash += parseFloat(balance);
-            updateData(
-                this.statData,
-                TOTAL_CASH,
-                displayCurrency(this.totalCash + this.storeBalance)
-            );
-        },
+        ...mapActions("BankAccount", ["getBankAccountBalance"]),
 
         async getMastersheetData() {
             setLoadingSingle(this.netEquityData, NET_EQUITY);
-            const assets = await axios.get("mastersheetdata");
-            const cogs = _.sumBy(this.orders, order =>
-                parseFloat(order.total_cost)
-            );
 
-            const {
-                total_credit_card,
-                total_inventory,
-                total_reserves,
-                total_supplier_payable
-            } = assets.data;
-
-            updateData(
-                this.statData,
-                TOTAL_INVENTORY,
-                displayCurrency(total_inventory)
-            );
-            this.totalReserves = total_reserves;
-            updateData(
-                this.statData,
-                TOTAL_RESERVES,
-                displayCurrency(this.assetsReservesTotal)
-            );
-
-            updateData(
-                this.debtsData,
-                TOTAL_CREDIT_CARD,
-                displayCurrency(this.debtsCreditCardTotal)
-            );
             setTimeout(() => {
+                updateData(this.statData, TOTAL_INVENTORY, displayCurrency(0));
+
+                updateData(
+                    this.statData,
+                    TOTAL_RESERVES,
+                    displayCurrency(this.assetsReservesTotal)
+                );
+
+                updateData(
+                    this.debtsData,
+                    TOTAL_CREDIT_CARD,
+                    displayCurrency(this.debtsCreditCardTotal)
+                );
                 updateData(
                     this.debtsData,
                     TOTAL_SUPPLIER_PAYABLE,
-                    displayCurrency(this.cogsTotal)
+                    displayCurrency(this.ShopifyCogsTotal)
                 );
-            }, 1000);
 
-            eventBus.$emit("netEquityTotal", this.netEquityTotal);
+                eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
-            updateData(
-                this.netEquityData,
-                NET_EQUITY,
-                displayCurrency(
-                    this.netEquityTotal + this.totalCash + this.storeBalance
-                )
-            );
-        },
-        async getStripeBalance() {
-            try {
-                const result = await axios.get("stripeaccount-balance");
-
-                const stripeData = result.data;
-
-                let stripeBalance = 0;
-                if (stripeData.length) {
-                    stripeData.forEach(element => {
-                        stripeBalance += parseFloat(element.amount / 100);
-                    });
-                }
-
-                this.totalCash += stripeBalance;
-            } catch (err) {
-                console.log(err);
-                return [];
-            }
-        },
-        async getStripeTransactions() {
-            try {
-                const result = await axios.get("getStripeTransactions");
-                const data = result.data;
-                return data;
-            } catch (err) {
-                console.log(err);
-                return [];
-            }
+                updateData(
+                    this.netEquityData,
+                    NET_EQUITY,
+                    displayCurrency(this.netEquityTotal)
+                );
+                updateData(
+                    this.statData,
+                    TOTAL_CASH,
+                    displayCurrency(this.assetsCashTotal)
+                );
+            }, 7000);
         }
     }
 };

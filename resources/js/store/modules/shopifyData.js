@@ -15,8 +15,8 @@ const getters = {
     shopifyOrders: state => state.orders,
     shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores,
-    cogsTotal: state => state.cogsTotal,
-    storeBalance: state => state.storeBalance,
+    ShopifyCogsTotal: state => state.cogsTotal,
+    shopifyStoreBalance: state => state.storeBalance,
     storeReserves: state => state.storeReserves
 };
 const actions = {
