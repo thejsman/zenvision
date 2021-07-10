@@ -20,6 +20,7 @@ const actions = {
             if (data.length > 0) {
                 commit("SET_BANK_ACCOUNT", data);
                 dispatch("getCreditCardBalance");
+                dispatch("getBankAccountBalance");
                 commit("TOGGGLE_BANK_ACCOUNT_STATUS", true, { root: true });
                 commit("SET_BANK_LOGO");
             } else {

@@ -111,6 +111,7 @@ export default {
         async removeChannel(account, event) {
             try {
                 eventBus.$emit("setLoadingTrue");
+                eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("stripeChannelRemoved", account.stripe_user_id);
                 await axios.patch("stripeconnectdelete", account);
                 await this.removeStripeAccount(account);

@@ -54,7 +54,7 @@ export default {
         }
     },
     created: function() {
-        this.getBankAccounts();
+        // this.getBankAccounts();
     },
     methods: {
         ...mapActions("BankAccount", ["getBankAccounts", "removeBankAccount"]),
