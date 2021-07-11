@@ -1,6 +1,16 @@
 <template>
     <div class="flex-start">
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-row" v-if="bankAccountLoadingStatus">
+            <div
+                class="border rounded p-1 icon-loader mx-1 d-flex justify-content-center align-items-center"
+            >
+                <b-skeleton-icon
+                    icon="person"
+                    :icon-props="{ fontScale: 2 }"
+                ></b-skeleton-icon>
+            </div>
+        </div>
+        <div v-else class="d-flex flex-row">
             <div
                 v-for="account in bankAccounts"
                 :key="account.id"
@@ -39,7 +49,11 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("BankAccount", ["bankAccounts", "bankLogos"]),
+        ...mapGetters("BankAccount", [
+            "bankAccounts",
+            "bankLogos",
+            "bankAccountLoadingStatus"
+        ]),
         bankName() {
             return account =>
                 this.titleCase(
@@ -66,21 +80,11 @@ export default {
             }
             return str.join(" ");
         },
-        async handleClick(store) {
-            try {
-                await axios.patch("shopifystore", store);
-                eventBus.$emit("toggleShopifyStore");
-                this.getBankAccounts();
-            } catch (error) {
-                console.log(error);
-            }
-        },
         async removeChannel(account, event) {
             try {
-                // eventBus.$emit("removeShopifyaccount", account.id);
                 await axios.patch("bankaccountdelete", account);
                 await this.removeBankAccount(account);
-                this.getBankAccounts();
+
                 eventBus.$emit("bankAccountRemoved", account.bank_user_id);
                 eventBus.$emit("toggleShopifyStore");
             } catch (error) {
@@ -107,3 +111,9 @@ export default {
     }
 };
 </script>
+<style>
+.icon-loader {
+    height: 41px;
+    width: 41px;
+}
+</style>
