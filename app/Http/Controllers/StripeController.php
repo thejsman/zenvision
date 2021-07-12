@@ -7,6 +7,8 @@ use App\Jobs\ProcessStripeCsvReport;
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
 use Auth;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 
 class StripeController extends Controller
@@ -197,20 +199,30 @@ class StripeController extends Controller
 
     public function merchantFeeReportRun(Request $request)
     {
-        $interval_end = strtotime($request->e_date);
-        $interval_start = strtotime($request->s_date);
 
-        $stripe = new \Stripe\StripeClient(
-            $request->access_token
-        );
-        $stripe->reporting->reportRuns->create([
-            'report_type' => 'balance.summary.1',
-            'parameters' => [
-                'interval_start' => $interval_start,
-                'interval_end' => $interval_end,
-                'timezone' => $request->time_zone
-            ],
-        ]);
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+
+                $stripe = new \Stripe\StripeClient(
+                    $account->access_token
+                );
+
+                $start_date = new DateTime($request->s_date, new DateTimeZone($account->time_zone));
+                $end_date = new DateTime($request->e_date, new DateTimeZone($account->time_zone));
+
+                $stripe->reporting->reportRuns->create([
+                    'report_type' => 'balance.summary.1',
+                    'parameters' => [
+                        'interval_start' => $start_date->format('U'),
+                        'interval_end' => $end_date->format('U'),
+                        'timezone' => $account->time_zone
+                    ],
+                ]);
+            }
+        }
     }
 
     public function reportWebhookHandler(Request $request)
@@ -220,6 +232,10 @@ class StripeController extends Controller
         $status = $data['object']['status'];
         $url = $data['object']['result']['url'];
 
+        $report_type = $data['object']['report_type'];
+
+
+
         $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
         $access_token = $stripe_account->access_token;
 
@@ -228,12 +244,15 @@ class StripeController extends Controller
                 'success',
             ], 200);
         } finally {
-            ProcessStripeCsvReport::dispatch(
-                $url,
-                $access_token,
-                $stripe_account->user_id,
-                $stripe_account->stripe_user_id
-            );
+            if ($report_type == 'balance.summary.1') {
+            } else {
+                ProcessStripeCsvReport::dispatch(
+                    $url,
+                    $access_token,
+                    $stripe_account->user_id,
+                    $stripe_account->stripe_user_id
+                );
+            }
         }
     }
 
