@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-// ini_set('max_execution_time', '300');
 
 use App\Jobs\ProcessStripeCsvReport;
 use App\StripeAccount;
@@ -40,8 +39,8 @@ class StripeController extends Controller
         $response = json_decode($result, true);
 
         if ($response) {
-
-            $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
+            $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token'])['name'];
+            $time_zone = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token'])['time_zone'];
             $stripeData = [];
             $stripeData['user_id'] = Auth::user()->id;
             $stripeData['access_token'] = $response['access_token'];
@@ -52,6 +51,7 @@ class StripeController extends Controller
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
             $stripeData['report_status'] = false;
+            $stripeData['time_zone'] = $time_zone;
 
             $object = StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
 
@@ -62,7 +62,6 @@ class StripeController extends Controller
             } else {
                 return redirect()->route('home', ['stripeAddAccount' => 'success', 'record_id' => $object->id]);
             }
-
         } else {
             if (strpos($state, 'mastersheet') !== false) {
                 return redirect()->route('mastersheet', ['stripeAddAccount' => 'error']);
@@ -93,7 +92,6 @@ class StripeController extends Controller
                     $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
                 }
             }
-
         }
         return $stripeTransactions;
     }
@@ -109,7 +107,6 @@ class StripeController extends Controller
                 $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->orderBy('created', 'desc')->paginate(20);
                 return $stripeTransactions;
             }
-
         }
         return ['stripeTransactions' => $stripeTransactions];
     }
@@ -125,7 +122,6 @@ class StripeController extends Controller
                 $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get()->toArray();
                 $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
             }
-
         }
         return $stripeTransactions;
     }
@@ -199,6 +195,24 @@ class StripeController extends Controller
         ]);
     }
 
+    public function merchantFeeReportRun(Request $request)
+    {
+        $interval_end = strtotime($request->e_date);
+        $interval_start = strtotime($request->s_date);
+
+        $stripe = new \Stripe\StripeClient(
+            $request->access_token
+        );
+        $stripe->reporting->reportRuns->create([
+            'report_type' => 'balance.summary.1',
+            'parameters' => [
+                'interval_start' => $interval_start,
+                'interval_end' => $interval_end,
+                'timezone' => $request->time_zone
+            ],
+        ]);
+    }
+
     public function reportWebhookHandler(Request $request)
     {
         $account_id = $request->account;
@@ -218,7 +232,8 @@ class StripeController extends Controller
                 $url,
                 $access_token,
                 $stripe_account->user_id,
-                $stripe_account->stripe_user_id);
+                $stripe_account->stripe_user_id
+            );
         }
     }
 
@@ -276,8 +291,9 @@ class StripeController extends Controller
         curl_close($ch);
 
         $response = json_decode($result, true);
+
         if ($response) {
-            return $response['business_profile']['name'];
+            return array('name' =>  $response['business_profile']['name'], 'time_zone' => $response['settings']['dashboard']['timezone']);
         } else {
             return null;
         }
@@ -320,9 +336,7 @@ class StripeController extends Controller
                 //Save the transacion in the table
                 StripeBalanceTransactionsReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id, 'balance_transaction_id' => $transaction['balance_transaction_id']], $transaction);
             }
-
         }
-
     }
 
     public function getBalanceTransaction($transaction_id, $access_token)
@@ -362,12 +376,9 @@ class StripeController extends Controller
                         array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
                     }
                 }
-
             }
 
             return $stripe_chargebacks;
         }
-
     }
-
 }

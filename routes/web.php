@@ -83,6 +83,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('stripeconnectdelete', 'StripeController@destroy');
     Route::get('stripeaccount-transactions', 'StripeController@getStripeTransactionsDateWise');
 
+    Route::post('stripeaccount-merchantfee2', 'StripeController@merchantFeeReportRun');
+
     //Bank Account
     Route::post('bankaccount', 'BankAccountController@store');
     Route::get('bankaccounts', 'BankAccountController@getBankAccounts');
@@ -149,7 +151,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('google-connect-test', 'GoogleAdController@store');
     Route::get('google-connect-getaccounts', 'GoogleAdController@getGoogleAdAccounts');
     Route::get('google-adspend', 'GoogleAdController@getAdSpends');
-
 });
 
 //Stripe Webhooks
