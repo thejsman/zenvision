@@ -1,5 +1,6 @@
 const state = {
     bankAccountArray: [],
+    bankAccountLoadingStatus: true,
     bankLogoArray: [],
     bankBalance: 0,
     bankTransactionsArray: [],
@@ -10,7 +11,8 @@ const getters = {
     bankLogos: state => state.bankLogoArray,
     bankTransactions: state => state.bankTransactionsArray,
     bankAccountBalance: state => state.bankBalance,
-    creditCardLiabilities: state => state.creditCardLiabilities
+    creditCardLiabilities: state => state.creditCardLiabilities,
+    bankAccountLoadingStatus: state => state.bankAccountLoadingStatus
 };
 const actions = {
     getBankAccounts: async ({ commit, dispatch }) => {
@@ -20,6 +22,7 @@ const actions = {
             if (data.length > 0) {
                 commit("SET_BANK_ACCOUNT", data);
                 dispatch("getCreditCardBalance");
+                dispatch("getBankAccountBalance");
                 commit("TOGGGLE_BANK_ACCOUNT_STATUS", true, { root: true });
                 commit("SET_BANK_LOGO");
             } else {
@@ -29,6 +32,7 @@ const actions = {
                 });
                 commit("SET_CREDIT_CARD_LIABILITIES", 0);
                 commit("SET_BANK_TRANSACTIONS", []);
+                commit("SET_ICON_LOADER", false);
             }
         } catch (err) {
             commit("TOGGGLE_BANK_ACCOUNT_STATUS", false, { root: true });
@@ -79,7 +83,9 @@ const actions = {
     }
 };
 const mutations = {
-    SET_BANK_ACCOUNT: (state, payload) => (state.bankAccountArray = payload),
+    SET_BANK_ACCOUNT: (state, payload) => {
+        state.bankAccountArray = payload;
+    },
     SET_BANK_LOGO: state => {
         state.bankAccountArray.forEach(account => {
             const { bank_user_id, institution_id } = account;
@@ -93,12 +99,15 @@ const mutations = {
     },
     SET_BANK_ACCOUNT_BALANCE: (state, payload) => {
         state.bankBalance = payload;
+        state.bankAccountLoadingStatus = false;
     },
     REMOVE_BANK_ACCOUNT: (state, payload) => {
         state.bankAccountArray = state.bankAccountArray.filter(
             account => account.id !== payload.id
         );
-    }
+    },
+    SET_ICON_LOADER: (state, payload) =>
+        (state.bankAccountLoadingStatus = payload)
 };
 export default {
     namespaced: true,

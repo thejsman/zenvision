@@ -9,15 +9,9 @@ import {
     YESTERDAYS_PROFIT_LOSS,
     OTHER_EXPENSES
 } from "../../constants";
-import {
-    updateData,
-    displayCurrency,
-    updateGraphData,
-    setLoading
-} from "../../utils";
-import { mapState, mapGetters, mapActions } from "vuex";
-import Axios from "axios";
-
+import { displayCurrency, updateGraphData, setLoading } from "../../utils";
+import { mapGetters } from "vuex";
+import axios from "axios";
 export default {
     components: { Stat, Transactions },
     data() {
@@ -99,6 +93,7 @@ export default {
     computed: {
         ...mapGetters(["shopifyAllOrders"]),
         ...mapGetters("MasterSheet", ["netEquityTotal"]),
+
         yesterday() {
             const today = new Date();
             const previous_day = new Date(today);
@@ -106,13 +101,7 @@ export default {
                 previous_day.setDate(previous_day.getDate() - 1)
             ).format("MM-DD-YYYY");
         },
-        dayBeforeYesterday() {
-            const today = new Date();
-            const previous_day = new Date(today);
-            return moment(
-                previous_day.setDate(previous_day.getDate() - 2)
-            ).format("MM-DD-YYYY");
-        },
+
         lastSevenDaysArray() {
             const today = new Date();
             let weeksArray = [];
@@ -125,6 +114,7 @@ export default {
             }
             return weeksArray;
         },
+
         yesterdayProfitLoss() {
             let yesterdaysOrder = 0;
             this.shopifyAllOrders.forEach(order => {
@@ -179,6 +169,14 @@ export default {
             setTimeout(() => {
                 updateGraphData(
                     this.statData,
+                    YESTERDAYS_NET_EQUITY_FLUCTUATION,
+                    displayCurrency(
+                        this.netEquityTotal - this.yesterDaysNetEquityTotal
+                    ),
+                    this.netEquityArray
+                );
+                updateGraphData(
+                    this.statData,
                     YESTERDAYS_PROFIT_LOSS,
                     displayCurrency(this.yesterdayProfitLoss),
                     this.profitLossGraphData
@@ -192,7 +190,7 @@ export default {
                     ),
                     this.otherExpensesData
                 );
-            }, 10);
+            }, 7000);
         },
         async yesterdaysNetEquityFluctuation() {
             try {

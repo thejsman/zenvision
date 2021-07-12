@@ -1,11 +1,6 @@
 <script>
 import Stat from "../../components/widgets/stat-mastersheet";
-import {
-    updateData,
-    displayCurrency,
-    setLoading,
-    setLoadingSingle
-} from "../../utils";
+import { updateData, displayCurrency } from "../../utils";
 import { eventBus } from "../../app";
 import _ from "lodash";
 import {
@@ -16,7 +11,6 @@ import {
     TOTAL_CREDIT_CARD,
     TOTAL_SUPPLIER_PAYABLE
 } from "../../constants";
-import axios from "axios";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -24,13 +18,6 @@ export default {
     components: { Stat },
     data() {
         return {
-            showModal: false,
-
-            totalInventory: 0,
-            totalCash: 0,
-            totalReserves: 0,
-            totalCreditCard: 0,
-            totalSupplierPayable: 0,
             netEquityData: [
                 {
                     icon: "bx bx-copy-alt",
@@ -98,6 +85,7 @@ export default {
                 displayCurrency(this.debtsSupplierPayableTotal)
             );
         },
+
         netEquityTotal(newVal, oldVal) {
             eventBus.$emit("netEquityTotal", this.netEquityTotal);
             updateData(
@@ -114,6 +102,7 @@ export default {
                 displayCurrency(this.debtsCreditCardTotal)
             );
         },
+
         assetsReservesTotal(newVal, oldVal) {
             updateData(
                 this.statData,
@@ -121,6 +110,7 @@ export default {
                 displayCurrency(this.assetsReservesTotal)
             );
         },
+
         assetsCashTotal(newVal, oldVal) {
             updateData(
                 this.statData,
@@ -130,30 +120,10 @@ export default {
         }
     },
     async created() {
-        eventBus.$on("stripeChannelRemoved", async () => {
-            await this.loadAllChannels();
-        });
-        eventBus.$on("toggleShopifyStore", () => {
-            setTimeout(async () => {
-                await this.loadAllChannels();
-                setLoading(this.statData);
-                setLoading(this.netEquityData);
-                this.getMastersheetData();
-
-                this.getBankAccountBalance();
-            }, 1000);
-        });
         this.getMastersheetData();
-
-        await this.getBankAccountBalance();
     },
     methods: {
-        ...mapActions("MasterSheet", ["loadAllChannels"]),
-        ...mapActions("BankAccount", ["getBankAccountBalance"]),
-
         async getMastersheetData() {
-            setLoadingSingle(this.netEquityData, NET_EQUITY);
-
             setTimeout(() => {
                 updateData(this.statData, TOTAL_INVENTORY, displayCurrency(0));
 
@@ -253,7 +223,6 @@ export default {
 </template>
 <style lang="scss">
 .sheet-leftbar {
-    width: 400px;
     float: left;
     padding: 20px;
     border-radius: 5px;

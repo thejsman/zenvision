@@ -60,6 +60,7 @@ export default {
 
     methods: {
         ...mapActions(["removeStripeAccount"]),
+        ...mapActions({ getStripeAccountsFromStore: ["getStripeAccounts"] }),
         async getStripeAccounts() {
             try {
                 const result = await axios.get("getstripeaccounts");
@@ -101,6 +102,7 @@ export default {
                 eventBus.$emit("setLoadingTrue");
                 await axios.patch("stripeconnect", account);
                 await this.getStripeAccounts();
+                await this.getStripeAccountsFromStore();
                 eventBus.$emit("setLoadingFalse");
             } catch (error) {
                 eventBus.$emit("setLoadingFalse");
@@ -111,6 +113,7 @@ export default {
         async removeChannel(account, event) {
             try {
                 eventBus.$emit("setLoadingTrue");
+                eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("stripeChannelRemoved", account.stripe_user_id);
                 await axios.patch("stripeconnectdelete", account);
                 await this.removeStripeAccount(account);

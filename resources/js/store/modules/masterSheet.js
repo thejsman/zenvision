@@ -74,9 +74,12 @@ const getters = {
 };
 const actions = {
     loadAllChannels: async ({ dispatch }) => {
-        dispatch("toggleLoadingStatus", true, { root: true });
-        dispatch("getShopifyStores", "MS", { root: true });
-        dispatch("getStripeAccounts", null, { root: true });
+        await Promise.allSettled([
+            dispatch("getShopifyStores", "MS", { root: true }),
+            dispatch("getStripeAccounts", null, { root: true }),
+            dispatch("BankAccount/getBankAccounts", null, { root: true })
+        ]);
+
         dispatch("toggleLoadingStatus", false, { root: true });
     },
     setLoadingStatus: ({ commit }, payload) => {
