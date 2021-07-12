@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessStripeCsvReport;
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
+use App\StripeReport;
 use Auth;
 use DateTime;
 use DateTimeZone;
@@ -221,6 +222,15 @@ class StripeController extends Controller
                         'timezone' => $account->time_zone
                     ],
                 ]);
+
+                $stripe_report_record = array(
+                    'user_id' => Auth::user()->id,
+                    'stripe_user_id' => $account->stripe_user_id,
+                    'start_date' => $request->s_date,
+                    'end_date' => $request->e_date,
+                    'report_status' => false
+                );
+                StripeReport::updateOrCreate(['stripe_user_id' => $account->stripe_user_id, 'start_date' => $request->s_date, 'end_date' => $request->e_date], $stripe_report_record);
             }
         }
     }
@@ -245,6 +255,13 @@ class StripeController extends Controller
             ], 200);
         } finally {
             if ($report_type == 'balance.summary.1') {
+
+                $this->stripeFeeReportHandler(
+                    $url,
+                    $access_token,
+                    $stripe_account->user_id,
+                    $stripe_account->stripe_user_id
+                );
             } else {
                 ProcessStripeCsvReport::dispatch(
                     $url,
@@ -256,6 +273,41 @@ class StripeController extends Controller
         }
     }
 
+
+    public function stripeFeeReportHandler($report_url, $access_token, $user_id, $stripe_user_id)
+    {
+
+        $options = array('http' => array(
+            'method' => 'GET',
+            'header' => 'Authorization: Bearer ' . $access_token,
+        ));
+        $context = stream_context_create($options);
+        $response = file_get_contents($report_url, false, $context);
+
+        $fp = fopen("php://temp", 'r+');
+        fputs($fp, $response);
+        rewind($fp);
+        $csv_data = [];
+        while (($data = fgetcsv($fp)) !== false) {
+            $csv_data[] = $data;
+        }
+        foreach ($csv_data as $key => $values) {
+            if ($key == 3) {
+                $transaction = array(
+                    'user_id' => $user_id,
+                    'stripe_user_id' => $stripe_user_id,
+                    // 'start_date' => $values[0],
+                    // 'end_date' => $values[1],
+                    'stripe_fee' => $values[2],
+                    'report_status' => true,
+                    'report_url' => $report_url
+                );
+                StripeReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id], $transaction);
+            } else {
+                continue;
+            }
+        }
+    }
     public function chargeWebookHandler(Request $request)
     {
         $stripe_user_id = $request->account;
