@@ -177,7 +177,7 @@ export default {
             hasSnapchatAccount: false,
             hasFacebookAccount: false,
             hasGoogleAccount: false,
-            hasStripeAccount: false,
+
             hasPaypalAccount: false,
             paypalFeeTotal: 0,
             hasShopifyAccount: false,
@@ -215,7 +215,7 @@ export default {
         anyActiveAccount() {
             return (
                 this.hasPaypalAccount ||
-                this.hasStripeAccount ||
+                this.hasStripeAccountCS ||
                 this.hasShopifyAccount
             );
         },
@@ -255,7 +255,8 @@ export default {
                 this.data[objIndex].loading = true;
                 this.data[objIndexCB].loading = true;
             } else {
-                this.getStripeTransactions();
+                // this.getStripeTransactions();
+                this.stripeMerchantFee();
                 this.getChargebackTotal();
                 // window.location.href = "/";
             }
@@ -341,13 +342,14 @@ export default {
         });
         eventBus.$on("hasStripeAccount", status => {
             setTimeout(() => {
-                this.hasStripeAccount = status;
+                this.hasStripeAccountCS = status;
                 this.stripeChargebacks = 0;
                 this.stripeFeeTotal = 0;
                 setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
 
                 if (status && !this.firstLoadStripe) {
-                    this.getStripeTransactions();
+                    // this.getStripeTransactions();
+                    this.stripeMerchantFee();
                     this.getChargebackTotal();
                 } else {
                     this.stripeFeeTotal = 0;
@@ -357,7 +359,7 @@ export default {
                         updateDataMerchantFee(
                             this.data,
                             MERCHANT_FEE,
-                            this.hasStripeAccount ||
+                            this.hasStripeAccountCS ||
                                 this.hasShopifyAccount ||
                                 this.hasPaypalAccount
                                 ? displayCurrency(this.totalMerchantFees)
@@ -366,11 +368,11 @@ export default {
                         eventBus.$emit("stripeTransactionEvent", []);
                         eventBus.$emit("stripeChargebackEvent", []);
 
-                        if (!this.hasStripeAccount)
+                        if (!this.hasStripeAccountCS)
                             updateDataMerchantFee(
                                 this.data,
                                 CHARGEBACKS_TOTAL,
-                                this.hasStripeAccount ||
+                                this.hasStripeAccountCS ||
                                     this.hasShopifyAccount ||
                                     this.hasPaypalAccount
                                     ? displayCurrency(this.totalChargeback)
@@ -392,12 +394,27 @@ export default {
     methods: {
         ...mapActions("MasterSheet", ["loadAllChannels"]),
         async stripeMerchantFee() {
+            this.stripeFeeTotal = 0;
             try {
                 const result = await axios.post("stripeaccount-merchantfee2", {
                     s_date: this.startDateS,
                     e_date: this.endDateS
                 });
-                console.log({ result });
+                const { data } = result;
+                console.log({ data });
+                if (data === "") {
+                    // run some trigger function
+                    this.checkStripeReportStatus2();
+                } else {
+                    //set Stripe merchant fee
+                    this.stripeFeeTotal = Math.abs(data);
+                    updateDataMerchantFee(
+                        this.data,
+                        MERCHANT_FEE,
+                        displayCurrency(data)
+                    );
+                    console.log("setting merchant fee", this.totalMerchantFees);
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -419,6 +436,21 @@ export default {
                 }
             }, 5000);
         },
+
+        checkStripeReportStatus2() {
+            this.timer = setInterval(async () => {
+                console.log("checking...");
+                const result = await axios.get("stripe-report-status2", {
+                    s_date: this.startDateS,
+                    e_date: this.endDateS,
+                    stripe_user_id: this.stripeAccounts[0]["stripe_user_id"]
+                });
+
+                const { data } = result;
+                console.log("see this data", data);
+            }, 5000);
+        },
+
         assignData(refundTotal, orders) {
             setTimeout(() => {
                 this.getCogsData(orders, refundTotal);
@@ -675,7 +707,7 @@ export default {
 
                 //Stripe Chargebacks
 
-                if (this.hasStripeAccount) {
+                if (this.hasStripeAccountCS) {
                     setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                     this.stripeChargebackTotal = 0;
 
@@ -714,7 +746,7 @@ export default {
                     updateData(
                         this.data,
                         CHARGEBACKS_TOTAL,
-                        this.hasStripeAccount ||
+                        this.hasStripeAccountCS ||
                             this.hasShopifyAccount ||
                             this.hasPaypalAccount
                             ? displayCurrency(this.totalChargeback)
@@ -743,14 +775,14 @@ export default {
                 );
             }
 
-            if (this.hasStripeAccount && !this.firstLoadStripe) {
-                await this.getStripeTransactions();
-            }
+            // if (this.hasStripeAccountCS && !this.firstLoadStripe) {
+            //     await this.getStripeTransactions();
+            // }
             setTimeout(() => {
                 updateData(
                     this.data,
                     MERCHANT_FEE,
-                    this.hasStripeAccount ||
+                    this.hasStripeAccountCS ||
                         this.hasShopifyAccount ||
                         this.hasPaypalAccount
                         ? displayCurrency(this.totalMerchantFees)
@@ -865,7 +897,7 @@ export default {
                 stripeObj.showicon = true;
             }, 1500);
             this.stripeFeeTotal = 0;
-            if (this.hasStripeAccount) {
+            if (this.hasStripeAccountCS) {
                 try {
                     const result = await axios.get(
                         "stripeconnect-merchantfee",
