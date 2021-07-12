@@ -37,7 +37,7 @@ import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
 import moment from "moment";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import {
     displayCurrency,
     updateData,
@@ -189,7 +189,12 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["startDateS", "endDateS"]),
+        ...mapGetters([
+            "startDateS",
+            "endDateS",
+            "stripeAccounts",
+            "hasStripeAccountCS"
+        ]),
         totalCost() {
             const totalCost = parseFloat(
                 this.totalMerchantFees +
@@ -256,7 +261,12 @@ export default {
             }
         }
     },
-    created() {
+    async created() {
+        await this.loadAllChannels();
+        console.log("Check this ", this.hasStripeAccountCS);
+        if (this.hasStripeAccountCS) {
+            this.stripeMerchantFee();
+        }
         eventBus.$on("updateSubscription", async () => {
             await this.getSubscriptionData();
         });
@@ -269,6 +279,10 @@ export default {
 
             // this.getMerchantfeesTotal();
             this.checkAndShowAdAccountsData(s_date, e_date);
+            console.log("Check this ", this.hasStripeAccountCS);
+            if (this.hasStripeAccountCS) {
+                this.stripeMerchantFee();
+            }
         });
 
         eventBus.$on("hasTiktokAccount", status => {
@@ -376,6 +390,19 @@ export default {
         });
     },
     methods: {
+        ...mapActions("MasterSheet", ["loadAllChannels"]),
+        async stripeMerchantFee() {
+            try {
+                const result = await axios.post("stripeaccount-merchantfee2", {
+                    s_date: this.startDateS,
+                    e_date: this.endDateS
+                });
+                console.log({ result });
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
         checkStripeReportStatus(recordId) {
             this.timer = setInterval(async () => {
                 const result = await axios.get("stripe-report-status", {
@@ -863,7 +890,7 @@ export default {
                             );
                         });
                     }
-
+                    console.log("Stripe Fee Total ", this.stripeFeeTotal);
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,

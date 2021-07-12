@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-// ini_set('max_execution_time', '300');
 
 use App\Jobs\ProcessStripeCsvReport;
 use App\StripeAccount;
 use App\StripeBalanceTransactionsReport;
+use App\StripeReport;
 use Auth;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 
 class StripeController extends Controller
@@ -40,8 +42,8 @@ class StripeController extends Controller
         $response = json_decode($result, true);
 
         if ($response) {
-
-            $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token']);
+            $account_name = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token'])['name'];
+            $time_zone = $this->getStripeAccountInfo($response['stripe_user_id'], $response['access_token'])['time_zone'];
             $stripeData = [];
             $stripeData['user_id'] = Auth::user()->id;
             $stripeData['access_token'] = $response['access_token'];
@@ -52,6 +54,7 @@ class StripeController extends Controller
             $stripeData['isDeleted'] = false;
             $stripeData['enabled_on_dashboard'] = true;
             $stripeData['report_status'] = false;
+            $stripeData['time_zone'] = $time_zone;
 
             $object = StripeAccount::updateOrCreate(['user_id' => Auth::user()->id, 'stripe_user_id' => $response['stripe_user_id']], $stripeData);
 
@@ -62,7 +65,6 @@ class StripeController extends Controller
             } else {
                 return redirect()->route('home', ['stripeAddAccount' => 'success', 'record_id' => $object->id]);
             }
-
         } else {
             if (strpos($state, 'mastersheet') !== false) {
                 return redirect()->route('mastersheet', ['stripeAddAccount' => 'error']);
@@ -93,7 +95,6 @@ class StripeController extends Controller
                     $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
                 }
             }
-
         }
         return $stripeTransactions;
     }
@@ -109,7 +110,6 @@ class StripeController extends Controller
                 $stripeTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->orderBy('created', 'desc')->paginate(20);
                 return $stripeTransactions;
             }
-
         }
         return ['stripeTransactions' => $stripeTransactions];
     }
@@ -125,7 +125,6 @@ class StripeController extends Controller
                 $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [$request->start_date, $request->end_date])->orderBy('created', 'desc')->get()->toArray();
                 $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
             }
-
         }
         return $stripeTransactions;
     }
@@ -199,12 +198,53 @@ class StripeController extends Controller
         ]);
     }
 
+    public function merchantFeeReportRun(Request $request)
+    {
+
+        $user = Auth::user();
+        $stripeAccounts = $user->getStripeAccountConnectIds();
+
+        if ($stripeAccounts->count()) {
+            foreach ($stripeAccounts as $account) {
+
+                $stripe = new \Stripe\StripeClient(
+                    $account->access_token
+                );
+
+                $start_date = new DateTime($request->s_date, new DateTimeZone($account->time_zone));
+                $end_date = new DateTime($request->e_date, new DateTimeZone($account->time_zone));
+
+                $stripe->reporting->reportRuns->create([
+                    'report_type' => 'balance.summary.1',
+                    'parameters' => [
+                        'interval_start' => $start_date->format('U'),
+                        'interval_end' => $end_date->format('U'),
+                        'timezone' => $account->time_zone
+                    ],
+                ]);
+
+                $stripe_report_record = array(
+                    'user_id' => Auth::user()->id,
+                    'stripe_user_id' => $account->stripe_user_id,
+                    'start_date' => $request->s_date,
+                    'end_date' => $request->e_date,
+                    'report_status' => false
+                );
+                StripeReport::updateOrCreate(['stripe_user_id' => $account->stripe_user_id, 'start_date' => $request->s_date, 'end_date' => $request->e_date], $stripe_report_record);
+            }
+        }
+    }
+
     public function reportWebhookHandler(Request $request)
     {
         $account_id = $request->account;
         $data = $request->data;
         $status = $data['object']['status'];
         $url = $data['object']['result']['url'];
+
+        $report_type = $data['object']['report_type'];
+
+
 
         $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
         $access_token = $stripe_account->access_token;
@@ -214,14 +254,60 @@ class StripeController extends Controller
                 'success',
             ], 200);
         } finally {
-            ProcessStripeCsvReport::dispatch(
-                $url,
-                $access_token,
-                $stripe_account->user_id,
-                $stripe_account->stripe_user_id);
+            if ($report_type == 'balance.summary.1') {
+
+                $this->stripeFeeReportHandler(
+                    $url,
+                    $access_token,
+                    $stripe_account->user_id,
+                    $stripe_account->stripe_user_id
+                );
+            } else {
+                ProcessStripeCsvReport::dispatch(
+                    $url,
+                    $access_token,
+                    $stripe_account->user_id,
+                    $stripe_account->stripe_user_id
+                );
+            }
         }
     }
 
+
+    public function stripeFeeReportHandler($report_url, $access_token, $user_id, $stripe_user_id)
+    {
+
+        $options = array('http' => array(
+            'method' => 'GET',
+            'header' => 'Authorization: Bearer ' . $access_token,
+        ));
+        $context = stream_context_create($options);
+        $response = file_get_contents($report_url, false, $context);
+
+        $fp = fopen("php://temp", 'r+');
+        fputs($fp, $response);
+        rewind($fp);
+        $csv_data = [];
+        while (($data = fgetcsv($fp)) !== false) {
+            $csv_data[] = $data;
+        }
+        foreach ($csv_data as $key => $values) {
+            if ($key == 3) {
+                $transaction = array(
+                    'user_id' => $user_id,
+                    'stripe_user_id' => $stripe_user_id,
+                    // 'start_date' => $values[0],
+                    // 'end_date' => $values[1],
+                    'stripe_fee' => $values[2],
+                    'report_status' => true,
+                    'report_url' => $report_url
+                );
+                StripeReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id], $transaction);
+            } else {
+                continue;
+            }
+        }
+    }
     public function chargeWebookHandler(Request $request)
     {
         $stripe_user_id = $request->account;
@@ -276,8 +362,9 @@ class StripeController extends Controller
         curl_close($ch);
 
         $response = json_decode($result, true);
+
         if ($response) {
-            return $response['business_profile']['name'];
+            return array('name' =>  $response['business_profile']['name'], 'time_zone' => $response['settings']['dashboard']['timezone']);
         } else {
             return null;
         }
@@ -320,9 +407,7 @@ class StripeController extends Controller
                 //Save the transacion in the table
                 StripeBalanceTransactionsReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id, 'balance_transaction_id' => $transaction['balance_transaction_id']], $transaction);
             }
-
         }
-
     }
 
     public function getBalanceTransaction($transaction_id, $access_token)
@@ -362,12 +447,9 @@ class StripeController extends Controller
                         array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
                     }
                 }
-
             }
 
             return $stripe_chargebacks;
         }
-
     }
-
 }
