@@ -40,46 +40,31 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "StripeAccount",
-    data() {
-        return {
-            stripeAccounts: []
-        };
-    },
+    // data() {
+    //     return {
+    //         stripeAccounts: []
+    //     };
+    // },
     props: {
         disableFeature: {
             type: Boolean,
             default: true
         }
     },
-    created() {
-        this.getStripeAccounts();
+    created() {},
+    computed: {
+        ...mapGetters(["stripeAccounts"])
     },
-
     methods: {
-        ...mapActions(["removeStripeAccount"]),
-        ...mapActions({ getStripeAccountsFromStore: ["getStripeAccounts"] }),
-        async getStripeAccounts() {
-            try {
-                const result = await axios.get("getstripeaccounts");
-                this.stripeAccounts = result.data;
+        ...mapActions([
+            "removeStripeAccount",
+            "getStripeAccounts",
+            "toggleLoadingStatus"
+        ]),
 
-                result.data.length
-                    ? this.checkEnabledStatus(result.data)
-                    : eventBus.$emit("hasStripeAccount", false);
-            } catch (err) {
-                console.log(err);
-                this.stripeAccounts = [];
-            }
-        },
-        checkEnabledStatus(data) {
-            const status = data.map(element => element.enabled_on_dashboard);
-            status.includes(true)
-                ? eventBus.$emit("hasStripeAccount", true)
-                : eventBus.$emit("hasStripeAccount", false);
-        },
         showMsgBoxOne(account) {
             this.boxOne = "";
             this.$bvModal
@@ -99,27 +84,28 @@ export default {
         },
         async handleClick(account) {
             try {
-                eventBus.$emit("setLoadingTrue");
+                this.toggleLoadingStatus(true);
                 await axios.patch("stripeconnect", account);
                 await this.getStripeAccounts();
-                await this.getStripeAccountsFromStore();
-                eventBus.$emit("setLoadingFalse");
+                this.toggleLoadingStatus(false);
             } catch (error) {
-                eventBus.$emit("setLoadingFalse");
+                this.toggleLoadingStatus(false);
                 console.log(error);
             }
         },
 
         async removeChannel(account, event) {
             try {
-                eventBus.$emit("setLoadingTrue");
+                this.toggleLoadingStatus(true);
+
                 eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("stripeChannelRemoved", account.stripe_user_id);
-                await axios.patch("stripeconnectdelete", account);
+
                 await this.removeStripeAccount(account);
-                await this.getStripeAccounts();
-                eventBus.$emit("setLoadingFalse");
+
+                this.toggleLoadingStatus(false);
             } catch (error) {
+                this.toggleLoadingStatus(false);
                 console.log(error);
             }
         }

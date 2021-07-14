@@ -132,6 +132,7 @@ class StripeController extends Controller
     {
         $account = StripeAccount::find($request->id);
         $account->enabled_on_dashboard = !$request->enabled_on_dashboard;
+
         $account->save();
     }
     public function destroy(Request $request)
@@ -144,6 +145,13 @@ class StripeController extends Controller
     public function getReportStatus(Request $request)
     {
         $stripe_record = StripeAccount::find($request->record_id)->select('report_status')->first();
+        return $stripe_record;
+    }
+
+    public function getReportStatus2(Request $request)
+    {
+
+        $stripe_record =  StripeReport::where('user_id', Auth::user()->id)->where('stripe_user_id', $request->stripe_user_id)->where('start_date', $request->s_date)->where('end_date', $request->e_date)->where('report_status', true)->first();
         return $stripe_record;
     }
     public function getAccountBalance()
@@ -200,38 +208,61 @@ class StripeController extends Controller
 
     public function merchantFeeReportRun(Request $request)
     {
-
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
+        $stripe_fee = 0;
+        $report_init = false;
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
+                $stripe_record_exist = StripeReport::where('user_id', Auth::user()->id)->where('stripe_user_id', $account->stripe_user_id)->where('start_date', $request->s_date)->where('end_date', $request->e_date)->where('report_status', true)->first();
 
-                $stripe = new \Stripe\StripeClient(
-                    $account->access_token
-                );
+                if ($stripe_record_exist) {
+                    $stripe_fee += $stripe_record_exist->stripe_fee;
+                } else {
+                    $stripe = new \Stripe\StripeClient(
+                        $account->access_token
+                    );
 
-                $start_date = new DateTime($request->s_date, new DateTimeZone($account->time_zone));
-                $end_date = new DateTime($request->e_date, new DateTimeZone($account->time_zone));
+                    $start_date = new DateTime($request->s_date, new DateTimeZone($account->time_zone));
+                    $end_date = new DateTime($request->e_date, new DateTimeZone($account->time_zone));
+                    $end_data_utc = new DateTime($request->e_date . ' 00:00:00 UTC');
+                    // if ($end_date >= new DateTime()) {
+                    //     $interval_end = $end_data_utc;
+                    // } else {
+                    //     $interval_end = $end_date;
+                    //     print_r($end_data_utc->format('U'));
+                    // }
+                    $report_status = $stripe->reporting->reportRuns->create([
+                        'report_type' => 'balance.summary.1',
+                        'parameters' => [
+                            'interval_start' => $start_date->format('U'),
+                            'interval_end' => $end_data_utc->format('U'),
+                            'timezone' => $account->time_zone
+                        ],
+                    ]);
 
-                $stripe->reporting->reportRuns->create([
-                    'report_type' => 'balance.summary.1',
-                    'parameters' => [
-                        'interval_start' => $start_date->format('U'),
-                        'interval_end' => $end_date->format('U'),
-                        'timezone' => $account->time_zone
-                    ],
-                ]);
 
-                $stripe_report_record = array(
-                    'user_id' => Auth::user()->id,
-                    'stripe_user_id' => $account->stripe_user_id,
-                    'start_date' => $request->s_date,
-                    'end_date' => $request->e_date,
-                    'report_status' => false
-                );
-                StripeReport::updateOrCreate(['stripe_user_id' => $account->stripe_user_id, 'start_date' => $request->s_date, 'end_date' => $request->e_date], $stripe_report_record);
+
+                    $stripe_report_record = array(
+                        'user_id' => Auth::user()->id,
+                        'object_id' => $report_status->id,
+                        'stripe_user_id' => $account->stripe_user_id,
+                        'start_date' => $request->s_date,
+                        'end_date' => $request->e_date,
+                        'report_type' => $report_status->report_type,
+                        'report_status' => false
+                    );
+
+                    StripeReport::updateOrCreate(['stripe_user_id' => $account->stripe_user_id, 'start_date' => $request->s_date, 'end_date' => $request->e_date], $stripe_report_record);
+                    $report_init = true;
+                }
             }
+        }
+        if ($report_init) {
+            return null;
+        } else {
+            return  $stripe_fee;
         }
     }
 
@@ -243,7 +274,7 @@ class StripeController extends Controller
         $url = $data['object']['result']['url'];
 
         $report_type = $data['object']['report_type'];
-
+        $object_id = $data['object']['id'];
 
 
         $stripe_account = StripeAccount::where('stripe_user_id', $account_id)->first();
@@ -260,7 +291,8 @@ class StripeController extends Controller
                     $url,
                     $access_token,
                     $stripe_account->user_id,
-                    $stripe_account->stripe_user_id
+                    $stripe_account->stripe_user_id,
+                    $object_id
                 );
             } else {
                 ProcessStripeCsvReport::dispatch(
@@ -274,7 +306,7 @@ class StripeController extends Controller
     }
 
 
-    public function stripeFeeReportHandler($report_url, $access_token, $user_id, $stripe_user_id)
+    public function stripeFeeReportHandler($report_url, $access_token, $user_id, $stripe_user_id, $object_id)
     {
 
         $options = array('http' => array(
@@ -294,15 +326,11 @@ class StripeController extends Controller
         foreach ($csv_data as $key => $values) {
             if ($key == 3) {
                 $transaction = array(
-                    'user_id' => $user_id,
-                    'stripe_user_id' => $stripe_user_id,
-                    // 'start_date' => $values[0],
-                    // 'end_date' => $values[1],
                     'stripe_fee' => $values[2],
                     'report_status' => true,
                     'report_url' => $report_url
                 );
-                StripeReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id], $transaction);
+                StripeReport::updateOrCreate(['user_id' => $user_id, 'stripe_user_id' => $stripe_user_id, 'object_id' =>  $object_id], $transaction);
             } else {
                 continue;
             }
