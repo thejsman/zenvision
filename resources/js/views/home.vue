@@ -105,10 +105,18 @@ export default {
             "startDateS",
             "endDateS",
             "shopifyOrders",
-            "hasShopifyStoreCS"
+            "hasShopifyStoreCS",
+            "loadingStatus"
         ])
     },
-    created() {
+    watch: {
+        isLoading(newVal, oldVal) {
+            return this.loadingStatus;
+        }
+    },
+    async created() {
+        await this.loadAllChannelsPA();
+
         if (new URL(location.href).searchParams.get("listSnapchatAccount")) {
             this.getSnapchatAdAccounts();
         }
@@ -168,7 +176,8 @@ export default {
         });
     },
     methods: {
-        ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
+        // ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
+        ...mapActions("ProfitAnalysis", ["loadAllChannelsPA"]),
 
         showModal(modalId) {
             this.$bvModal.show(modalId);
@@ -177,8 +186,8 @@ export default {
             window.location.href = "/";
         },
         async getShopifyStoreData() {
-            await this.getShopifyStores();
-            await this.getShopifyStoreOrders();
+            // await this.getShopifyStores();
+            // await this.getShopifyStoreOrders();
             try {
                 const orders = this.shopifyOrders;
                 //assign values
@@ -310,7 +319,7 @@ export default {
             </div>
         </div>
         <loading
-            :active.sync="isLoading"
+            :active.sync="loadingStatus"
             :can-cancel="false"
             :is-full-page="true"
             :background-color="'#2F3863'"

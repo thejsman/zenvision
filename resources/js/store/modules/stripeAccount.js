@@ -58,8 +58,14 @@ const actions = {
             commit("SET_STRIPE_TRANSACTIONS", stripeTransactions);
         }
     },
-    removeStripeAccount: async ({ commit }, account) => {
-        commit("REMOVE_STRIPE_ACCOUNT", account);
+    removeStripeAccount: async ({ commit, dispatch }, account) => {
+        try {
+            await axios.patch("stripeconnectdelete", account);
+            dispatch("getStripeAccounts");
+            commit("REMOVE_STRIPE_ACCOUNT", account);
+        } catch (err) {
+            console.log({ err });
+        }
     }
 };
 const mutations = {

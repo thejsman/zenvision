@@ -7,6 +7,8 @@ import keyPerformance from "./modules/keyPerformance";
 import StripeAccount from "./modules/stripeAccount";
 import MasterSheet from "./modules/masterSheet";
 import BankAccount from "./modules/bankAccount";
+
+import ProfitAnalysis from "./modules/profitAnalysis";
 //Load Vuex
 Vue.use(Vuex);
 
@@ -19,6 +21,7 @@ export default new Vuex.Store({
         keyPerformance,
         StripeAccount,
         MasterSheet,
-        BankAccount
+        BankAccount,
+        ProfitAnalysis
     }
 });

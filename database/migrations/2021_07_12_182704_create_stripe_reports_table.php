@@ -16,6 +16,7 @@ class CreateStripeReportsTable extends Migration
         Schema::create('stripe_reports', function (Blueprint $table) {
             $table->id();
             $table->string('stripe_user_id')->nullable();
+            $table->string('object_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamp('start_date');
             $table->timestamp('end_date');
