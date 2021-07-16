@@ -54,7 +54,9 @@ export default {
             default: true
         }
     },
-    created() {},
+    created() {
+        this.getStripeTransactions();
+    },
     computed: {
         ...mapGetters(["stripeAccounts"])
     },
@@ -62,7 +64,8 @@ export default {
         ...mapActions([
             "removeStripeAccount",
             "getStripeAccounts",
-            "toggleLoadingStatus"
+            "toggleLoadingStatus",
+            "getStripeTransactions"
         ]),
 
         showMsgBoxOne(account) {

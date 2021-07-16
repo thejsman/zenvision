@@ -36,7 +36,8 @@
 import Stat from "../../widgets/stat";
 import { eventBus } from "../../../app";
 import SubscriptionCost from "../modals/subscription-cost";
-import moment from "moment";
+// import moment from "moment";
+import moment from "moment-timezone";
 import { mapGetters, mapActions } from "vuex";
 import {
     displayCurrency,
@@ -71,8 +72,7 @@ export default {
         return {
             subscriptionData: 0,
             cogsTotal: 0,
-            stripeChargebackTotal: 0,
-            paypalChargebackTotal: 0,
+
             shopifyChargebackTotal: 0,
             merchantFees: 0,
             tiktokAdsSpend: 0,
@@ -180,7 +180,7 @@ export default {
 
             hasPaypalAccount: false,
             paypalFeeTotal: 0,
-            hasShopifyAccount: false,
+            // hasShopifyAccount: false,
             stripeFeeTotal: 0,
             stripeLoadingStatus: false,
             subscriptionDateArray: [],
@@ -193,7 +193,11 @@ export default {
             "startDateS",
             "endDateS",
             "stripeAccounts",
-            "hasStripeAccountCS"
+            "hasStripeAccountCS",
+            "stripeFirstLoad",
+            "hasShopifyStoreCS",
+            "stripeChargebackTotal",
+            "stripeChargebackArray"
         ]),
         totalCost() {
             const totalCost = parseFloat(
@@ -216,7 +220,7 @@ export default {
             return (
                 this.hasPaypalAccount ||
                 this.hasStripeAccountCS ||
-                this.hasShopifyAccount
+                this.hasShopifyStoreCS
             );
         },
         totalMerchantFees() {
@@ -265,26 +269,22 @@ export default {
             updateData(
                 this.data,
                 MERCHANT_FEE,
-                this.hasStripeAccountCS ||
-                    this.hasShopifyAccount ||
-                    this.hasPaypalAccount
+                this.anyActiveAccount
                     ? displayCurrency(this.totalMerchantFees)
                     : "-"
             );
         },
         hasStripeAccountCS(newVal, oldVal) {
-            this.stripeChargebacks = 0;
             this.stripeFeeTotal = 0;
             setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
             setLoadingSingle(this.data, MERCHANT_FEE);
 
             if (this.hasStripeAccountCS && !this.firstLoadStripe) {
-                // this.getStripeTransactions();
+                this.getStripeTransactions();
                 this.stripeMerchantFee();
                 this.getChargebackTotal();
             } else {
                 this.stripeFeeTotal = 0;
-                this.stripeChargebackTotal = 0;
 
                 if (!this.firstLoadStripe) {
                     updateDataMerchantFee(
@@ -297,7 +297,8 @@ export default {
                     eventBus.$emit("stripeTransactionEvent", []);
                     eventBus.$emit("stripeChargebackEvent", []);
 
-                    if (!this.hasStripeAccountCS)
+                    if (this.hasStripeAccountCS) {
+                        console.log("this is causing the issue");
                         updateDataMerchantFee(
                             this.data,
                             CHARGEBACKS_TOTAL,
@@ -305,24 +306,40 @@ export default {
                                 ? displayCurrency(this.totalChargeback)
                                 : "-"
                         );
+                    }
                 }
             }
+        },
+        stripeChargebackTotal(newVal, oldVal) {
+            console.log("value changed", newVal);
+            updateData(
+                this.data,
+                CHARGEBACKS_TOTAL,
+                this.anyActiveAccount ? displayCurrency(newVal) : "-"
+            );
+        },
+        stripeChargebackArray() {
+            updateData(
+                this.data,
+                CHARGEBACKS_TOTAL,
+                this.anyActiveAccount
+                    ? displayCurrency(this.stripeChargebackTotal)
+                    : "-"
+            );
         }
     },
     async created() {
-        console.log("Check this ", this.hasStripeAccountCS);
-
+        this.getStripeTransactions();
         eventBus.$on("updateSubscription", async () => {
             await this.getSubscriptionData();
         });
         this.checkAndShowAdAccountsData(this.startDateS, this.endDateS);
         eventBus.$on("dateChanged", ({ s_date, e_date }) => {
-            console.log("Date has changed");
             this.startDate = this.startDateS;
             this.endDate = this.endDateS;
 
             setLoading(this.data);
-
+            this.getStripeTransactions();
             // this.getMerchantfeesTotal();
             this.checkAndShowAdAccountsData(this.startDateS, this.endDateS);
 
@@ -392,18 +409,21 @@ export default {
         eventBus.$on("hasPaypalAccount", status => {
             this.hasPaypalAccount = status;
         });
-        eventBus.$on("hasShopifyAccount", status => {
-            this.hasShopifyAccount = status;
-            // this.assignData(this.refundTotal, this.costData);
-        });
     },
     methods: {
+        ...mapActions(["getStripeChargeBack"]),
         async stripeMerchantFee() {
             this.stripeFeeTotal = 0;
+            console.log(
+                "Check date: ",
+                moment
+                    .tz(this.startDateS, "America/New_York")
+                    .format("YYYY-MM-DD HH:mm")
+            );
             try {
                 const result = await axios.post("stripeaccount-merchantfee2", {
-                    s_date: this.startDateS,
-                    e_date: this.endDateS
+                    s_date: moment.utc(this.startDateS).tz("America/New_York"),
+                    e_date: moment.utc(this.endDateS).tz("America/New_York")
                 });
                 const { data } = result;
                 console.log({ data });
@@ -465,7 +485,6 @@ export default {
         assignData(refundTotal, orders) {
             setTimeout(() => {
                 this.getCogsData(orders, refundTotal);
-
                 this.getSubscriptionData();
                 this.getChargebackTotal();
             }, 1000);
@@ -488,7 +507,7 @@ export default {
         },
 
         async getCogsData(orders, refundTotal) {
-            if (this.hasShopifyAccount) {
+            if (this.hasShopifyStoreCS) {
                 setLoadingSingle(this.data, DISCOUNTS_TOTAL);
                 setLoadingSingle(this.data, REFUNDS_TOTAL);
                 const discounts = _.sumBy(orders, order =>
@@ -519,7 +538,7 @@ export default {
                     this.updateCogsData(
                         this.data,
                         COGS_TOTAL,
-                        this.hasShopifyAccount ? displayCurrency(cogs) : "-",
+                        this.hasShopifyStoreCS ? displayCurrency(cogs) : "-",
                         showIcon
                     );
                 } catch (err) {
@@ -700,9 +719,10 @@ export default {
         },
         async getChargebackTotal() {
             this.totalChargeback = 0;
+            this.getStripeChargeBack();
             try {
                 //Shopify Chargebacks
-                if (this.hasShopifyAccount) {
+                if (this.hasShopifyStoreCS) {
                     // setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                     // this.shopifyChargebackTotal = 0;
                     // const result = await axios.get("getshopifydisputes");
@@ -715,62 +735,8 @@ export default {
                     //     });
                     // }
                 }
-
-                //Stripe Chargebacks
-
-                if (this.hasStripeAccountCS) {
-                    setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-                    this.stripeChargebackTotal = 0;
-
-                    const stripeResult = await axios.get(
-                        "stripeconnect-chargeback",
-                        {
-                            params: {
-                                s_date: `${this.startDateS} 00:00:00`,
-                                e_date: `${this.endDateS} 23:59:59`
-                            }
-                        }
-                    );
-
-                    let stripeChargebacks = stripeResult.data.filter(
-                        sc =>
-                            sc.status === "charge_refunded" ||
-                            sc.status === "lost"
-                    );
-
-                    if (stripeChargebacks.length > 0) {
-                        this.stripeChargebackTotal = 0;
-
-                        eventBus.$emit(
-                            "stripeChargebackEvent",
-                            stripeChargebacks
-                        );
-                        stripeChargebacks.forEach(sc => {
-                            this.stripeChargebackTotal += parseFloat(
-                                sc.amount / 100
-                            );
-                        });
-                    }
-                }
-
-                setTimeout(() => {
-                    updateData(
-                        this.data,
-                        CHARGEBACKS_TOTAL,
-                        this.hasStripeAccountCS ||
-                            this.hasShopifyAccount ||
-                            this.hasPaypalAccount
-                            ? displayCurrency(this.totalChargeback)
-                            : "-"
-                    );
-                }, 1500);
             } catch (err) {
                 console.log(err);
-                this.totalChargeback = 0;
-                setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
-                setTimeout(() => {
-                    updateData(this.data, CHARGEBACKS_TOTAL, "-");
-                }, 2000);
             }
         },
         async getMerchantfeesTotal(s_date, e_date) {
@@ -793,9 +759,7 @@ export default {
                 updateData(
                     this.data,
                     MERCHANT_FEE,
-                    this.hasStripeAccountCS ||
-                        this.hasShopifyAccount ||
-                        this.hasPaypalAccount
+                    this.anyActiveAccount
                         ? displayCurrency(this.totalMerchantFees)
                         : "-"
                 );
@@ -908,6 +872,7 @@ export default {
                 stripeObj.showicon = true;
             }, 1500);
             this.stripeFeeTotal = 0;
+
             if (this.hasStripeAccountCS) {
                 try {
                     const result = await axios.get(
@@ -921,19 +886,18 @@ export default {
                     );
 
                     const stripeTransactions = result.data;
-
+                    console.log({ stripeTransactions });
+                    let stripeTotalFee = 0;
                     if (stripeTransactions !== undefined) {
                         eventBus.$emit(
                             "stripeTransactionEvent",
                             stripeTransactions
                         );
                         stripeTransactions.forEach(sTransaction => {
-                            this.stripeFeeTotal += parseFloat(
-                                sTransaction.fee / 100
-                            );
+                            stripeTotalFee += parseFloat(sTransaction.fee);
                         });
                     }
-                    console.log("Stripe Fee Total ", this.stripeFeeTotal);
+                    console.log("Stripe Fee Total ", stripeTotalFee);
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
