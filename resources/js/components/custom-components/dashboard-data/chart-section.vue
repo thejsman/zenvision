@@ -130,7 +130,7 @@ export default {
             tiktokTransactionArray: [],
             tiktokTransationStatus: false,
 
-            stripeChargebackArray: [],
+            stripeChargebackArray2: [],
             stripeChargebackStatus: false,
 
             subscriptionDataStatus: false,
@@ -140,7 +140,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["startDateS", "endDateS"])
+        ...mapGetters(["startDateS", "endDateS", "stripeChargebackArray"])
     },
     created() {
         //Stripe
@@ -202,16 +202,16 @@ export default {
         });
 
         //StripeChargeback
-        eventBus.$on("stripeChargebackEvent", stripeChargeback => {
-            if (stripeChargeback.length > 0) {
-                this.stripeChargebackStatus = true;
-                this.stripeChargebackArray = stripeChargeback;
-                this.assignData();
-            } else {
-                this.stripeChargebackStatus = false;
-                this.assignData();
-            }
-        });
+        // eventBus.$on("stripeChargebackEvent", stripeChargeback => {
+        //     if (stripeChargeback.length > 0) {
+        //         this.stripeChargebackStatus = true;
+        //         this.stripeChargebackArray = stripeChargeback;
+        //         this.assignData();
+        //     } else {
+        //         this.stripeChargebackStatus = false;
+        //         this.assignData();
+        //     }
+        // });
 
         //Subscription
         eventBus.$on("subscriptionDataEvent", subscriptionData => {
@@ -295,13 +295,13 @@ export default {
         renderStripeData() {
             this.chartSeries.forEach(cs => {
                 cs[1] -= _.sumBy(this.stripeTransactionArray, stripeTrans =>
-                    moment(stripeTrans.available_on).format("YYYY-MM-DD") ===
+                    moment(stripeTrans.created).format("YYYY-MM-DD") ===
                     moment(cs[0]).format("YYYY-MM-DD")
-                        ? parseFloat(stripeTrans.fee / 100)
+                        ? parseFloat(stripeTrans.fee)
                         : 0
                 );
             });
-
+            console.log("chart series: ", this.chartSeries);
             this.updateSeries();
         },
         renderFacebookData() {
@@ -358,7 +358,7 @@ export default {
         renderStripeChargeback() {
             this.chartSeries.forEach(cs => {
                 cs[1] -= _.sumBy(
-                    this.stripeChargebackArray,
+                    this.stripeChargebackArray2,
                     stripeChargeback => {
                         return moment(stripeChargeback.created * 1000).format(
                             "YYYY-MM-DD"
@@ -403,6 +403,17 @@ export default {
     watch: {
         chartData(value, newValue) {
             this.assignData(this.chartData);
+        },
+        stripeChargebackArray(stripeChargeback, oldVal) {
+            console.log("we have received chargeback event");
+            if (stripeChargeback.length > 0) {
+                this.stripeChargebackStatus = true;
+                this.stripeChargebackArray2 = stripeChargeback;
+                this.assignData();
+            } else {
+                this.stripeChargebackStatus = false;
+                this.assignData();
+            }
         }
     }
 };

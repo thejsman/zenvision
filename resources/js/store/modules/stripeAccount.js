@@ -2,15 +2,21 @@ import _ from "lodash";
 
 const state = {
     hasStripeAccount: false,
+    stripeFirstLoad: true,
     stripeAccounts: [],
     stripeAccountsBalance: 0,
-    stripeTransactionsArray: []
+    stripeTransactionsArray: [],
+    stripeChargebackArray: [],
+    stripeChargebackTotal: 0
 };
 const getters = {
     hasStripeAccountCS: state => state.hasStripeAccount,
     stripeAccounts: state => state.stripeAccounts,
     stripeTransactions: state => state.stripeTransactionsArray,
-    stripeAccountsBalance: state => state.stripeAccountsBalance / 100
+    stripeAccountsBalance: state => state.stripeAccountsBalance / 100,
+    stripeFirstLoad: state => state.stripeFirstLoad,
+    stripeChargebackTotal: state => state.stripeChargebackTotal,
+    stripeChargebackArray: state => state.stripeChargebackArray
 };
 const actions = {
     toggleStripeAccountStatus: ({ commit }, payload) => {
@@ -58,6 +64,33 @@ const actions = {
             commit("SET_STRIPE_TRANSACTIONS", stripeTransactions);
         }
     },
+    getStripeChargeBack: async ({ commit, rootGetters }) => {
+        try {
+            let chargebackTotal = 0;
+            const { data } = await axios.get("stripeconnect-chargeback", {
+                params: {
+                    s_date: `${rootGetters.startDateS} 00:00:00`,
+                    e_date: `${rootGetters.endDateS} 23:59:59`
+                }
+            });
+            const ChargebackArray = data.filter(
+                sc => sc.status === "charge_refunded" || sc.status === "lost"
+            );
+            if (ChargebackArray.length) {
+                ChargebackArray.forEach(cb => {
+                    chargebackTotal += parseFloat(cb.amount / 100);
+                });
+                commit("SET_STRIPE_CHARGEBACK_TOTAL", chargebackTotal);
+                commit("SET_STRIPE_CHARGEBACK_ARRAY", ChargebackArray);
+            } else {
+                commit("SET_STRIPE_CHARGEBACK_TOTAL", 0);
+                commit("SET_STRIPE_CHARGEBACK_ARRAY", []);
+            }
+        } catch (err) {
+            commit("SET_STRIPE_CHARGEBACK_TOTAL", 0);
+            console.log({ err });
+        }
+    },
     removeStripeAccount: async ({ commit, dispatch }, account) => {
         try {
             await axios.patch("stripeconnectdelete", account);
@@ -71,6 +104,7 @@ const actions = {
 const mutations = {
     TOGGGLE_STRIPE_ACCOUNT_STATUS: (state, status) => {
         state.hasStripeAccount = status;
+        state.stripeFirstLoad = !state;
     },
     SET_STRIPE_ACCOUNT: (state, payload) => {
         state.stripeAccounts = payload;
@@ -78,9 +112,13 @@ const mutations = {
 
     SET_STRIPE_TRANSACTIONS: (state, payload) =>
         (state.stripeTransactionsArray = payload),
-
+    SET_STRIPE_CHARGEBACK_ARRAY: (state, payload) =>
+        (state.stripeChargebackArray = payload),
     SET_STRIPE_ACCOUNT_BALANCE: (state, payload) =>
         (state.stripeAccountsBalance = payload),
+
+    SET_STRIPE_CHARGEBACK_TOTAL: (state, payload) =>
+        (state.stripeChargebackTotal = payload),
     REMOVE_STRIPE_ACCOUNT: (state, payload) => {
         const filteredAccounts = state.stripeAccounts.filter(
             account => account.stripe_user_id !== payload.stripe_user_id

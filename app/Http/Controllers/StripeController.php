@@ -90,8 +90,9 @@ class StripeController extends Controller
 
         if ($stripeAccounts->count()) {
             foreach ($stripeAccounts as $account) {
+                // return [new DateTime($request->s_date, new DateTimeZone($account->time_zone)), new DateTime($request->e_date, new DateTimeZone($account->time_zone))];
                 if ($account->enabled_on_dashboard) {
-                    $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('available_on', [$request->s_date, $request->e_date])->select('available_on', 'fee')->get()->toArray();
+                    $stripeAccountTransactions = StripeBalanceTransactionsReport::where('user_id', $account->user_id)->where('stripe_user_id', $account->stripe_user_id)->whereBetween('created', [new DateTime($request->s_date, new DateTimeZone($account->time_zone)), new DateTime($request->e_date, new DateTimeZone($account->time_zone))])->select('created', 'fee')->get()->toArray();
                     $stripeTransactions = array_merge($stripeTransactions, $stripeAccountTransactions);
                 }
             }
@@ -198,7 +199,7 @@ class StripeController extends Controller
             $access_token
         );
         $stripe->reporting->reportRuns->create([
-            'report_type' => 'balance_change_from_activity.itemized.3',
+            'report_type' => 'balance.summary.1',
             'parameters' => [
                 'interval_start' => $interval_start,
                 'interval_end' => $interval_end,
@@ -208,6 +209,7 @@ class StripeController extends Controller
 
     public function merchantFeeReportRun(Request $request)
     {
+
         $user = Auth::user();
         $stripeAccounts = $user->getStripeAccountConnectIds();
         $stripe_fee = 0;
@@ -226,19 +228,16 @@ class StripeController extends Controller
 
                     $start_date = new DateTime($request->s_date, new DateTimeZone($account->time_zone));
                     $end_date = new DateTime($request->e_date, new DateTimeZone($account->time_zone));
-                    $end_data_utc = new DateTime($request->e_date . ' 00:00:00 UTC');
-                    // if ($end_date >= new DateTime()) {
-                    //     $interval_end = $end_data_utc;
-                    // } else {
-                    //     $interval_end = $end_date;
-                    //     print_r($end_data_utc->format('U'));
-                    // }
+                    // $end_data_utc = new DateTime($request->e_date . ' 00:00:00 UTC');
+
                     $report_status = $stripe->reporting->reportRuns->create([
                         'report_type' => 'balance.summary.1',
                         'parameters' => [
+                            // 'interval_start' => strtotime($request->s_date),
+                            // 'interval_end' => strtotime($request->e_date),
                             'interval_start' => $start_date->format('U'),
-                            'interval_end' => $end_data_utc->format('U'),
-                            'timezone' => $account->time_zone
+                            'interval_end' => $end_date->format('U'),
+                            "timezone" => $account->time_zone
                         ],
                     ]);
 
