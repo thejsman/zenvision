@@ -208,6 +208,14 @@
                             >{{ updateResult }}</b-alert
                         >
                     </div>
+                    <div class="mt-5">
+                        <p
+                            class="zv-danger float-right"
+                            @click="showAccountModal"
+                        >
+                            Deactivate my account
+                        </p>
+                    </div>
                     <loading
                         :active.sync="loadingStatus"
                         :can-cancel="false"
@@ -215,6 +223,32 @@
                         :background-color="'#191e2c'"
                         :opacity="0.8"
                     ></loading>
+
+                    <!-- Account confirmation modal -->
+                    <b-modal
+                        id="deactivate-modal"
+                        title="Deactivate my account"
+                    >
+                        <p>
+                            Are you use you want to deactivate your account?
+                        </p>
+                        <template #modal-footer="{ ok, cancel }">
+                            <b-button
+                                variant="danger"
+                                size="lg"
+                                @click="deactivateAccount"
+                            >
+                                Yes
+                            </b-button>
+                            <b-button
+                                variant="success p-2 px-3"
+                                size="lg"
+                                @click="cancel()"
+                            >
+                                No
+                            </b-button>
+                        </template>
+                    </b-modal>
                 </div>
             </div>
         </div>
@@ -376,7 +410,18 @@ export default {
             this.$nextTick(() => {
                 this.show = true;
             });
+        },
+        showAccountModal() {
+            this.$bvModal.show("deactivate-modal");
+        },
+        deactivateAccount() {
+            window.location.href = "/logout";
         }
     }
 };
 </script>
+<style>
+.zv-danger {
+    color: #e75555;
+}
+</style>
