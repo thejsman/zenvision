@@ -133,7 +133,10 @@ export default {
                             width="30%"
                             class="skeleton-loading"
                         ></b-skeleton>
-                        <h4 v-else class="mx-auto">{{ value }}</h4>
+
+                        <h4 v-else class="mx-auto">
+                            {{ value }}
+                        </h4>
                     </div>
                     <div class="d-flex justify-content-between">
                         <!-- <div class="rectangle mt-3" v-if="loading">
@@ -164,13 +167,15 @@ export default {
                 <span class="float-right">{{ data.value }}</span>
             </div>
         </div>
-        <div v-if="showInventorySection" class="card-body border-top">
-            <div class="media">
-                <div class="media-body text-center">
-                    <AddInventoryBtn />
+        <transition name="fade">
+            <div v-if="showInventorySection" class="card-body border-top">
+                <div class="media">
+                    <div class="media-body text-center">
+                        <AddInventoryBtn />
+                    </div>
                 </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 <style>
@@ -192,5 +197,12 @@ export default {
 }
 .skeleton-loading {
     padding: 12px;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
 }
 </style>
