@@ -27,6 +27,8 @@ class CreateShopifyProductVariantsTable extends Migration
             $table->decimal('sales_price');
             $table->decimal('cost')->nullable();
             $table->decimal('shipping_cost')->nullable();
+            $table->decimal('units')->nullable();
+            $table->decimal('total_inventory')->nullable();
             $table->timestamps();
 
             $table->foreign('store_id')->references('id')->on('shopify_stores')->onDelete('cascade');
