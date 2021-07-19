@@ -414,8 +414,13 @@ export default {
         showAccountModal() {
             this.$bvModal.show("deactivate-modal");
         },
-        deactivateAccount() {
-            window.location.href = "/logout";
+        async deactivateAccount() {
+            try {
+                await axios.delete("/user");
+                window.location.href = "/logout";
+            } catch (error) {
+                window.location.href = "/logout";
+            }
         }
     }
 };

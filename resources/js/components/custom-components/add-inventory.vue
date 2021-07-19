@@ -4,15 +4,15 @@
             >Add</b-button
         >
         <b-modal id="cogs-details" size="xl" centered hide-footer hide-header>
-            <CogsModal @handle-close="handleCogsClose" />
+            <InventoryModal @handle-close="handleCogsClose" />
         </b-modal>
     </div>
 </template>
 
 <script>
-import CogsModal from "../../components/custom-components/modals/CogsDetails-modal.vue";
+import InventoryModal from "../../components/custom-components/modals/add-inventory-modal.vue";
 export default {
-    components: { CogsModal },
+    components: { InventoryModal },
     methods: {
         showInventoryModal() {
             this.$bvModal.show("cogs-details");
