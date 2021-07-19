@@ -189,7 +189,8 @@ export default {
                 },
                 {
                     key: "shipping_cost",
-                    label: "Shipping Cost*"
+                    label: "Shipping Cost*",
+                    tdClass: "tdcenter"
                 },
                 {
                     key: "units",
@@ -315,7 +316,7 @@ export default {
 
 <style>
 .cogs_cost_width {
-    width: 120px;
+    width: 125px;
 }
 .table-active,
 .table-active > th,
