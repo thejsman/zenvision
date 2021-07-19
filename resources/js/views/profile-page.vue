@@ -210,7 +210,7 @@
                     </div>
                     <div class="mt-5">
                         <p
-                            class="zv-danger float-right"
+                            class="zv-danger float-right deactivate-account"
                             @click="showAccountModal"
                         >
                             Deactivate my account

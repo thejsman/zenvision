@@ -696,3 +696,12 @@ body::-webkit-scrollbar {
 .fa-info-circle {
   padding-left: 10px;
 }
+
+.deactivate-account {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.deactivate-account:hover {
+  opacity: 0.5;
+}
