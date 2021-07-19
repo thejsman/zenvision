@@ -39,7 +39,8 @@ export default {
                     icon: "bx bx-archive-in",
                     title: TOTAL_INVENTORY,
                     value: "$0",
-                    loading: true
+                    loading: true,
+                    showCaret: true
                 },
                 {
                     icon: "bx bx-purchase-tag-alt",
@@ -156,7 +157,7 @@ export default {
                     TOTAL_CASH,
                     displayCurrency(this.assetsCashTotal)
                 );
-            }, 7000);
+            }, 1000);
         }
     }
 };
@@ -196,6 +197,7 @@ export default {
                         :title="stat.title"
                         :value="stat.value"
                         :loading="stat.loading"
+                        :showCaret="stat.showCaret"
                     />
                 </div>
             </div>

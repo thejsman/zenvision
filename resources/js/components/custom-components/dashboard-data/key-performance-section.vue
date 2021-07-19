@@ -149,7 +149,7 @@ export default {
                 this.getAvgUnitCount();
 
                 // Development - saving network requst
-                this.getAbandonedCartCount();
+                // this.getAbandonedCartCount();
             } else {
                 updateNoData(this.data);
             }
