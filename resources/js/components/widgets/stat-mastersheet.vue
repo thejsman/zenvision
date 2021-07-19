@@ -1,5 +1,11 @@
 <script>
+import AddInventoryBtn from "../../components/custom-components/add-inventory.vue";
 export default {
+    data() {
+        return {
+            showInventorySection: false
+        };
+    },
     props: {
         title: {
             type: String,
@@ -82,8 +88,18 @@ export default {
         showGraph: {
             type: Boolean,
             default: false
+        },
+        showCaret: {
+            type: Boolean,
+            default: false
         }
-    }
+    },
+    methods: {
+        clickHandler() {
+            this.showInventorySection = !this.showInventorySection;
+        }
+    },
+    components: { AddInventoryBtn }
 };
 </script>
 
@@ -98,6 +114,16 @@ export default {
                             v-if="tooltip"
                             v-b-tooltip.hover="tooltip"
                             class="fas fas fa-info-circle"
+                        ></i>
+                        <i
+                            v-if="showCaret"
+                            @click="clickHandler"
+                            class="fas"
+                            :class="
+                                showInventorySection
+                                    ? 'fa-angle-up'
+                                    : 'fa-angle-down'
+                            "
                         ></i>
                     </div>
                     <div class="mb-3 mt-1">
@@ -136,6 +162,13 @@ export default {
                     data.title
                 }}</span>
                 <span class="float-right">{{ data.value }}</span>
+            </div>
+        </div>
+        <div v-if="showInventorySection" class="card-body border-top">
+            <div class="media">
+                <div class="media-body text-center">
+                    <AddInventoryBtn />
+                </div>
             </div>
         </div>
     </div>

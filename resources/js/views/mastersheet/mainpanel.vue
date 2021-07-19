@@ -190,7 +190,7 @@ export default {
                     ),
                     this.otherExpensesData
                 );
-            }, 7000);
+            }, 1000);
         },
         async yesterdaysNetEquityFluctuation() {
             try {
