@@ -37,7 +37,6 @@
             </div>
             <div v-else>
                 <b-table
-                    @row-selected="onRowSelected"
                     ref="inventoryTable"
                     selectable
                     sticky-header
@@ -90,16 +89,13 @@
                         <b-input-group
                             class="cogs_cost_width"
                             :class="{
-                                emptyInput: row.item.shipping_cost === null
+                                emptyInput: row.item.units === null
                             }"
                         >
-                            <b-input-group-prepend is-text>
-                                <b>$</b>
-                            </b-input-group-prepend>
                             <b-form-input
                                 type="number"
-                                v-model="row.item.shipping_cost"
-                                placeholder="Price"
+                                v-model="row.item.units"
+                                placeholder="Units"
                                 min="0"
                                 trim
                             />
@@ -109,7 +105,7 @@
                         <b-input-group
                             class="cogs_cost_width"
                             :class="{
-                                emptyInput: row.item.shipping_cost === null
+                                emptyInput: row.item.total_inventory === null
                             }"
                         >
                             <b-input-group-prepend is-text>
@@ -117,8 +113,8 @@
                             </b-input-group-prepend>
                             <b-form-input
                                 type="number"
-                                v-model="row.item.shipping_cost"
-                                placeholder="Price"
+                                v-model="row.item.total_inventory"
+                                placeholder="Total Inventory"
                                 min="0"
                                 trim
                             />
@@ -222,9 +218,6 @@ export default {
         await this.getCogsData();
     },
     methods: {
-        handleSelectAll() {
-            this.selectAll ? this.selectAllRows() : this.clearSelected();
-        },
         handleSearch() {
             this.items = this.preItems.filter(
                 item =>
@@ -236,26 +229,7 @@ export default {
                         .includes(this.searchText.toLowerCase())
             );
         },
-        handleBulkUpdate() {
-            if (this.selected.length < 2) {
-                this.showAlert("Please select at least two rows", "danger");
-            } else if (this.bulk_cost <= 0 || this.bulk_shipping <= 0) {
-                this.showAlert(
-                    "Product Cost & shipping Cost must be provided",
-                    "danger"
-                );
-            } else {
-                this.selected.map(item => {
-                    item.cost = this.bulk_cost;
-                    item.shipping_cost = this.bulk_shipping;
-                });
-                //clean up
-                this.bulk_cost = "";
-                this.bulk_shipping = "";
-                this.selectAll = false;
-                this.clearSelected();
-            }
-        },
+
         async handleClick() {
             try {
                 const updateTable = this.items.filter(
@@ -269,7 +243,7 @@ export default {
                     this.showAlert("No changes to update", "danger");
                 } else {
                     const updateResult = await axios.post("cogs", updateTable);
-                    this.showAlert("COGS updated succesfully", "success");
+                    this.showAlert("Inventory updated succesfully", "success");
 
                     setTimeout(() => {
                         eventBus.$emit("cogs-updated");
@@ -284,15 +258,7 @@ export default {
                 );
             }
         },
-        onRowSelected(items) {
-            this.selected = items;
-        },
-        selectAllRows() {
-            this.$refs.cogsTable.selectAllRows();
-        },
-        clearSelected() {
-            this.$refs.cogsTable.clearSelected();
-        },
+
         showAlert(message, variant) {
             this.updateResult = message;
             this.updateVariant = variant;
@@ -300,9 +266,9 @@ export default {
         },
         async getCogsData() {
             try {
-                const result = await axios.get("cogs");
+                const { data } = await axios.get("cogs");
 
-                this.items = result.data.products;
+                this.items = data.products;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
             } catch (error) {
