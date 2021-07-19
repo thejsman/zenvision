@@ -4,6 +4,7 @@
             <h3>Cost</h3>
             <h3>{{ totalCost }}</h3>
         </div>
+        <cogs-component />
         <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
             <Stat
                 :title="cost.title"
@@ -39,6 +40,8 @@ import SubscriptionCost from "../modals/subscription-cost";
 // import moment from "moment";
 import moment from "moment-timezone";
 import { mapGetters, mapActions } from "vuex";
+
+import CogsComponent from "../stats-components/cogs-component.vue";
 import {
     displayCurrency,
     updateData,
@@ -67,7 +70,7 @@ import {
 } from "../../../constants";
 import _ from "lodash";
 export default {
-    components: { Stat, SubscriptionCost, CogsModal },
+    components: { Stat, SubscriptionCost, CogsModal, CogsComponent },
     data() {
         return {
             subscriptionData: 0,
@@ -414,19 +417,14 @@ export default {
         ...mapActions(["getStripeChargeBack"]),
         async stripeMerchantFee() {
             this.stripeFeeTotal = 0;
-            console.log(
-                "Check date: ",
-                moment
-                    .tz(this.startDateS, "America/New_York")
-                    .format("YYYY-MM-DD HH:mm")
-            );
+
             try {
                 const result = await axios.post("stripeaccount-merchantfee2", {
                     s_date: moment.utc(this.startDateS).tz("America/New_York"),
                     e_date: moment.utc(this.endDateS).tz("America/New_York")
                 });
                 const { data } = result;
-                console.log({ data });
+
                 if (data === "") {
                     // run some trigger function
                     this.checkStripeReportStatus2();
@@ -438,7 +436,6 @@ export default {
                         MERCHANT_FEE,
                         displayCurrency(data)
                     );
-                    console.log("setting merchant fee", this.totalMerchantFees);
                 }
             } catch (error) {
                 console.log(error);
@@ -464,7 +461,6 @@ export default {
 
         checkStripeReportStatus2() {
             this.timer = setInterval(async () => {
-                console.log("checking...");
                 setLoadingSingle(this.data, MERCHANT_FEE);
                 const result = await axios.get("stripe-report-status2", {
                     params: {
@@ -886,7 +882,7 @@ export default {
                     );
 
                     const stripeTransactions = result.data;
-                    console.log({ stripeTransactions });
+
                     let stripeTotalFee = 0;
                     if (stripeTransactions !== undefined) {
                         eventBus.$emit(
@@ -897,7 +893,7 @@ export default {
                             stripeTotalFee += parseFloat(sTransaction.fee);
                         });
                     }
-                    console.log("Stripe Fee Total ", stripeTotalFee);
+
                     updateDataMerchantFee(
                         this.data,
                         MERCHANT_FEE,
@@ -1016,7 +1012,6 @@ export default {
             }
         },
         checkAndShowAdAccountsData(s_date, e_date) {
-            console.log("Start");
             this.hasTiktokAccount
                 ? this.getTiktokAdSpend(s_date, e_date)
                 : updateAdData(this.data, "TIKTOK", "-");
@@ -1029,7 +1024,6 @@ export default {
             this.hasGoogleAccount
                 ? this.getGoogleAdSpend(s_date, e_date)
                 : updateAdData(this.data, "GOOGLE", "-");
-            console.log("End");
         }
     }
 };

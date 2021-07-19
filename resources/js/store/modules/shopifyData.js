@@ -2,22 +2,30 @@ import axios from "axios";
 import { sumBy } from "lodash";
 
 const state = {
-    hasShopifyStore: false,
+    hasShopifyStore: null,
+    hasShopifyStorePA: null,
+    exclamationIconStatus: false,
+    numberOfOrders: null,
     shopifyStores: [],
     orders: [],
     allOrders: [],
     cogsTotal: 0,
+    paCogsTotal: 0,
     storeBalance: 0,
     storeReserves: 0
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
+    hasShopifyStorePA: state => state.hasShopifyStorePA,
     shopifyOrders: state => state.orders,
     shopifyAllOrders: state => state.allOrders,
     shopifyStores: state => state.shopifyStores,
     ShopifyCogsTotal: state => state.cogsTotal,
+    ShopifyCogsTotalPA: state => state.paCogsTotal,
     shopifyStoreBalance: state => state.storeBalance,
-    storeReserves: state => state.storeReserves
+    storeReserves: state => state.storeReserves,
+    exclamationIconStatus: state => state.exclamationIconStatus,
+    numberOfOrders: state => state.numberOfOrders
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -33,34 +41,41 @@ const actions = {
                 const status = data.map(
                     element => element.enabled_on_dashboard
                 );
+
                 if (section === "MS") {
                     dispatch("getShopifyStoreAllOrders");
                     dispatch("getShopifyStoreBalance");
                     dispatch("getShopifyStoreReserves");
+                    commit("TOGGGLE_SHOPIFY_STORE_STATUS", true);
                 } else {
                     dispatch("getShopifyStoreOrders");
+                    commit(
+                        "TOGGGLE_SHOPIFY_STORE_STATUS_PA",
+                        status.includes(true)
+                    );
                 }
-                commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
             } else {
                 commit("SET_SHOPIFY_STORES", []);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
+                commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
             }
         } catch (err) {
             commit("SET_SHOPIFY_STORES", []);
             commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
+            commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
             console.log(err);
         }
     },
-    getShopifyStoreOrders: async ({ commit, rootState }) => {
+    getShopifyStoreOrders: async ({ commit, rootGetters }) => {
         try {
-            const response = await axios.get("shopify-orders", {
+            const { data } = await axios.get("shopify-orders", {
                 params: {
-                    start_date: rootState.dateRange.startDateS,
-                    end_date: `${rootState.dateRange.endDateS} 23:59:59`
+                    s_date: rootGetters.startDateS,
+                    e_date: rootGetters.endDateS
                 }
             });
 
-            commit("SET_SHOPIFY_ORDERS", response.data);
+            commit("SET_SHOPIFY_ORDERS", data);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ORDERS", []);
@@ -104,6 +119,24 @@ const actions = {
             });
         }
     },
+    getCogsIconStatus: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("/cogsicon");
+        } catch (err) {
+            console.log({ err });
+        }
+    },
+    getShopifyCogsTotalPA: async ({ commit, state }) => {
+        const cogs = state.orders.reduce((sum, current) => {
+            return sum + parseFloat(current.total_cost);
+        }, 0);
+
+        commit("SET_COGS_ORDERS_PA", cogs);
+    },
+    getNumberOfOrders: async ({ commit, state }) => {
+        const numberOfOrders = state.orders.length;
+        commit("SET_NUMBER_OF_ORDERS", numberOfOrders);
+    },
     removeShopifyAccount: async ({ commit }, account) => {
         commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
@@ -111,6 +144,9 @@ const actions = {
 const mutations = {
     TOGGGLE_SHOPIFY_STORE_STATUS: (state, status) => {
         state.hasShopifyStore = status;
+    },
+    TOGGGLE_SHOPIFY_STORE_STATUS_PA: (state, status) => {
+        state.hasShopifyStorePA = status;
     },
     SET_SHOPIFY_STORES: (state, payload) => {
         if (payload.length > 0) {
@@ -122,8 +158,6 @@ const mutations = {
     SET_SHOPIFY_ORDERS: (state, payload) => {
         if (payload.length > 0) {
             state.orders = payload;
-        } else {
-            state.orders = [];
         }
     },
     SET_SHOPIFY_ALL_ORDERS: (state, payload) => {
@@ -134,7 +168,12 @@ const mutations = {
         }
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
-        state.cogsTotal = sumBy(payload, order => order.total_cost);
+        state.cogsTotal = state.orders.reduce((sum, current) => {
+            return sum + parseFloat(current.total_cost);
+        }, 0);
+    },
+    SET_COGS_ORDERS_PA: (state, payload) => {
+        state.paCogsTotal = payload;
     },
     SET_SHOPIFY_BALANCE: (state, payload) => {
         state.storeBalance = payload;
@@ -142,6 +181,10 @@ const mutations = {
     SET_SHOPIFY_RESERVES: (state, payload) => {
         state.storeReserves = payload;
     },
+    SET_EXCLAMATION_ICON_STATUS: (state, payload) => {
+        state.exclamationIconStatus = payload === 0 ? false : true;
+    },
+    SET_NUMBER_OF_ORDERS: (state, payload) => (state.numberOfOrders = payload),
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
             account => account.id !== payload.id
