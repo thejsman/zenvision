@@ -58,6 +58,7 @@
                                 width="20px"
                                 type="number"
                                 v-model="row.item.cost"
+                                @input="handleCostChange(row.item)"
                                 placeholder="Price"
                                 min="0"
                                 trim
@@ -96,6 +97,7 @@
                                 type="number"
                                 v-model="row.item.units"
                                 placeholder="Units"
+                                @input="handleUnitsChange(row.item)"
                                 min="0"
                                 trim
                             />
@@ -115,6 +117,7 @@
                                 type="number"
                                 v-model="row.item.total_inventory"
                                 placeholder="Total Inventory"
+                                @input="handleInventoryChange(row.item)"
                                 min="0"
                                 trim
                             />
@@ -152,6 +155,7 @@
 </template>
 <script>
 import axios from "axios";
+import { mapActions } from "vuex";
 import { eventBus } from "../../../app";
 
 export default {
@@ -196,7 +200,19 @@ export default {
                 {
                     key: "total_inventory",
                     label: "Total Inventory",
-                    tdClass: "tdcenter"
+                    tdClass: "tdcenter",
+                    formatter: (value, key, item) => {
+                        return parseFloat(item.units * item.cost).toFixed(2);
+                        console.log(
+                            { value, key, item },
+                            parseFloat(item.units * item.cost)
+                        );
+                        if (item.units >= 0) {
+                            return parseFloat(item.units * item.cost).toFixed(
+                                2
+                            );
+                        }
+                    }
                 }
             ],
 
@@ -218,6 +234,7 @@ export default {
         await this.getCogsData();
     },
     methods: {
+        ...mapActions(["getShopifyTotalInventory", "toggleLoadingStatus"]),
         handleSearch() {
             this.items = this.preItems.filter(
                 item =>
@@ -229,20 +246,36 @@ export default {
                         .includes(this.searchText.toLowerCase())
             );
         },
-
+        handleUnitsChange(item) {
+            item.total_inventory = parseFloat(item.cost * item.units).toFixed(
+                2
+            );
+        },
+        handleInventoryChange(item) {
+            item.units = parseInt(item.total_inventory / item.cost);
+        },
+        handleCostChange(item) {
+            item.total_inventory = parseFloat(item.cost * item.units);
+        },
         async handleClick() {
             try {
+                this.toggleLoadingStatus(true);
                 const updateTable = this.items.filter(
                     (item, index) =>
                         this.preItems[index].shipping_cost !==
                             item.shipping_cost ||
-                        this.preItems[index].cost !== item.cost
+                        this.preItems[index].cost !== item.cost ||
+                        this.preItems[index].units !== item.units ||
+                        this.preItems[index].total_inventory !==
+                            item.total_inventory
                 );
 
                 if (updateTable.length < 1) {
                     this.showAlert("No changes to update", "danger");
                 } else {
-                    const updateResult = await axios.post("cogs", updateTable);
+                    await axios.post("cogs", updateTable);
+                    this.getShopifyTotalInventory();
+                    this.toggleLoadingStatus(false);
                     this.showAlert("Inventory updated succesfully", "success");
 
                     setTimeout(() => {
