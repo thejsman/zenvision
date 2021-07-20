@@ -71,6 +71,7 @@ export default {
             "debtsCreditCardTotal",
             "debtsSupplierPayableTotal",
             "netEquityTotal",
+            "assetsInventoryTotal",
             "assetsReservesTotal",
             "assetsCashTotal"
         ]),
@@ -103,7 +104,13 @@ export default {
                 displayCurrency(this.debtsCreditCardTotal)
             );
         },
-
+        assetsInventoryTotal(newVal, oldVal) {
+            updateData(
+                this.statData,
+                TOTAL_INVENTORY,
+                displayCurrency(this.assetsInventoryTotal)
+            );
+        },
         assetsReservesTotal(newVal, oldVal) {
             updateData(
                 this.statData,
@@ -126,7 +133,11 @@ export default {
     methods: {
         async getMastersheetData() {
             setTimeout(() => {
-                updateData(this.statData, TOTAL_INVENTORY, displayCurrency(0));
+                updateData(
+                    this.statData,
+                    TOTAL_INVENTORY,
+                    displayCurrency(this.assetsInventoryTotal)
+                );
 
                 updateData(
                     this.statData,

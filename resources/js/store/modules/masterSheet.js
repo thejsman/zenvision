@@ -29,6 +29,9 @@ const state = {
 const getters = {
     transactionsStartDate: state => state.transStartDate,
     transactionsEndDate: state => state.transEndDate,
+    assetsInventoryTotal: (state, getters, rootState, rootGetters) => {
+        return rootGetters["inventoryTotal"];
+    },
     assetsCashTotal: (state, getters, rootState, rootGetters) => {
         return parseFloat(
             rootGetters["shopifyStoreBalance"] +
@@ -66,6 +69,7 @@ const getters = {
             rootGetters["shopifyStoreBalance"] +
                 rootGetters["stripeAccountsBalance"] +
                 rootGetters["BankAccount/bankAccountBalance"] +
+                rootGetters["inventoryTotal"] +
                 state.assetsInventoryTotal +
                 state.assetsReservesTotal -
                 rootGetters["BankAccount/creditCardLiabilities"] -

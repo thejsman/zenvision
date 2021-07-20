@@ -22,7 +22,9 @@ class CogsController extends Controller
     }
     public function update(Request $request)
     {
+
         $products = $request->toArray();
+
         foreach ($products as $key => $value) {
             ShopifyProductVariant::find($value['id'])->update($value);
             $cogs = $value['cost'] + $value['shipping_cost'];

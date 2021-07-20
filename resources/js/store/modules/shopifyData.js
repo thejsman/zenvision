@@ -7,6 +7,7 @@ const state = {
     orders: [],
     allOrders: [],
     cogsTotal: 0,
+    inventoryTotal: 0,
     storeBalance: 0,
     storeReserves: 0
 };
@@ -17,7 +18,8 @@ const getters = {
     shopifyStores: state => state.shopifyStores,
     ShopifyCogsTotal: state => state.cogsTotal,
     shopifyStoreBalance: state => state.storeBalance,
-    storeReserves: state => state.storeReserves
+    storeReserves: state => state.storeReserves,
+    inventoryTotal: state => state.inventoryTotal
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -37,6 +39,7 @@ const actions = {
                     dispatch("getShopifyStoreAllOrders");
                     dispatch("getShopifyStoreBalance");
                     dispatch("getShopifyStoreReserves");
+                    dispatch("getShopifyTotalInventory");
                 } else {
                     dispatch("getShopifyStoreOrders");
                 }
@@ -104,6 +107,19 @@ const actions = {
             });
         }
     },
+    getShopifyTotalInventory: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("cogs");
+
+            const totalInventory = data.products.reduce((total, product) => {
+                return total + parseFloat(product.total_inventory) || 0;
+            }, 0);
+            commit("SET_TOTAL_INVENTORY", totalInventory);
+        } catch (err) {
+            commit("SET_TOTAL_INVENTORY", 0);
+            console.log({ err });
+        }
+    },
     removeShopifyAccount: async ({ commit }, account) => {
         commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
@@ -141,6 +157,9 @@ const mutations = {
     },
     SET_SHOPIFY_RESERVES: (state, payload) => {
         state.storeReserves = payload;
+    },
+    SET_TOTAL_INVENTORY: (state, payload) => {
+        state.inventoryTotal = payload;
     },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
