@@ -75,7 +75,7 @@ export default {
         return {
             snapchatUrl: `https://accounts.snapchat.com/login/oauth2/authorize?response_type=code&client_id=${process.env.MIX_SNAPCHAT_CLIENT_ID}&redirect_uri=${process.env.MIX_SNAPCHAT_REDIRECT_URL}&scope=snapchat-marketing-api`,
             tiktokUrl: `https://ads.tiktok.com/marketing_api/auth?app_id=${process.env.MIX_TIKTOK_APP_ID}&redirect_uri=${process.env.MIX_TIKTOK_REDIRECT_URL}`,
-            googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?prompt=consent&scope=https://www.googleapis.com/auth/adwords&response_type=code&access_type=offline&redirect_uri=${process.env.MIX_GOOGLE_REDIRECT_URL}&client_id=${process.env.MIX_GOOGLE_CLIENT_ID}`,
+            googleAdsUrl: `https://accounts.google.com/o/oauth2/auth?prompt=consent&client_id=${process.env.MIX_GOOGLE_CLIENT_ID}&scope=https://www.googleapis.com/auth/adwords&response_type=code&access_type=offline&redirect_uri=${process.env.MIX_GOOGLE_REDIRECT_URL}`,
             facebookUrl: `https://www.facebook.com/v10.0/dialog/oauth?client_id=${process.env.MIX_FACEBOOK_CLIENT_ID}&redirect_uri=${process.env.MIX_FACEBOOK_REDIRECT_URL}&scope=ads_management,ads_read`,
             stripeUrl: `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IXYHhxtBir6EPIAuynBwhmTDeNJLAC0H&scope=read_write&redirect_uri=https://localhost:8000/stripeconnect&state=profitanalysis-${Math.floor(
                 Math.random() * 10000000 + 1

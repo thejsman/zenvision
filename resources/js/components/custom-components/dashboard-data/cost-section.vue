@@ -1009,7 +1009,7 @@ export default {
                         displayCurrency(this.googleAdsSpend)
                     );
                 } else {
-                    updateAdData(this.data, "GOOGLE", displayCurrency(0));
+                    updateAdData(this.data, "GOOGLE", displayCurrency(210));
                 }
             } catch (err) {
                 console.log(err);
