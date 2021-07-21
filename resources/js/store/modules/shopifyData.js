@@ -7,9 +7,10 @@ const state = {
     orders: [],
     allOrders: [],
     cogsTotal: 0,
-    inventoryTotal: 0,
+    inventoryTotal: null,
     storeBalance: 0,
-    storeReserves: 0
+    storeReserves: 0,
+    shopifyCogsArray: []
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -19,7 +20,8 @@ const getters = {
     ShopifyCogsTotal: state => state.cogsTotal,
     shopifyStoreBalance: state => state.storeBalance,
     storeReserves: state => state.storeReserves,
-    inventoryTotal: state => state.inventoryTotal
+    inventoryTotal: state => state.inventoryTotal,
+    shopifyCogsArray: state => state.shopifyCogsArray
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -110,7 +112,7 @@ const actions = {
     getShopifyTotalInventory: async ({ commit }) => {
         try {
             const { data } = await axios.get("cogs");
-
+            commit("SET_COGS_ARRAY", data.products);
             const totalInventory = data.products.reduce((total, product) => {
                 return total + parseFloat(product.total_inventory) || 0;
             }, 0);
@@ -160,6 +162,9 @@ const mutations = {
     },
     SET_TOTAL_INVENTORY: (state, payload) => {
         state.inventoryTotal = payload;
+    },
+    SET_COGS_ARRAY: (state, payload) => {
+        state.shopifyCogsArray = payload;
     },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(

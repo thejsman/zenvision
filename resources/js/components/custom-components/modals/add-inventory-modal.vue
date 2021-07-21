@@ -155,7 +155,7 @@
 </template>
 <script>
 import axios from "axios";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { eventBus } from "../../../app";
 
 export default {
@@ -187,11 +187,7 @@ export default {
                         }
                     }
                 },
-                {
-                    key: "shipping_cost",
-                    label: "Shipping Cost*",
-                    tdClass: "tdcenter"
-                },
+
                 {
                     key: "units",
                     label: "Units",
@@ -200,19 +196,7 @@ export default {
                 {
                     key: "total_inventory",
                     label: "Total Inventory",
-                    tdClass: "tdcenter",
-                    formatter: (value, key, item) => {
-                        return parseFloat(item.units * item.cost).toFixed(2);
-                        console.log(
-                            { value, key, item },
-                            parseFloat(item.units * item.cost)
-                        );
-                        if (item.units >= 0) {
-                            return parseFloat(item.units * item.cost).toFixed(
-                                2
-                            );
-                        }
-                    }
+                    tdClass: "tdcenter"
                 }
             ],
 
@@ -232,6 +216,9 @@ export default {
     },
     async created() {
         await this.getCogsData();
+    },
+    computed: {
+        ...mapGetters(["shopifyCogsArray"])
     },
     methods: {
         ...mapActions(["getShopifyTotalInventory", "toggleLoadingStatus"]),
@@ -299,9 +286,9 @@ export default {
         },
         async getCogsData() {
             try {
-                const { data } = await axios.get("cogs");
+                // const { data } = await axios.get("cogs");
 
-                this.items = data.products;
+                this.items = this.shopifyCogsArray;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
             } catch (error) {

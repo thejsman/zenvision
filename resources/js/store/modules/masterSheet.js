@@ -14,7 +14,7 @@ const state = {
     assetsData: [],
     netEquityTotal: 0,
     assetsCashTotal: 0,
-    assetsInventoryTotal: 0,
+    assetsInventoryTotal: null,
     assetsReservesTotal: 0,
     debtsCreditCardTotal: 0,
     debtsSupplierPayableTotal: 0,
