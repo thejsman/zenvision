@@ -1,5 +1,6 @@
 import axios from "axios";
-import { sumBy } from "lodash";
+import { propertyOf, sumBy } from "lodash";
+import _ from "lodash";
 
 const state = {
     hasShopifyStore: false,
@@ -10,7 +11,8 @@ const state = {
     inventoryTotal: null,
     storeBalance: 0,
     storeReserves: 0,
-    shopifyCogsArray: []
+    shopifyCogsArray: [],
+    inventoryChangedProducts: []
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -21,7 +23,8 @@ const getters = {
     shopifyStoreBalance: state => state.storeBalance,
     storeReserves: state => state.storeReserves,
     inventoryTotal: state => state.inventoryTotal,
-    shopifyCogsArray: state => state.shopifyCogsArray
+    shopifyCogsArray: state => state.shopifyCogsArray,
+    inventoryChangedProducts: state => state.inventoryChangedProducts
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -122,6 +125,13 @@ const actions = {
             console.log({ err });
         }
     },
+    addToChangedProducts: ({ commit }, product) => {
+        commit("SET_CHANGED_PRODUCTS", product);
+    },
+    removeItemfromChangedProducts: ({ commit, dispatch }, product) => {
+        commit("REMOVE_ITEM_FORM_CHANGED_PRODUCTS", product);
+        dispatch("getShopifyTotalInventory");
+    },
     removeShopifyAccount: async ({ commit }, account) => {
         commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
@@ -161,10 +171,20 @@ const mutations = {
         state.storeReserves = payload;
     },
     SET_TOTAL_INVENTORY: (state, payload) => {
+        console.log("called", payload);
         state.inventoryTotal = payload;
     },
     SET_COGS_ARRAY: (state, payload) => {
         state.shopifyCogsArray = payload;
+    },
+    SET_CHANGED_PRODUCTS: (state, payload) => {
+        state.inventoryChangedProducts = [];
+        state.inventoryChangedProducts = Array.from(new Set([...payload]));
+    },
+    REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
+        state.inventoryChangedProducts = state.inventoryChangedProducts.filter(
+            product => product.id !== payload.id
+        );
     },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
