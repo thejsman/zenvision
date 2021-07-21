@@ -75,4 +75,12 @@ class InventoryController extends Controller
 
         response()->json(['success' => 'success'], 200);
     }
+
+    public function deleteInventory(Request $request)
+    {
+        $item = ShopifyProductVariant::find($request->id);
+        $item->total_inventory = null;
+        $item->units = null;
+        $item->save();
+    }
 }

@@ -157,10 +157,12 @@
 import axios from "axios";
 import { mapGetters, mapActions } from "vuex";
 import { eventBus } from "../../../app";
+import _ from "lodash";
 
 export default {
     data() {
         return {
+            changedProducts: [],
             fields: [
                 {
                     key: "product_title",
@@ -216,12 +218,20 @@ export default {
     },
     async created() {
         await this.getCogsData();
+        eventBus.$on("editInventoryText", text => {
+            this.searchText = text;
+            this.handleSearch();
+        });
     },
     computed: {
         ...mapGetters(["shopifyCogsArray"])
     },
     methods: {
-        ...mapActions(["getShopifyTotalInventory", "toggleLoadingStatus"]),
+        ...mapActions([
+            "getShopifyTotalInventory",
+            "toggleLoadingStatus",
+            "addToChangedProducts"
+        ]),
         handleSearch() {
             this.items = this.preItems.filter(
                 item =>
@@ -234,19 +244,23 @@ export default {
             );
         },
         handleUnitsChange(item) {
+            this.changedProducts.push(item);
             item.total_inventory = parseFloat(item.cost * item.units).toFixed(
                 2
             );
         },
         handleInventoryChange(item) {
+            this.changedProducts.push(item);
             item.units = parseInt(item.total_inventory / item.cost);
         },
         handleCostChange(item) {
+            this.changedProducts.push(item);
             item.total_inventory = parseFloat(item.cost * item.units);
         },
         async handleClick() {
             try {
                 this.toggleLoadingStatus(true);
+                this.addToChangedProducts(this.changedProducts);
                 const updateTable = this.items.filter(
                     (item, index) =>
                         this.preItems[index].shipping_cost !==
