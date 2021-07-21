@@ -104,10 +104,16 @@ export default {
 </script>
 
 <template>
-    <div class="card mini-stats-wid">
+    <div
+        class="card mini-stats-wid"
+        :class="{ cogscard: title === 'Inventory' }"
+    >
         <div class="card-body">
             <div class="media">
-                <div class="media-body">
+                <div
+                    class="media-body"
+                    v-on="showCaret ? { click: clickHandler } : {}"
+                >
                     <div class="d-flex justify-content-between">
                         <p class="text-muted font-weight-medium">{{ title }}</p>
                         <i
@@ -117,7 +123,6 @@ export default {
                         ></i>
                         <i
                             v-if="showCaret"
-                            @click="clickHandler"
                             class="fas"
                             :class="
                                 showInventorySection
@@ -169,10 +174,8 @@ export default {
         </div>
         <transition name="fade">
             <div v-if="showInventorySection" class="card-body border-top">
-                <div class="media">
-                    <div class="media-body text-center">
-                        <AddInventoryBtn />
-                    </div>
+                <div class="text-center">
+                    <AddInventoryBtn />
                 </div>
             </div>
         </transition>

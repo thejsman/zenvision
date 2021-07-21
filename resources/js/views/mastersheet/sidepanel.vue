@@ -13,7 +13,7 @@ import {
 } from "../../constants";
 
 import { mapGetters, mapActions } from "vuex";
-
+import { setLoadingSingle } from "../../utils";
 export default {
     components: { Stat },
     data() {
@@ -105,6 +105,11 @@ export default {
             );
         },
         assetsInventoryTotal(newVal, oldVal) {
+            if (this.assetsInventoryTotal === null) {
+                if (this.hasShopifyStoreCS) {
+                    setLoadingSingle(this.statData, TOTAL_INVENTORY);
+                }
+            }
             updateData(
                 this.statData,
                 TOTAL_INVENTORY,
@@ -132,12 +137,20 @@ export default {
     },
     methods: {
         async getMastersheetData() {
+            console.log("check this", this.assetsInventoryTotal);
+            if (
+                this.assetsInventoryTotal === null &&
+                this.hasShopifyStoreCS === true
+            ) {
+                console.log("Set loading");
+                setLoadingSingle(this.statData, "Inventory");
+            }
             setTimeout(() => {
-                updateData(
-                    this.statData,
-                    TOTAL_INVENTORY,
-                    displayCurrency(this.assetsInventoryTotal)
-                );
+                // updateData(
+                //     this.statData,
+                //     TOTAL_INVENTORY,
+                //     displayCurrency(this.assetsInventoryTotal)
+                // );
 
                 updateData(
                     this.statData,
@@ -158,11 +171,11 @@ export default {
 
                 eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
-                updateData(
-                    this.netEquityData,
-                    NET_EQUITY,
-                    displayCurrency(this.netEquityTotal)
-                );
+                // updateData(
+                //     this.netEquityData,
+                //     NET_EQUITY,
+                //     displayCurrency(this.netEquityTotal)
+                // );
                 updateData(
                     this.statData,
                     TOTAL_CASH,
