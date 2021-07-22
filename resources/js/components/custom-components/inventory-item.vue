@@ -18,7 +18,7 @@
             </b-dropdown>
             <div class="d-flex justify-content-between align-items-center">
                 <div>{{ cogsItem.product_title }}</div>
-                <div class="mr-2 text-success font-weight-bold">
+                <div class="pr-2 text-success font-weight-bold">
                     {{
                         new Intl.NumberFormat("en-US", {
                             style: "currency",

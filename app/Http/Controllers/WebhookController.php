@@ -89,7 +89,7 @@ class WebhookController extends Controller
                 $order_exists->save();
 
                 // update line items
-                $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number);
+                $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
             }
         }
     }
@@ -113,7 +113,7 @@ class WebhookController extends Controller
         return $result;
     }
 
-    public function addLineItems($line_items, $user_id, $store_id, $order_id, $order_number)
+    public function addLineItems($line_items, $user_id, $store_id, $order_id, $order_number, $webhook_type = "create")
     {
 
         foreach ($line_items as $line_item) {
@@ -139,7 +139,7 @@ class WebhookController extends Controller
                 'duties' => $line_item['duties'],
                 'tax_lines' => $line_item['tax_lines'],
             );
-            $this->updateInventory($line_item['variant_id'], $line_item['quantity']);
+            $this->updateInventory($line_item['variant_id'], $line_item['quantity'], $webhook_type, $order_id);
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
         }
     }
@@ -153,14 +153,24 @@ class WebhookController extends Controller
             return $product->cost + $product->shipping_cost;
         }
     }
-    public function updateInventory($variant_id, $qty)
+    public function updateInventory($variant_id, $qty, $webhook_type, $order_id = null)
     {
         $product = ShopifyProductVariant::where('variant_id', $variant_id)->first();
         if ($product) {
             if ($product->units !== null) {
-                $product->units = $product->units - $qty;
-                $product->total_inventory = $product->total_inventory - $product->cost * $qty;
-                $product->save();
+                if ($webhook_type == "create") {
+                    $product->units = $product->units - $qty;
+                    $product->total_inventory = $product->total_inventory - $product->cost * $qty;
+                    $product->save();
+                } else {
+                    $order = ShopifyOrderProduct::where('order_id', $order_id)->where('variant_id', $variant_id)->first();
+                    if ($order) {
+                        $qty_diff = $order->quantity - $qty;
+                        $product->units = $product->units - $qty_diff;
+                        $product->total_inventory = $product->total_inventory - $product->cost * $qty_diff;
+                        $product->save();
+                    }
+                }
             }
         }
     }
