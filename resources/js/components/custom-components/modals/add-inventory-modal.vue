@@ -280,7 +280,6 @@ export default {
                     this.showAlert("Inventory updated succesfully", "success");
 
                     setTimeout(() => {
-                        eventBus.$emit("cogs-updated");
                         this.$emit("handle-close");
                     }, 2000);
                 }
