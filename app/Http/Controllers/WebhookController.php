@@ -139,6 +139,7 @@ class WebhookController extends Controller
                 'duties' => $line_item['duties'],
                 'tax_lines' => $line_item['tax_lines'],
             );
+            $this->updateInventory($line_item['variant_id'], $line_item['quantity']);
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
         }
     }
@@ -150,6 +151,17 @@ class WebhookController extends Controller
             return null;
         } else {
             return $product->cost + $product->shipping_cost;
+        }
+    }
+    public function updateInventory($variant_id, $qty)
+    {
+        $product = ShopifyProductVariant::where('variant_id', $variant_id)->first();
+        if ($product) {
+            if ($product->units !== null) {
+                $product->units = $product->units - $qty;
+                $product->total_inventory = $product->total_inventory - $product->cost * $qty;
+                $product->save();
+            }
         }
     }
 }
