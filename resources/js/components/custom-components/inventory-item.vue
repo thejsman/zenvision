@@ -16,7 +16,7 @@
                     Delete
                 </b-dropdown-item>
             </b-dropdown>
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
                 <div>{{ cogsItem.product_title }}</div>
                 <div class="mr-2 text-success font-weight-bold">
                     {{
