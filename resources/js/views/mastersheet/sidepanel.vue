@@ -75,6 +75,18 @@ export default {
             "assetsReservesTotal",
             "assetsCashTotal"
         ]),
+        totalAssets() {
+            return displayCurrency(
+                this.assetsInventoryTotal +
+                    this.assetsReservesTotal +
+                    this.assetsCashTotal
+            );
+        },
+        totalDebts() {
+            return displayCurrency(
+                this.debtsCreditCardTotal + this.debtsSupplierPayableTotal
+            );
+        },
         ...mapGetters(["ShopifyCogsTotal"]),
         ...mapGetters("BankAccount", ["bankAccountBalance"])
     },
@@ -142,7 +154,6 @@ export default {
                 this.assetsInventoryTotal === null &&
                 this.hasShopifyStoreCS === true
             ) {
-                console.log("Set loading");
                 setLoadingSingle(this.statData, "Inventory");
             }
             setTimeout(() => {
@@ -209,7 +220,10 @@ export default {
         <div class="mail-list mt-4">
             <div class="row">
                 <div class="col-xl-12">
-                    <h4>Assets</h4>
+                    <div class="d-flex justify-content-between">
+                        <h4>Assets</h4>
+                        <h4>{{ totalAssets }}</h4>
+                    </div>
                 </div>
                 <div
                     v-for="stat of statData"
@@ -229,7 +243,10 @@ export default {
         <div class="mail-list mt-4">
             <div class="row">
                 <div class="col-xl-12">
-                    <h4>Debts</h4>
+                    <div class="d-flex justify-content-between">
+                        <h4>Debts</h4>
+                        <h4>{{ totalDebts }}</h4>
+                    </div>
                 </div>
                 <div
                     v-for="stat of debtsData"
