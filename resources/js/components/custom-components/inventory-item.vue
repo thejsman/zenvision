@@ -80,7 +80,13 @@ export default {
     overflow-y: auto;
     max-height: 320px;
 }
-.edit_btn {
-    width: 100px;
+#inventory_item .btn-link {
+    font-size: 1.5rem;
+    line-height: 0px;
+    padding: 15px 0px;
+    opacity: 0.5;
+}
+#inventory_item .btn-link:hover {
+    opacity: 1;
 }
 </style>
