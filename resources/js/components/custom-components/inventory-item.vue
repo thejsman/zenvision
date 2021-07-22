@@ -1,5 +1,5 @@
 <template>
-    <div class="changed_inventory">
+    <div class="changed_inventory" id="inventory_item">
         <div
             class="text-left border-bottom py-2"
             v-for="cogsItem in inventoryChangedProducts"
@@ -18,7 +18,7 @@
             </b-dropdown>
             <div class="d-flex justify-content-between">
                 <div>{{ cogsItem.product_title }}</div>
-                <div class="mr-2">
+                <div class="mr-2 text-success font-weight-bold">
                     {{
                         new Intl.NumberFormat("en-US", {
                             style: "currency",
@@ -64,14 +64,23 @@ export default {
 </script>
 
 <style>
+#inventory_item .dropdown-menu {
+    min-width: 5rem !important;
+    padding: 0px;
+    margin: 0px;
+}
+#inventory_item .dropdown-item {
+    padding: 5px 15px;
+}
+
 .opacity5 {
     opacity: 0.5;
 }
 .changed_inventory {
-    overflow-y: scroll;
+    overflow-y: auto;
     max-height: 320px;
 }
 .edit_btn {
-    z-index: 99;
+    width: 100px;
 }
 </style>

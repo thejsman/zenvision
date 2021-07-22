@@ -116,9 +116,11 @@ const actions = {
         try {
             const { data } = await axios.get("cogs");
             commit("SET_COGS_ARRAY", data.products);
-            const totalInventory = data.products.reduce((total, product) => {
-                return total + parseFloat(product.total_inventory) || 0;
-            }, 0);
+            const totalInventory = _.sumBy(
+                data.products,
+                product => parseFloat(product.total_inventory) || 0
+            );
+
             commit("SET_TOTAL_INVENTORY", totalInventory);
         } catch (err) {
             commit("SET_TOTAL_INVENTORY", 0);
@@ -171,14 +173,16 @@ const mutations = {
         state.storeReserves = payload;
     },
     SET_TOTAL_INVENTORY: (state, payload) => {
-        console.log("called", payload);
         state.inventoryTotal = payload;
     },
     SET_COGS_ARRAY: (state, payload) => {
+        const filteredArray = payload.filter(
+            product => product.total_inventory !== null
+        );
+        state.inventoryChangedProducts = filteredArray;
         state.shopifyCogsArray = payload;
     },
     SET_CHANGED_PRODUCTS: (state, payload) => {
-        state.inventoryChangedProducts = [];
         state.inventoryChangedProducts = Array.from(new Set([...payload]));
     },
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
