@@ -6,6 +6,7 @@
             :key="cogsItem.variant_id"
         >
             <b-dropdown variant="link" text="..." class="edit_btn">
+                {{ cogsItem }}
                 <b-dropdown-item href="#" @click="editInventory(cogsItem)"
                     ><i class="fas fa-pencil-alt text-success mr-1" />
                     Edit
@@ -45,7 +46,7 @@ export default {
     methods: {
         ...mapActions(["removeItemfromChangedProducts", "setSearchText"]),
         editInventory(item) {
-            console.log("item.sku", item.sku);
+            console.log("item.sku", item);
             this.setSearchText(item.sku);
             this.$bvModal.show("inventory-details");
 
