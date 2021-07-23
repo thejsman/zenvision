@@ -10,12 +10,14 @@
                         <a
                             href="https://www.zenvision.io/terms-and-conditions/"
                             target="_blank"
+                            rel="noopener"
                             class="text-white footer-link"
                             >Terms & Conditions</a
                         >
                         <a
                             href="https://www.zenvision.io/privacy-policy/"
                             target="_blank"
+                            rel="noopener"
                             class="ml-3 text-white footer-link"
                             >Privacy Policy</a
                         >
