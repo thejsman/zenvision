@@ -46,11 +46,11 @@ export default {
         ...mapActions(["removeItemfromChangedProducts"]),
         editInventory(item) {
             this.$bvModal.show("inventory-details");
-
-            setTimeout(() => {
-                eventBus.$emit("editInventoryText", item.sku);
-                console.log("event emitted", item.sku);
-            }, 900);
+            const searchText = item.sku;
+            setTimeout(searchText => {
+                eventBus.$emit("editInventoryText", searchText);
+                console.log("event emitted", searchText);
+            }, 200);
         },
 
         async deleteInventory(item) {
