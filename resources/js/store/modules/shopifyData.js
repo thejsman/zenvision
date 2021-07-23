@@ -12,7 +12,8 @@ const state = {
     storeBalance: 0,
     storeReserves: 0,
     shopifyCogsArray: [],
-    inventoryChangedProducts: []
+    inventoryChangedProducts: [],
+    searchText: ""
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -24,7 +25,8 @@ const getters = {
     storeReserves: state => state.storeReserves,
     inventoryTotal: state => state.inventoryTotal,
     shopifyCogsArray: state => state.shopifyCogsArray,
-    inventoryChangedProducts: state => state.inventoryChangedProducts
+    inventoryChangedProducts: state => state.inventoryChangedProducts,
+    inventorySearchText: state => state.searchText
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -131,6 +133,9 @@ const actions = {
             console.log({ err });
         }
     },
+    setSearchText: ({ commit }, text) => {
+        commit("SET_SEARCH_TEXT", text);
+    },
     addToChangedProducts: ({ commit }, product) => {
         commit("SET_CHANGED_PRODUCTS", product);
     },
@@ -188,6 +193,9 @@ const mutations = {
     },
     SET_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = Array.from(new Set([...payload]));
+    },
+    SET_SEARCH_TEXT: (state, payload) => {
+        state.searchText = payload;
     },
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = state.inventoryChangedProducts.filter(
