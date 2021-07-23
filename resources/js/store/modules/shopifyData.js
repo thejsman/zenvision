@@ -3,7 +3,7 @@ import { propertyOf, sumBy } from "lodash";
 import _ from "lodash";
 
 const state = {
-    hasShopifyStore: false,
+    hasShopifyStore: null,
     shopifyStores: [],
     orders: [],
     allOrders: [],
@@ -51,6 +51,10 @@ const actions = {
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", status.includes(true));
             } else {
                 commit("SET_SHOPIFY_STORES", []);
+                commit("SET_TOTAL_INVENTORY", 0);
+                commit("SET_SHOPIFY_RESERVES", 0);
+                commit("SET_SHOPIFY_ORDERS", []);
+                commit("SET_SHOPIFY_BALANCE", 0);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
             }
         } catch (err) {
@@ -201,6 +205,8 @@ const mutations = {
             state.cogsTotal = 0;
             state.storeBalance = 0;
             state.storeReserves = 0;
+            state.shopifyCogsArray = [];
+            state.inventoryChangedProducts = [];
         }
     }
 };

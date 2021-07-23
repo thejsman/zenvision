@@ -121,12 +121,13 @@ export default {
                 if (this.hasShopifyStoreCS) {
                     setLoadingSingle(this.statData, TOTAL_INVENTORY);
                 }
+            } else {
+                updateData(
+                    this.statData,
+                    TOTAL_INVENTORY,
+                    displayCurrency(this.assetsInventoryTotal)
+                );
             }
-            updateData(
-                this.statData,
-                TOTAL_INVENTORY,
-                displayCurrency(this.assetsInventoryTotal)
-            );
         },
         assetsReservesTotal(newVal, oldVal) {
             updateData(
@@ -149,13 +150,13 @@ export default {
     },
     methods: {
         async getMastersheetData() {
-            console.log("check this", this.assetsInventoryTotal);
-            if (
-                this.assetsInventoryTotal === null &&
-                this.hasShopifyStoreCS === true
-            ) {
-                setLoadingSingle(this.statData, "Inventory");
-            }
+            // console.log("check this", this.assetsInventoryTotal);
+            // if (
+            //     this.assetsInventoryTotal === null &&
+            //     this.hasShopifyStoreCS === true
+            // ) {
+            //     setLoadingSingle(this.statData, "Inventory");
+            // }
             setTimeout(() => {
                 // updateData(
                 //     this.statData,
@@ -182,11 +183,11 @@ export default {
 
                 eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
-                // updateData(
-                //     this.netEquityData,
-                //     NET_EQUITY,
-                //     displayCurrency(this.netEquityTotal)
-                // );
+                updateData(
+                    this.netEquityData,
+                    NET_EQUITY,
+                    displayCurrency(this.netEquityTotal)
+                );
                 updateData(
                     this.statData,
                     TOTAL_CASH,
