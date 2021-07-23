@@ -47,7 +47,7 @@ export default {
         editInventory(item) {
             setTimeout(() => {
                 eventBus.$emit("editInventoryText", item.sku);
-            }, 100);
+            }, 500);
             this.$bvModal.show("inventory-details");
         },
 

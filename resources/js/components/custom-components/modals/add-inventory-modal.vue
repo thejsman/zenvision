@@ -28,10 +28,14 @@
             </div>
         </b-col>
         <b-col cols="12">
-            <div v-if="is_loading">
+            <div v-if="!hasShopifyStoreCS">
                 <div>
                     <div class="d-flex justify-content-center mt-5 mb-5">
-                        <b-spinner type="border" label="Loading..."></b-spinner>
+                        <b-alert show variant="warning"
+                            >Please connect a Shopify store to manage
+                            inventory</b-alert
+                        >
+                        <!-- <b-spinner type="border" label="Loading..."></b-spinner> -->
                     </div>
                 </div>
             </div>
@@ -124,33 +128,32 @@
                         </b-input-group>
                     </template>
                 </b-table>
-            </div>
-            <div>
-                <b-alert
-                    :show="dismissCountDown"
-                    :variant="updateVariant"
-                    @dismissed="dismissCountDown = 0"
-                    class="mr-5"
-                    >{{ updateResult }}</b-alert
-                >
-            </div>
-        </b-col>
-        <b-col cols="12">
-            <div
-                class="d-flex mt-4 text-muted justify-content-between align-items-center"
-            >
-                <small>*Per unit</small>
                 <div>
-                    <b-button
-                        type="submit"
-                        variant="success"
-                        class="btn btn-green ml-2"
-                        @click="handleClick"
-                        >Add</b-button
+                    <b-alert
+                        :show="dismissCountDown"
+                        :variant="updateVariant"
+                        @dismissed="dismissCountDown = 0"
+                        class="mr-5"
+                        >{{ updateResult }}</b-alert
                     >
+                </div>
+                <div
+                    class="d-flex mt-4 text-muted justify-content-between align-items-center"
+                >
+                    <small>*Per unit</small>
+                    <div>
+                        <b-button
+                            type="submit"
+                            variant="success"
+                            class="btn btn-green ml-2"
+                            @click="handleClick"
+                            >Add</b-button
+                        >
+                    </div>
                 </div>
             </div>
         </b-col>
+        <!-- <b-col cols="12"> </b-col> -->
     </b-row>
 </template>
 <script>
@@ -219,12 +222,13 @@ export default {
     async created() {
         await this.getCogsData();
         eventBus.$on("editInventoryText", text => {
+            console.log("search text is ", text);
             this.searchText = text;
             this.handleSearch();
         });
     },
     computed: {
-        ...mapGetters(["shopifyCogsArray"])
+        ...mapGetters(["shopifyCogsArray", "hasShopifyStoreCS"])
     },
     methods: {
         ...mapActions([

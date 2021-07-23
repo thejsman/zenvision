@@ -85,9 +85,7 @@ class WebhookController extends Controller
                 $order_exists->original_total_duties_set = $request->original_total_duties_set;
                 $order_exists->current_total_duties_set = $request->current_total_duties_set;
                 $order_exists->shipping_lines = $request->shipping_lines;
-
                 $order_exists->save();
-
                 // update line items
                 $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
             }
@@ -127,19 +125,20 @@ class WebhookController extends Controller
                 'line_item_id' => $line_item['id'],
                 'variant_id' => $line_item['variant_id'],
                 'title' => $line_item['title'],
-                'quantity' => $line_item['quantity'],
+                'quantity' => $line_item['fulfillable_quantity'],
                 'sku' => $line_item['sku'] ? $line_item['sku']  : 'no_sku',
                 'variant_title' => $line_item['variant_title'],
                 'fulfillment_service' => $line_item['fulfillment_service'],
                 'product_id' => $line_item['product_id'],
                 'price' => $line_item['price'],
-                'total_cost' => $this->getTotalCost($line_item['variant_id']) * $line_item['quantity'],
+                'total_cost' => $this->getTotalCost($line_item['variant_id']) * $line_item['fulfillable_quantity'],
                 'total_discount' => $line_item['total_discount'],
                 'fulfillment_status' => $line_item['fulfillment_status'],
                 'duties' => $line_item['duties'],
                 'tax_lines' => $line_item['tax_lines'],
             );
-            $this->updateInventory($line_item['variant_id'], $line_item['quantity'], $webhook_type, $order_id);
+
+            $this->updateInventory($line_item['variant_id'], $line_item['fulfillable_quantity'], $webhook_type, $order_id);
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
         }
     }
@@ -165,7 +164,7 @@ class WebhookController extends Controller
                 } else {
                     $order = ShopifyOrderProduct::where('order_id', $order_id)->where('variant_id', $variant_id)->first();
                     if ($order) {
-                        $qty_diff = $order->quantity - $qty;
+                        $qty_diff =  $qty - $order->quantity;
                         $product->units = $product->units - $qty_diff;
                         $product->total_inventory = $product->total_inventory - $product->cost * $qty_diff;
                         $product->save();
