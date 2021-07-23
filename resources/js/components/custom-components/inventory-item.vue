@@ -50,7 +50,7 @@ export default {
             setTimeout(() => {
                 eventBus.$emit("editInventoryText", item.sku);
                 console.log("event emitted", item.sku);
-            }, 900);
+            }, 10);
         },
 
         async deleteInventory(item) {
