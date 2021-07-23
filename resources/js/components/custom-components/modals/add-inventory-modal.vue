@@ -220,15 +220,18 @@ export default {
         };
     },
     async created() {
-        eventBus.$on("editInventoryText", text => {
-            console.log("search text is ", text);
-            this.searchText = text;
+        eventBus.$on("editInventoryText", () => {
+            this.searchText = this.inventorySearchText;
             this.handleSearch();
         });
         await this.getCogsData();
     },
     computed: {
-        ...mapGetters(["shopifyCogsArray", "hasShopifyStoreCS"])
+        ...mapGetters([
+            "shopifyCogsArray",
+            "hasShopifyStoreCS",
+            "inventorySearchText"
+        ])
     },
     methods: {
         ...mapActions([
