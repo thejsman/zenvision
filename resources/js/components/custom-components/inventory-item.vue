@@ -6,7 +6,6 @@
             :key="cogsItem.variant_id"
         >
             <b-dropdown variant="link" text="..." class="edit_btn">
-                {{ cogsItem }}
                 <b-dropdown-item href="#" @click="editInventory(cogsItem)"
                     ><i class="fas fa-pencil-alt text-success mr-1" />
                     Edit
@@ -46,13 +45,11 @@ export default {
     methods: {
         ...mapActions(["removeItemfromChangedProducts", "setSearchText"]),
         editInventory(item) {
-            console.log("item.sku", item);
             this.setSearchText(item.sku);
             this.$bvModal.show("inventory-details");
 
             setTimeout(() => {
                 eventBus.$emit("editInventoryText");
-                console.log("event emitted");
             }, 100);
         },
 
@@ -83,7 +80,8 @@ export default {
 }
 .changed_inventory {
     overflow-y: auto;
-    max-height: 320px;
+    max-height: 340px;
+    min-height: 130px;
 }
 #inventory_item .btn-link {
     font-size: 1.5rem;
