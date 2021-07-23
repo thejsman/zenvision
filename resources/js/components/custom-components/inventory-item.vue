@@ -45,10 +45,12 @@ export default {
     methods: {
         ...mapActions(["removeItemfromChangedProducts"]),
         editInventory(item) {
+            this.$bvModal.show("inventory-details");
+
             setTimeout(() => {
                 eventBus.$emit("editInventoryText", item.sku);
-            }, 500);
-            this.$bvModal.show("inventory-details");
+                console.log("event emitted", item.sku);
+            }, 900);
         },
 
         async deleteInventory(item) {
