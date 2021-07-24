@@ -45,7 +45,12 @@ const getters = {
             return _.sumBy(order.shipping_lines, line =>
                 parseFloat(line.price)
             );
-        })
+        }),
+
+    shopifyTotalTax: state =>
+        _.sumBy(state.orders, order => parseFloat(order.total_tax)),
+    shopifyDiscounts: state =>
+        _.sumBy(state.orders, order => parseFloat(order.total_discounts))
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {

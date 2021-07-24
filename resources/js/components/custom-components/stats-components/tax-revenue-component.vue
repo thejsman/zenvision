@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-xs-4">
+    <div class="col-md-4 mt-4">
         <Stat
             :title="data.title"
             :value="data.value"
@@ -11,16 +11,16 @@
 
 <script>
 import Stat from "../../widgets/stat";
-import { mapGetters, mapActions } from "vuex";
-import { NUMBER_OF_ORDERS } from "../../../constants";
-
+import { mapGetters } from "vuex";
+import { TAXES_REVENUE } from "../../../constants";
+import { displayCurrency } from "../../../utils";
 export default {
     components: { Stat },
     data() {
         return {
             data: {
-                id: 1,
-                title: NUMBER_OF_ORDERS,
+                id: 2,
+                title: TAXES_REVENUE,
                 value: "0",
                 loading: true,
                 toolTip:
@@ -29,21 +29,21 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["hasShopifyStorePA", "numberOfOrders"])
+        ...mapGetters(["hasShopifyStorePA", "shopifyTotalTax"])
     },
     watch: {
         hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
                 this.data.loading = false;
-                this.data.value = `${this.numberOfOrders}`;
+                this.data.value = displayCurrency(`${this.shopifyTotalTax}`);
             } else {
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
-        numberOfOrders(newVal, oldVal) {
+        shopifyTotalTax(newVal, oldVal) {
             this.data.loading = false;
-            this.data.value = `${newVal}`;
+            this.data.value = displayCurrency(`${newVal}`);
         }
     }
 };
