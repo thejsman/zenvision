@@ -28,7 +28,7 @@ const getters = {
     shopifyStoreBalance: state => state.storeBalance,
     storeReserves: state => state.storeReserves,
     exclamationIconStatus: state => state.exclamationIconStatus,
-    numberOfOrders: state => state.numberOfOrders,
+    numberOfOrders: state => state.orders.length,
     inventoryTotal: state => state.inventoryTotal,
     shopifyCogsArray: state => state.shopifyCogsArray,
     inventoryChangedProducts: state => state.inventoryChangedProducts,
@@ -146,6 +146,7 @@ const actions = {
     },
     getNumberOfOrders: async ({ commit, state }) => {
         const numberOfOrders = state.orders.length;
+        console.log("Check this", numberOfOrders);
         commit("SET_NUMBER_OF_ORDERS", numberOfOrders);
     },
     getShopifyTotalInventory: async ({ commit }) => {

@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{ hasShopifyStorePA }}
         <Stat
             :title="data.title"
             :value="data.value"
@@ -38,7 +37,8 @@ export default {
     watch: {
         hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
-                this.getNumberOfOrders();
+                this.data.loading = false;
+                this.data.value = `${this.numberOfOrders}`;
             } else {
                 this.data.loading = false;
                 this.data.value = "-";
