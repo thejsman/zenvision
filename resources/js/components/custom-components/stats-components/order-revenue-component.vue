@@ -11,16 +11,16 @@
 
 <script>
 import Stat from "../../widgets/stat";
-import { mapGetters, mapActions } from "vuex";
-import { NUMBER_OF_ORDERS } from "../../../constants";
-
+import { mapGetters } from "vuex";
+import { ORDER_REVENUE } from "../../../constants";
+import { displayCurrency } from "../../../utils";
 export default {
     components: { Stat },
     data() {
         return {
             data: {
-                id: 1,
-                title: NUMBER_OF_ORDERS,
+                id: 2,
+                title: ORDER_REVENUE,
                 value: "0",
                 loading: true,
                 toolTip:
@@ -29,21 +29,21 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["hasShopifyStorePA", "numberOfOrders"])
+        ...mapGetters(["hasShopifyStorePA", "shopifyRevenue"])
     },
     watch: {
         hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
                 this.data.loading = false;
-                this.data.value = `${this.numberOfOrders}`;
+                this.data.value = displayCurrency(`${this.shopifyRevenue}`);
             } else {
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
-        numberOfOrders(newVal, oldVal) {
+        shopifyRevenue(newVal, oldVal) {
             this.data.loading = false;
-            this.data.value = `${newVal}`;
+            this.data.value = displayCurrency(`${newVal}`);
         }
     }
 };

@@ -5,6 +5,7 @@
             <h3>{{ totalRevenueinUSD }}</h3>
         </div>
         <NumberOfOrders />
+        <OrderRevenue />
         <div v-for="stat of data" :key="stat.id" class="col-md-4 p-2">
             <Stat
                 :title="stat.title"
@@ -18,6 +19,7 @@
 <script>
 import Stat from "../../widgets/stat";
 import NumberOfOrders from "../../custom-components/stats-components/number-of-orders-component.vue";
+import OrderRevenue from "../../custom-components/stats-components/order-revenue-component.vue";
 import _ from "lodash";
 import {
     displayCurrency,
@@ -36,26 +38,10 @@ import {
 } from "../../../constants";
 
 export default {
-    components: { Stat, NumberOfOrders },
+    components: { Stat, NumberOfOrders, OrderRevenue },
     data() {
         return {
             data: [
-                {
-                    id: 1,
-                    title: NUMBER_OF_ORDERS,
-                    value: "0",
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
-                {
-                    id: 2,
-                    title: ORDER_REVENUE,
-                    value: "0",
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
                 {
                     id: 3,
                     title: SHIPPING_REVENUE,

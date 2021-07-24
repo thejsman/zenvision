@@ -1,6 +1,7 @@
 import axios from "axios";
 import { propertyOf, sumBy } from "lodash";
 import _ from "lodash";
+import { updateLocale } from "moment";
 
 const state = {
     hasShopifyStore: null,
@@ -16,6 +17,10 @@ const state = {
     shopifyCogsArray: [],
     inventoryChangedProducts: [],
     searchText: ""
+    // shopifyRevenue: null,
+    // shopifyShippingRevenue: null,
+    // shopifyTotalTax: null,
+    // shopifyDiscounts: null
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -32,7 +37,9 @@ const getters = {
     inventoryTotal: state => state.inventoryTotal,
     shopifyCogsArray: state => state.shopifyCogsArray,
     inventoryChangedProducts: state => state.inventoryChangedProducts,
-    inventorySearchText: state => state.searchText
+    inventorySearchText: state => state.searchText,
+    shopifyRevenue: state =>
+        _.sumBy(state.orders, order => parseFloat(order.total_price))
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
