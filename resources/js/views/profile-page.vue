@@ -210,7 +210,7 @@
                     </div>
                     <div class="mt-5">
                         <p
-                            class="zv-danger float-right"
+                            class="zv-danger float-right deactivate-account"
                             @click="showAccountModal"
                         >
                             Deactivate my account
@@ -232,7 +232,7 @@
                         <p>
                             Are you use you want to deactivate your account?
                         </p>
-                        <template #modal-footer="{ ok, cancel }">
+                        <template #modal-footer="{ cancel }">
                             <b-button
                                 variant="danger"
                                 size="lg"
@@ -337,7 +337,7 @@ export default {
             event.preventDefault();
             try {
                 this.loadingStatus = true;
-                const result = await axios.patch("/user", this.formProfile);
+                await axios.patch("/user", this.formProfile);
 
                 this.messageVariant = "success";
                 this.updateResult = "Profile updated successfully";
@@ -368,10 +368,7 @@ export default {
                     this.formPassword.password ===
                     this.formPassword.repeatPassword
                 ) {
-                    const result = await axios.patch(
-                        "changepassword",
-                        this.formPassword
-                    );
+                    await axios.patch("changepassword", this.formPassword);
                     this.messageVariant = "success";
                     this.updateResult = "Password updated successfully";
                     this.showMessage = true;
@@ -414,8 +411,13 @@ export default {
         showAccountModal() {
             this.$bvModal.show("deactivate-modal");
         },
-        deactivateAccount() {
-            window.location.href = "/logout";
+        async deactivateAccount() {
+            try {
+                await axios.delete("/user");
+                window.location.href = "/logout";
+            } catch (error) {
+                window.location.href = "/logout";
+            }
         }
     }
 };
@@ -423,5 +425,12 @@ export default {
 <style>
 .zv-danger {
     color: #e75555;
+}
+.deactivate-account {
+    cursor: pointer;
+    transition: 0.3s;
+}
+.deactivate-account:hover {
+    opacity: 0.5;
 }
 </style>

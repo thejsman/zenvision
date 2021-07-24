@@ -15,14 +15,16 @@ class CogsController extends Controller
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
 
-        $products = ShopifyProductVariant::select('id', 'variant_id', 'product_title',  'sku', 'color', 'size', 'sales_price', 'cost', 'shipping_cost')->whereIn('store_id', $enabled_on_dashboard)->get();
+        $products = ShopifyProductVariant::select('id', 'variant_id', 'product_title',  'sku', 'color', 'size', 'sales_price', 'cost', 'shipping_cost', 'units', 'total_inventory')->whereIn('store_id', $enabled_on_dashboard)->get();
         return [
             'products' => $products
         ];
     }
     public function update(Request $request)
     {
+
         $products = $request->toArray();
+
         foreach ($products as $key => $value) {
             ShopifyProductVariant::find($value['id'])->update($value);
             $cogs = $value['cost'] + $value['shipping_cost'];

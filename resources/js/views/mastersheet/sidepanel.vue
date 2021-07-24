@@ -13,7 +13,7 @@ import {
 } from "../../constants";
 
 import { mapGetters, mapActions } from "vuex";
-
+import { setLoadingSingle } from "../../utils";
 export default {
     components: { Stat },
     data() {
@@ -39,7 +39,8 @@ export default {
                     icon: "bx bx-archive-in",
                     title: TOTAL_INVENTORY,
                     value: "$0",
-                    loading: true
+                    loading: true,
+                    showCaret: true
                 },
                 {
                     icon: "bx bx-purchase-tag-alt",
@@ -70,9 +71,22 @@ export default {
             "debtsCreditCardTotal",
             "debtsSupplierPayableTotal",
             "netEquityTotal",
+            "assetsInventoryTotal",
             "assetsReservesTotal",
             "assetsCashTotal"
         ]),
+        totalAssets() {
+            return displayCurrency(
+                this.assetsInventoryTotal +
+                    this.assetsReservesTotal +
+                    this.assetsCashTotal
+            );
+        },
+        totalDebts() {
+            return displayCurrency(
+                this.debtsCreditCardTotal + this.debtsSupplierPayableTotal
+            );
+        },
         ...mapGetters(["ShopifyCogsTotal"]),
         ...mapGetters("BankAccount", ["bankAccountBalance"])
     },
@@ -102,7 +116,19 @@ export default {
                 displayCurrency(this.debtsCreditCardTotal)
             );
         },
-
+        assetsInventoryTotal(newVal, oldVal) {
+            if (this.assetsInventoryTotal === null) {
+                if (this.hasShopifyStoreCS) {
+                    setLoadingSingle(this.statData, TOTAL_INVENTORY);
+                }
+            } else {
+                updateData(
+                    this.statData,
+                    TOTAL_INVENTORY,
+                    displayCurrency(this.assetsInventoryTotal)
+                );
+            }
+        },
         assetsReservesTotal(newVal, oldVal) {
             updateData(
                 this.statData,
@@ -124,8 +150,19 @@ export default {
     },
     methods: {
         async getMastersheetData() {
+            // console.log("check this", this.assetsInventoryTotal);
+            // if (
+            //     this.assetsInventoryTotal === null &&
+            //     this.hasShopifyStoreCS === true
+            // ) {
+            //     setLoadingSingle(this.statData, "Inventory");
+            // }
             setTimeout(() => {
-                updateData(this.statData, TOTAL_INVENTORY, displayCurrency(0));
+                // updateData(
+                //     this.statData,
+                //     TOTAL_INVENTORY,
+                //     displayCurrency(this.assetsInventoryTotal)
+                // );
 
                 updateData(
                     this.statData,
@@ -156,7 +193,7 @@ export default {
                     TOTAL_CASH,
                     displayCurrency(this.assetsCashTotal)
                 );
-            }, 7000);
+            }, 1000);
         }
     }
 };
@@ -184,7 +221,10 @@ export default {
         <div class="mail-list mt-4">
             <div class="row">
                 <div class="col-xl-12">
-                    <h4>Assets</h4>
+                    <div class="d-flex justify-content-between">
+                        <h4>Assets</h4>
+                        <h4>{{ totalAssets }}</h4>
+                    </div>
                 </div>
                 <div
                     v-for="stat of statData"
@@ -196,6 +236,7 @@ export default {
                         :title="stat.title"
                         :value="stat.value"
                         :loading="stat.loading"
+                        :showCaret="stat.showCaret"
                     />
                 </div>
             </div>
@@ -203,7 +244,10 @@ export default {
         <div class="mail-list mt-4">
             <div class="row">
                 <div class="col-xl-12">
-                    <h4>Debts</h4>
+                    <div class="d-flex justify-content-between">
+                        <h4>Debts</h4>
+                        <h4>{{ totalDebts }}</h4>
+                    </div>
                 </div>
                 <div
                     v-for="stat of debtsData"

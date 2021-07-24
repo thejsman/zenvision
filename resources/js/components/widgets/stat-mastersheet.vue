@@ -1,5 +1,11 @@
 <script>
+import AddInventoryBtn from "../../components/custom-components/add-inventory.vue";
 export default {
+    data() {
+        return {
+            showInventorySection: false
+        };
+    },
     props: {
         title: {
             type: String,
@@ -82,14 +88,27 @@ export default {
         showGraph: {
             type: Boolean,
             default: false
+        },
+        showCaret: {
+            type: Boolean,
+            default: false
         }
-    }
+    },
+    methods: {
+        clickHandler() {
+            this.showInventorySection = !this.showInventorySection;
+        }
+    },
+    components: { AddInventoryBtn }
 };
 </script>
 
 <template>
-    <div class="card mini-stats-wid">
-        <div class="card-body">
+    <div
+        class="card mini-stats-wid"
+        :class="{ cogscard: title === 'Inventory' }"
+    >
+        <div class="card-body" v-on="showCaret ? { click: clickHandler } : {}">
             <div class="media">
                 <div class="media-body">
                     <div class="d-flex justify-content-between">
@@ -99,6 +118,15 @@ export default {
                             v-b-tooltip.hover="tooltip"
                             class="fas fas fa-info-circle"
                         ></i>
+                        <i
+                            v-if="showCaret"
+                            class="fas"
+                            :class="
+                                showInventorySection
+                                    ? 'fa-angle-up'
+                                    : 'fa-angle-down'
+                            "
+                        ></i>
                     </div>
                     <div class="mb-3 mt-1">
                         <b-skeleton
@@ -107,7 +135,10 @@ export default {
                             width="30%"
                             class="skeleton-loading"
                         ></b-skeleton>
-                        <h4 v-else class="mx-auto">{{ value }}</h4>
+
+                        <h4 v-else class="mx-auto">
+                            {{ value }}
+                        </h4>
                     </div>
                     <div class="d-flex justify-content-between">
                         <!-- <div class="rectangle mt-3" v-if="loading">
@@ -138,6 +169,13 @@ export default {
                 <span class="float-right">{{ data.value }}</span>
             </div>
         </div>
+        <transition name="fade">
+            <div v-if="showInventorySection" class="border-top px-3">
+                <div class="text-center">
+                    <AddInventoryBtn />
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
 <style>
@@ -159,5 +197,12 @@ export default {
 }
 .skeleton-loading {
     padding: 12px;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
 }
 </style>

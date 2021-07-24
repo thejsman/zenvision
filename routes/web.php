@@ -17,7 +17,7 @@ Auth::routes();
 Route::get('user/stores', 'ShopifyStoreController@getStores');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/', 'HomeController@index')->name('home');
-
+Route::delete('/user', 'UserController@destroy');
 Route::get('/shopify/auth/', 'ShopifyStoreController@getResponse');
 
 
@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', 'UserController@index');
     Route::get('/user', 'UserController@getUser');
     Route::patch('/user', 'UserController@edit');
+
     Route::patch('/changepassword', 'UserController@changePassword');
 
     //Shopify Connect APIs
@@ -106,6 +107,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('cogs', 'CogsController@update');
     Route::get('cogsicon', 'CogsController@showCogsIcon');
 
+    //Inventory 
+    Route::patch('inventory', 'InventoryController@deleteInventory');
     //Facebook APIs
     Route::get('getfacebookaccounts', 'FacebookController@getAdAccounts');
     Route::get('getfacebookadsdata', 'FacebookController@getFacebookAdsData');

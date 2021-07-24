@@ -1,18 +1,20 @@
 import axios from "axios";
-import { sumBy } from "lodash";
+import { propertyOf, sumBy } from "lodash";
+import _ from "lodash";
 
 const state = {
     hasShopifyStore: null,
-    hasShopifyStorePA: null,
-    exclamationIconStatus: false,
-    numberOfOrders: null,
     shopifyStores: [],
     orders: [],
     allOrders: [],
     cogsTotal: 0,
     paCogsTotal: 0,
+    inventoryTotal: null,
     storeBalance: 0,
-    storeReserves: 0
+    storeReserves: 0,
+    shopifyCogsArray: [],
+    inventoryChangedProducts: [],
+    searchText: ""
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -25,7 +27,11 @@ const getters = {
     shopifyStoreBalance: state => state.storeBalance,
     storeReserves: state => state.storeReserves,
     exclamationIconStatus: state => state.exclamationIconStatus,
-    numberOfOrders: state => state.numberOfOrders
+    numberOfOrders: state => state.numberOfOrders,
+    inventoryTotal: state => state.inventoryTotal,
+    shopifyCogsArray: state => state.shopifyCogsArray,
+    inventoryChangedProducts: state => state.inventoryChangedProducts,
+    inventorySearchText: state => state.searchText
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -56,6 +62,10 @@ const actions = {
                 }
             } else {
                 commit("SET_SHOPIFY_STORES", []);
+                commit("SET_TOTAL_INVENTORY", 0);
+                commit("SET_SHOPIFY_RESERVES", 0);
+                commit("SET_SHOPIFY_ORDERS", []);
+                commit("SET_SHOPIFY_BALANCE", 0);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
             }
@@ -137,6 +147,31 @@ const actions = {
         const numberOfOrders = state.orders.length;
         commit("SET_NUMBER_OF_ORDERS", numberOfOrders);
     },
+    getShopifyTotalInventory: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("cogs");
+            commit("SET_COGS_ARRAY", data.products);
+            const totalInventory = _.sumBy(
+                data.products,
+                product => parseFloat(product.total_inventory) || 0
+            );
+
+            commit("SET_TOTAL_INVENTORY", totalInventory);
+        } catch (err) {
+            commit("SET_TOTAL_INVENTORY", 0);
+            console.log({ err });
+        }
+    },
+    setSearchText: ({ commit }, text) => {
+        commit("SET_SEARCH_TEXT", text);
+    },
+    addToChangedProducts: ({ commit }, product) => {
+        commit("SET_CHANGED_PRODUCTS", product);
+    },
+    removeItemfromChangedProducts: ({ commit, dispatch }, product) => {
+        commit("REMOVE_ITEM_FORM_CHANGED_PRODUCTS", product);
+        dispatch("getShopifyTotalInventory");
+    },
     removeShopifyAccount: async ({ commit }, account) => {
         commit("REMOVE_SHOPIFY_ACCOUNT", account);
     }
@@ -185,6 +220,27 @@ const mutations = {
         state.exclamationIconStatus = payload === 0 ? false : true;
     },
     SET_NUMBER_OF_ORDERS: (state, payload) => (state.numberOfOrders = payload),
+    SET_TOTAL_INVENTORY: (state, payload) => {
+        state.inventoryTotal = payload;
+    },
+    SET_COGS_ARRAY: (state, payload) => {
+        const filteredArray = payload.filter(
+            product => product.total_inventory !== null
+        );
+        state.inventoryChangedProducts = filteredArray;
+        state.shopifyCogsArray = payload;
+    },
+    SET_CHANGED_PRODUCTS: (state, payload) => {
+        state.inventoryChangedProducts = Array.from(new Set([...payload]));
+    },
+    SET_SEARCH_TEXT: (state, payload) => {
+        state.searchText = payload;
+    },
+    REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
+        state.inventoryChangedProducts = state.inventoryChangedProducts.filter(
+            product => product.id !== payload.id
+        );
+    },
     REMOVE_SHOPIFY_ACCOUNT: (state, payload) => {
         state.shopifyStores = state.shopifyStores.filter(
             account => account.id !== payload.id
@@ -196,6 +252,8 @@ const mutations = {
             state.cogsTotal = 0;
             state.storeBalance = 0;
             state.storeReserves = 0;
+            state.shopifyCogsArray = [];
+            state.inventoryChangedProducts = [];
         }
     }
 };
