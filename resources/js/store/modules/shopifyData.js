@@ -4,6 +4,7 @@ import _ from "lodash";
 
 const state = {
     hasShopifyStore: null,
+    hasShopifyStorePA: null,
     shopifyStores: [],
     orders: [],
     allOrders: [],
