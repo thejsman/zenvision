@@ -6,6 +6,7 @@
         </div>
         <NumberOfOrders />
         <OrderRevenue />
+        <ShippingRevenue />
         <div v-for="stat of data" :key="stat.id" class="col-md-4 p-2">
             <Stat
                 :title="stat.title"
@@ -20,6 +21,7 @@
 import Stat from "../../widgets/stat";
 import NumberOfOrders from "../../custom-components/stats-components/number-of-orders-component.vue";
 import OrderRevenue from "../../custom-components/stats-components/order-revenue-component.vue";
+import ShippingRevenue from "../../custom-components/stats-components/shipping-revenue-component.vue";
 import _ from "lodash";
 import {
     displayCurrency,
@@ -38,7 +40,7 @@ import {
 } from "../../../constants";
 
 export default {
-    components: { Stat, NumberOfOrders, OrderRevenue },
+    components: { Stat, NumberOfOrders, OrderRevenue, ShippingRevenue },
     data() {
         return {
             data: [
