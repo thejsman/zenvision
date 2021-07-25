@@ -3,6 +3,7 @@
         <div class="col-xl-12 mt-4 header-key-perf">
             <h3>Key Performance Metrics</h3>
         </div>
+        <AbandonedCart />
         <div
             v-for="performance of data"
             :key="performance.id"
@@ -18,6 +19,7 @@
     </div>
 </template>
 <script>
+import AbandonedCart from "../../custom-components/stats-components/key-performance-section/abandoned-cart-component.vue";
 import Stat from "../../widgets/stat";
 import _ from "lodash";
 import { eventBus } from "../../../app";
@@ -40,7 +42,7 @@ import {
 import { mapGetters } from "vuex";
 
 export default {
-    components: { Stat },
+    components: { Stat, AbandonedCart },
     data() {
         return {
             totalProfitValue: 0,

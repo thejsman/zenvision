@@ -15,7 +15,8 @@ const state = {
     storeReserves: 0,
     shopifyCogsArray: [],
     inventoryChangedProducts: [],
-    searchText: ""
+    searchText: "",
+    shopifyAbandonedCart: null
     // shopifyRevenue: null,
     // shopifyShippingRevenue: null,
     // shopifyTotalTax: null,
@@ -50,7 +51,8 @@ const getters = {
     shopifyTotalTax: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_tax)),
     shopifyDiscounts: state =>
-        _.sumBy(state.orders, order => parseFloat(order.total_discounts))
+        _.sumBy(state.orders, order => parseFloat(order.total_discounts)),
+    shopifyAbandonedCartCount: state => state.shopifyAbandonedCart
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -74,6 +76,7 @@ const actions = {
                     commit("TOGGGLE_SHOPIFY_STORE_STATUS", true);
                 } else {
                     dispatch("getShopifyStoreOrders");
+                    // dispatch("getAbandonedCartCount");
                     commit(
                         "TOGGGLE_SHOPIFY_STORE_STATUS_PA",
                         status.includes(true)
@@ -85,6 +88,7 @@ const actions = {
                 commit("SET_SHOPIFY_RESERVES", 0);
                 commit("SET_SHOPIFY_ORDERS", []);
                 commit("SET_SHOPIFY_BALANCE", 0);
+                commit("SET_ABANDONED_CART_COUNT", 0);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
             }
@@ -188,6 +192,15 @@ const actions = {
     addToChangedProducts: ({ commit }, product) => {
         commit("SET_CHANGED_PRODUCTS", product);
     },
+    getAbandonedCartCount: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("abandonedcart");
+            commit("SET_ABANDONED_CART_COUNT", data);
+        } catch (err) {
+            console.log({ err });
+            commit("SET_ABANDONED_CART_COUNT", 0);
+        }
+    },
     removeItemfromChangedProducts: ({ commit, dispatch }, product) => {
         commit("REMOVE_ITEM_FORM_CHANGED_PRODUCTS", product);
         dispatch("getShopifyTotalInventory");
@@ -255,6 +268,9 @@ const mutations = {
     },
     SET_SEARCH_TEXT: (state, payload) => {
         state.searchText = payload;
+    },
+    SET_ABANDONED_CART_COUNT: (state, payload) => {
+        state.shopifyAbandonedCart = payload;
     },
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = state.inventoryChangedProducts.filter(

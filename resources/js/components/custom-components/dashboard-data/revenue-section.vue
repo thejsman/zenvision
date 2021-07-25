@@ -17,10 +17,10 @@
     </div>
 </template>
 <script>
-import NumberOfOrders from "../../custom-components/stats-components/number-of-orders-component.vue";
-import OrderRevenue from "../../custom-components/stats-components/order-revenue-component.vue";
-import ShippingRevenue from "../../custom-components/stats-components/shipping-revenue-component.vue";
-import TaxRevenue from "../../custom-components/stats-components/tax-revenue-component.vue";
+import NumberOfOrders from "../stats-components/revenue-section/number-of-orders-component.vue";
+import OrderRevenue from "../stats-components/revenue-section/order-revenue-component.vue";
+import ShippingRevenue from "../stats-components/revenue-section/shipping-revenue-component.vue";
+import TaxRevenue from "../stats-components/revenue-section/tax-revenue-component.vue";
 
 import { mapGetters } from "vuex";
 import { displayCurrency } from "../../../utils";

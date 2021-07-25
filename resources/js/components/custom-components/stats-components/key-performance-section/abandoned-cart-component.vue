@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import Stat from "../../widgets/stat";
+import Stat from "../../../widgets/stat";
 import { mapGetters, mapActions } from "vuex";
-import { NUMBER_OF_ORDERS } from "../../../constants";
+import { ABANDONED_CART } from "../../../../constants";
 
 export default {
     components: { Stat },
@@ -20,7 +20,7 @@ export default {
         return {
             data: {
                 id: 1,
-                title: NUMBER_OF_ORDERS,
+                title: ABANDONED_CART,
                 value: "0",
                 loading: true,
                 toolTip:
@@ -29,19 +29,23 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["hasShopifyStorePA", "numberOfOrders"])
+        ...mapGetters(["hasShopifyStorePA", "shopifyAbandonedCartCount"])
+    },
+    methods: {
+        ...mapActions(["getAbandonedCartCount"])
     },
     watch: {
-        hasShopifyStorePA() {
+        async hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
+                await this.getAbandonedCartCount();
                 this.data.loading = false;
-                this.data.value = `${this.numberOfOrders}`;
+                this.data.value = `${this.shopifyAbandonedCartCount}`;
             } else {
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
-        numberOfOrders(newVal, oldVal) {
+        shopifyAbandonedCartCount(newVal, oldVal) {
             this.data.loading = false;
             this.data.value = `${newVal}`;
         }
