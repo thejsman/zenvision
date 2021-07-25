@@ -170,7 +170,7 @@
 </template>
 <script>
 import axios from "axios";
-import { eventBus } from "../../../app";
+import { mapActions } from "vuex";
 
 export default {
     data() {
@@ -246,6 +246,11 @@ export default {
         await this.getCogsData();
     },
     methods: {
+        ...mapActions([
+            "getShopifyStoreOrders",
+            "toggleLoadingStatus",
+            "getShopifyCogsTotalPA"
+        ]),
         handleSelectAll() {
             this.selectAll ? this.selectAllRows() : this.clearSelected();
         },
@@ -294,11 +299,12 @@ export default {
                 } else {
                     const updateResult = await axios.post("cogs", updateTable);
                     this.showAlert("COGS updated succesfully", "success");
+                    this.toggleLoadingStatus(true);
+                    await this.getShopifyStoreOrders();
+                    await this.getShopifyCogsTotalPA();
 
-                    setTimeout(() => {
-                        eventBus.$emit("cogs-updated");
-                        this.$emit("handle-close");
-                    }, 2000);
+                    this.$emit("handle-close");
+                    this.toggleLoadingStatus(false);
                 }
             } catch (error) {
                 console.log(error);

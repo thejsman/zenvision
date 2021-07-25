@@ -1,23 +1,28 @@
 <template>
-    <Stat
-        :title="data.title"
-        :value="data.value"
-        :loading="data.loading"
-        :onClick="data.onClick"
-        :totalSubscriptionCount="data.totalSubscriptionCount"
-        :showIcon="exclamationIconStatus"
-        :iconName="data.iconName"
-        :channelIcon="data.channelIcon"
-        :toolTip="data.toolTip"
-    />
+    <div>
+        <Stat
+            :title="data.title"
+            :value="data.value"
+            :loading="data.loading"
+            :onClick="data.onClick"
+            :totalSubscriptionCount="data.totalSubscriptionCount"
+            :showIcon="exclamationIconStatus"
+            :iconName="data.iconName"
+            :channelIcon="data.channelIcon"
+            :toolTip="data.toolTip"
+        />
+        <b-modal id="cogs-details" size="xl" centered hide-footer hide-header>
+            <CogsModal @handle-close="handleCogsClose" />
+        </b-modal>
+    </div>
 </template>
 
 <script>
-import Stat from "../../widgets/stat";
+import Stat from "../../../widgets/stat";
 import { mapGetters, mapActions } from "vuex";
-import CogsModal from "../modals/CogsDetails-modal.vue";
-import { COGS_TOTAL } from "../../../constants";
-import { displayCurrency } from "../../../utils";
+import CogsModal from "../../modals/CogsDetails-modal.vue";
+import { COGS_TOTAL } from "../../../../constants";
+import { displayCurrency } from "../../../../utils";
 
 export default {
     components: { CogsModal, Stat },
@@ -45,12 +50,17 @@ export default {
         ])
     },
     methods: {
-        ...mapActions(["getShopifyCogsTotalPA"])
+        ...mapActions(["getShopifyCogsTotalPA"]),
+        handleCogsClick() {
+            this.$bvModal.show("cogs-details");
+        },
+        handleCogsClose() {
+            this.$bvModal.hide("cogs-details");
+        }
     },
     watch: {
         hasShopifyStorePA() {
-            if (this.hasShopifyStorePA) {
-            } else {
+            if (!this.hasShopifyStorePA) {
                 this.data.loading = false;
                 this.data.value = "-";
             }
@@ -58,14 +68,12 @@ export default {
         ShopifyCogsTotalPA() {
             this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
         },
-        shopifyOrders(newVal, oldVal) {
-            console.log("Value changed shopifyOrders", newVal, oldVal);
-            this.getShopifyCogsTotalPA();
+        async shopifyOrders(newVal, oldVal) {
+            this.data.loading = true;
+            await this.getShopifyCogsTotalPA();
             this.data.loading = false;
             this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
         }
     }
 };
 </script>
-
-<style></style>

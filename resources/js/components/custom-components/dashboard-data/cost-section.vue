@@ -28,9 +28,6 @@
         >
             <SubscriptionCost @handle-close="handleSubscriptionClose" />
         </b-modal>
-        <b-modal id="cogs-details" size="xl" centered hide-footer hide-header>
-            <CogsModal @handle-close="handleCogsClose" />
-        </b-modal>
     </div>
 </template>
 <script>
@@ -41,7 +38,7 @@ import SubscriptionCost from "../modals/subscription-cost";
 import moment from "moment-timezone";
 import { mapGetters, mapActions } from "vuex";
 
-import CogsComponent from "../stats-components/cogs-component.vue";
+import CogsComponent from "../stats-components/cost-section/cogs-component.vue";
 import {
     displayCurrency,
     updateData,
@@ -85,17 +82,6 @@ export default {
             timer: null,
             firstLoadStripe: false,
             data: [
-                {
-                    id: 1,
-                    title: COGS_TOTAL,
-                    value: `0`,
-                    loading: true,
-                    onClick: this.handleCogsClick,
-                    iconName: "exclamation-icon.svg",
-                    showIcon: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
                 {
                     id: 2,
                     title: DISCOUNTS_TOTAL,
@@ -493,13 +479,6 @@ export default {
         },
         handleSubscriptionClose() {
             this.$bvModal.hide("subscription-details");
-        },
-        handleCogsClick() {
-            this.$bvModal.show("cogs-details");
-        },
-
-        handleCogsClose() {
-            this.$bvModal.hide("cogs-details");
         },
 
         async getCogsData(orders, refundTotal) {
