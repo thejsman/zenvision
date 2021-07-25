@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-xs-4">
+    <div class="col-md-4 mt-4 mt-md-0">
         <Stat
             :title="data.title"
             :value="data.value"
@@ -13,7 +13,6 @@
 import Stat from "../../../widgets/stat";
 import { mapGetters, mapActions } from "vuex";
 import { AVERAGE_UNITS_PER_ORDER } from "../../../../constants";
-import { displayCurrency } from "../../../../utils";
 
 export default {
     components: { Stat },

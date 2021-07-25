@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-4 mt-md-0">
+    <div class="col-md-4 mt-4">
         <Stat
             :title="data.title"
             :value="data.value"
@@ -12,8 +12,8 @@
 <script>
 import Stat from "../../../widgets/stat";
 import { mapGetters } from "vuex";
-import { AVERAGE_ORDER_VALUE } from "../../../../constants";
-import { displayCurrency } from "../../../../utils";
+import { US_ORDERS_PERCENTAGE } from "../../../../constants";
+import { countBy } from "lodash";
 
 export default {
     components: { Stat },
@@ -21,7 +21,7 @@ export default {
         return {
             data: {
                 id: 1,
-                title: AVERAGE_ORDER_VALUE,
+                title: US_ORDERS_PERCENTAGE,
                 value: "0",
                 loading: true,
                 toolTip:
@@ -30,15 +30,20 @@ export default {
         };
     },
     computed: {
-        ...mapGetters([
-            "hasShopifyStorePA",
-            "numberOfOrders",
-            "shopifyRevenue"
-        ]),
-        averageOrderValue() {
-            return displayCurrency(
-                parseFloat(this.shopifyRevenue / this.numberOfOrders)
+        ...mapGetters(["hasShopifyStorePA", "numberOfOrders", "shopifyOrders"]),
+        usOrdersPercentage() {
+            const usOrdersCountObj = countBy(
+                this.shopifyOrders,
+                order => order.shipping_country === "United States"
             );
+            if (usOrdersCountObj.true) {
+                return (
+                    parseFloat(usOrdersCountObj.true / this.numberOfOrders) *
+                    100
+                );
+            } else {
+                return "0";
+            }
         }
     },
 
@@ -46,13 +51,13 @@ export default {
         async hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
                 this.data.loading = false;
-                this.data.value = `${this.averageOrderValue}`;
+                this.data.value = `${this.usOrdersPercentage}`;
             } else {
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
-        averageOrderValue(newVal, oldVal) {
+        usOrdersPercentage(newVal, oldVal) {
             this.data.loading = false;
             this.data.value = `${newVal}`;
         }

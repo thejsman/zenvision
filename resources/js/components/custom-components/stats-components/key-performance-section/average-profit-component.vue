@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-4 mt-md-0">
+    <div class="col-md-4 mt-4">
         <Stat
             :title="data.title"
             :value="data.value"
@@ -12,7 +12,7 @@
 <script>
 import Stat from "../../../widgets/stat";
 import { mapGetters } from "vuex";
-import { AVERAGE_ORDER_VALUE } from "../../../../constants";
+import { AVERAGE_PROFIT_PER_ORDER } from "../../../../constants";
 import { displayCurrency } from "../../../../utils";
 
 export default {
@@ -21,7 +21,7 @@ export default {
         return {
             data: {
                 id: 1,
-                title: AVERAGE_ORDER_VALUE,
+                title: AVERAGE_PROFIT_PER_ORDER,
                 value: "0",
                 loading: true,
                 toolTip:
@@ -33,11 +33,23 @@ export default {
         ...mapGetters([
             "hasShopifyStorePA",
             "numberOfOrders",
-            "shopifyRevenue"
+            "shopifyRevenue",
+            "shopifyShippingRevenue",
+            "shopifyDiscounts",
+            "shopifyTotalTax",
+            "ShopifyCogsTotalPA"
         ]),
-        averageOrderValue() {
+
+        averageProfitValue() {
             return displayCurrency(
-                parseFloat(this.shopifyRevenue / this.numberOfOrders)
+                parseFloat(
+                    (this.shopifyRevenue +
+                        this.shopifyShippingRevenue +
+                        this.shopifyTotalTax -
+                        this.shopifyDiscounts -
+                        this.ShopifyCogsTotalPA) /
+                        this.numberOfOrders
+                )
             );
         }
     },
@@ -45,14 +57,14 @@ export default {
     watch: {
         async hasShopifyStorePA() {
             if (this.hasShopifyStorePA) {
+                this.data.value = `${this.averageProfitValue}`;
                 this.data.loading = false;
-                this.data.value = `${this.averageOrderValue}`;
             } else {
-                this.data.loading = false;
                 this.data.value = "-";
+                this.data.loading = false;
             }
         },
-        averageOrderValue(newVal, oldVal) {
+        averageProfitValue(newVal, oldVal) {
             this.data.loading = false;
             this.data.value = `${newVal}`;
         }
