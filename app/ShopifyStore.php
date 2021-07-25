@@ -63,8 +63,8 @@ class ShopifyStore extends Model
         ];
     }
 
-    public function getRefundTotal()
+    public function getRefundTotal($start_date, $end_date)
     {
-        return $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['refunded', 'voided'])->get()->sum('total_price');
+        return $this->hasMany(ShopifyOrder::class, 'store_id')->where('is_deleted', false)->whereIn('financial_status', ['refunded', 'voided'])->whereBetween('created_on_shopify', [$start_date, $end_date])->get()->sum('total_price');
     }
 }

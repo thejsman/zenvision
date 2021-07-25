@@ -17,7 +17,8 @@ const state = {
     inventoryChangedProducts: [],
     searchText: "",
     shopifyAbandonedCart: null,
-    shopifyAverageUnitsPerOrder: null
+    shopifyAverageUnitsPerOrder: null,
+    shopifyRefundTotal: null
     // shopifyRevenue: null,
     // shopifyShippingRevenue: null,
     // shopifyTotalTax: null,
@@ -45,13 +46,13 @@ const getters = {
         _.sumBy(state.orders, order =>
             _.sumBy(order.shipping_lines, line => parseFloat(line.price))
         ),
-
     shopifyTotalTax: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_tax)),
     shopifyDiscounts: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_discounts)),
     shopifyAbandonedCartCount: state => state.shopifyAbandonedCart,
-    shopifyAverageUnitsPerOrder: state => state.shopifyAverageUnitsPerOrder
+    shopifyAverageUnitsPerOrder: state => state.shopifyAverageUnitsPerOrder,
+    shopifyRefundTotal: state => state.shopifyRefundTotal
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -75,7 +76,8 @@ const actions = {
                     commit("TOGGGLE_SHOPIFY_STORE_STATUS", true);
                 } else {
                     dispatch("getShopifyStoreOrders");
-                    // dispatch("getAbandonedCartCount");
+                    dispatch("getShopifyRefundTotal");
+
                     commit(
                         "TOGGGLE_SHOPIFY_STORE_STATUS_PA",
                         status.includes(true)
@@ -109,6 +111,7 @@ const actions = {
 
             commit("SET_SHOPIFY_ORDERS", data);
             dispatch("getAverageUnitsCount");
+            dispatch("getShopifyCogsTotalPA");
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ORDERS", []);
@@ -134,6 +137,20 @@ const actions = {
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_BALANCE", 0);
+        }
+    },
+    getShopifyRefundTotal: async ({ commit, rootGetters }) => {
+        try {
+            const response = await axios.get("shopify-refunds", {
+                params: {
+                    start_date: rootGetters.startDateS,
+                    end_date: rootGetters.endDateS
+                }
+            });
+            commit("SET_SHOPIFY_REFUND_TOTAL", response.data);
+        } catch (err) {
+            console.log(err);
+            commit("SET_SHOPIFY_REFUND_TOTAL", 0);
         }
     },
     getShopifyStoreReserves: async ({ commit }) => {
@@ -163,7 +180,6 @@ const actions = {
         const cogs = state.orders.reduce((sum, current) => {
             return sum + parseFloat(current.total_cost);
         }, 0);
-
         commit("SET_COGS_ORDERS_PA", cogs);
     },
     getNumberOfOrders: async ({ commit, state }) => {
@@ -294,6 +310,9 @@ const mutations = {
     },
     SET_AVERAGE_UNITS_COUNT: (state, payload) => {
         state.shopifyAverageUnitsPerOrder = payload;
+    },
+    SET_SHOPIFY_REFUND_TOTAL: (state, payload) => {
+        state.shopifyRefundTotal = payload;
     },
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = state.inventoryChangedProducts.filter(

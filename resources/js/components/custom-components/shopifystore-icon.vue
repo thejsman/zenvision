@@ -52,7 +52,8 @@ export default {
         ...mapActions([
             "removeShopifyAccount",
             "getShopifyStores",
-            "toggleLoadingStatus"
+            "toggleLoadingStatus",
+            "getShopifyCogsTotalPA"
         ]),
         async getStores() {
             try {
@@ -78,6 +79,7 @@ export default {
                 await axios.patch("shopifystore", store);
                 await this.getShopifyStores(this.currentChannel);
                 eventBus.$emit("toggleShopifyStore");
+
                 this.toggleLoadingStatus(false);
                 // to remove below line
                 this.getStores();

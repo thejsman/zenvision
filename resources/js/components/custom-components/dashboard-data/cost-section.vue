@@ -4,7 +4,9 @@
             <h3>Cost</h3>
             <h3>{{ totalCost }}</h3>
         </div>
-        <cogs-component />
+        <CogsComponent />
+        <ShopifyDiscounts />
+        <ShopifyRefunds />
         <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
             <Stat
                 :title="cost.title"
@@ -39,6 +41,9 @@ import moment from "moment-timezone";
 import { mapGetters, mapActions } from "vuex";
 
 import CogsComponent from "../stats-components/cost-section/cogs-component.vue";
+import ShopifyDiscounts from "../stats-components/cost-section/shopify-discounts-component.vue";
+import ShopifyRefunds from "../stats-components/cost-section/shopify-refunds-component.vue";
+
 import {
     displayCurrency,
     updateData,
@@ -67,7 +72,14 @@ import {
 } from "../../../constants";
 import _ from "lodash";
 export default {
-    components: { Stat, SubscriptionCost, CogsModal, CogsComponent },
+    components: {
+        Stat,
+        SubscriptionCost,
+        CogsModal,
+        CogsComponent,
+        ShopifyDiscounts,
+        ShopifyRefunds
+    },
     data() {
         return {
             subscriptionData: 0,
@@ -82,22 +94,6 @@ export default {
             timer: null,
             firstLoadStripe: false,
             data: [
-                {
-                    id: 2,
-                    title: DISCOUNTS_TOTAL,
-                    value: `0`,
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
-                {
-                    id: 3,
-                    title: REFUNDS_TOTAL,
-                    value: `0`,
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
                 {
                     id: 4,
                     title: CHARGEBACKS_TOTAL,
@@ -186,16 +182,20 @@ export default {
             "stripeFirstLoad",
             "hasShopifyStoreCS",
             "stripeChargebackTotal",
-            "stripeChargebackArray"
+            "stripeChargebackArray",
+
+            "ShopifyCogsTotalPA",
+            "shopifyDiscounts",
+            "shopifyRefundTotal"
         ]),
         totalCost() {
             const totalCost = parseFloat(
                 this.totalMerchantFees +
-                    this.refundTotal +
-                    this.totalDiscount +
+                    this.shopifyRefundTotal +
+                    this.shopifyDiscounts +
                     this.subscriptionData +
-                    this.cogsTotal +
-                    this.totalChargeback +
+                    this.ShopifyCogsTotalPA +
+                    // this.totalChargeback +
                     this.tiktokAdsSpend +
                     this.snapchatAdsSpend +
                     this.facebookAdsSpend +

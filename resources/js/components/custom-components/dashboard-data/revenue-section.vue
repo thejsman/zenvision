@@ -45,8 +45,7 @@ export default {
             return displayCurrency(
                 this.shopifyRevenue +
                     this.shopifyShippingRevenue +
-                    this.shopifyTotalTax -
-                    this.shopifyDiscounts
+                    this.shopifyTotalTax
             );
         }
     },

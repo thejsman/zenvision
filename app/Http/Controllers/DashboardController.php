@@ -29,7 +29,6 @@ class DashboardController extends Controller
             $store = ShopifyStore::find($store_id);
             $numberOfProducts += $store->getOrderedProductCount();
             $orders = array_merge($orders, $store->getOrders($request->start_date, $request->end_date)->toArray());
-            $refundTotal += $store->getRefundTotal();
         }
 
         return [

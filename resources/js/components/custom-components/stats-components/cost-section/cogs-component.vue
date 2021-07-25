@@ -61,7 +61,6 @@ export default {
     watch: {
         hasShopifyStorePA() {
             if (!this.hasShopifyStorePA) {
-                console.log("check this", this.hasShopifyStorePA);
                 this.data.loading = false;
                 this.data.value = "-";
             }
@@ -74,7 +73,7 @@ export default {
         async shopifyOrders(newVal, oldVal) {
             if (this.hasShopifyStorePA) {
                 this.data.loading = true;
-                await this.getShopifyCogsTotalPA();
+                // await this.getShopifyCogsTotalPA();
                 this.data.loading = false;
                 this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
             }

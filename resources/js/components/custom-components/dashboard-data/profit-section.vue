@@ -31,13 +31,16 @@ export default {
             "shopifyRevenue",
             "shopifyDiscounts",
             "shopifyShippingRevenue",
-            "ShopifyCogsTotalPA"
+            "ShopifyCogsTotalPA",
+            "shopifyRefundTotal"
         ]),
         totalProfit() {
             return displayCurrency(
                 this.shopifyRevenue +
                     this.shopifyShippingRevenue -
-                    this.ShopifyCogsTotalPA
+                    this.shopifyDiscounts -
+                    this.ShopifyCogsTotalPA -
+                    this.shopifyRefundTotal
             );
         }
     }
