@@ -16,7 +16,8 @@ const state = {
     shopifyCogsArray: [],
     inventoryChangedProducts: [],
     searchText: "",
-    shopifyAbandonedCart: null
+    shopifyAbandonedCart: null,
+    shopifyAverageUnitsPerOrder: null
     // shopifyRevenue: null,
     // shopifyShippingRevenue: null,
     // shopifyTotalTax: null,
@@ -41,18 +42,16 @@ const getters = {
     shopifyRevenue: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_price)),
     shopifyShippingRevenue: state =>
-        _.sumBy(state.orders, order => {
-            console.log(order);
-            return _.sumBy(order.shipping_lines, line =>
-                parseFloat(line.price)
-            );
-        }),
+        _.sumBy(state.orders, order =>
+            _.sumBy(order.shipping_lines, line => parseFloat(line.price))
+        ),
 
     shopifyTotalTax: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_tax)),
     shopifyDiscounts: state =>
         _.sumBy(state.orders, order => parseFloat(order.total_discounts)),
-    shopifyAbandonedCartCount: state => state.shopifyAbandonedCart
+    shopifyAbandonedCartCount: state => state.shopifyAbandonedCart,
+    shopifyAverageUnitsPerOrder: state => state.shopifyAverageUnitsPerOrder
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -168,7 +167,7 @@ const actions = {
     },
     getNumberOfOrders: async ({ commit, state }) => {
         const numberOfOrders = state.orders.length;
-        console.log("Check this", numberOfOrders);
+
         commit("SET_NUMBER_OF_ORDERS", numberOfOrders);
     },
     getShopifyTotalInventory: async ({ commit }) => {
@@ -199,6 +198,15 @@ const actions = {
         } catch (err) {
             console.log({ err });
             commit("SET_ABANDONED_CART_COUNT", 0);
+        }
+    },
+    getAverageUnitsCount: async ({ commit }) => {
+        try {
+            const { data } = await axios.get("getavgunitperorder");
+            commit("SET_AVERAGE_UNITS_COUNT", data);
+        } catch (err) {
+            console.log({ err });
+            commit("SET_AVERAGE_UNITS_COUNT", 0);
         }
     },
     removeItemfromChangedProducts: ({ commit, dispatch }, product) => {
@@ -271,6 +279,9 @@ const mutations = {
     },
     SET_ABANDONED_CART_COUNT: (state, payload) => {
         state.shopifyAbandonedCart = payload;
+    },
+    SET_AVERAGE_UNITS_COUNT: (state, payload) => {
+        state.shopifyAverageUnitsPerOrder = payload;
     },
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = state.inventoryChangedProducts.filter(

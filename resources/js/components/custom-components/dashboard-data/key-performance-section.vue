@@ -4,6 +4,8 @@
             <h3>Key Performance Metrics</h3>
         </div>
         <AbandonedCart />
+        <AverageOrderValue />
+        <AverageUnitCount />
         <div
             v-for="performance of data"
             :key="performance.id"
@@ -20,6 +22,8 @@
 </template>
 <script>
 import AbandonedCart from "../../custom-components/stats-components/key-performance-section/abandoned-cart-component.vue";
+import AverageOrderValue from "../../custom-components/stats-components/key-performance-section/average-order-component.vue";
+import AverageUnitCount from "../../custom-components/stats-components/key-performance-section/average-units-component.vue";
 import Stat from "../../widgets/stat";
 import _ from "lodash";
 import { eventBus } from "../../../app";
@@ -42,28 +46,11 @@ import {
 import { mapGetters } from "vuex";
 
 export default {
-    components: { Stat, AbandonedCart },
+    components: { Stat, AbandonedCart, AverageOrderValue, AverageUnitCount },
     data() {
         return {
             totalProfitValue: 0,
             data: [
-                {
-                    id: 1,
-                    title: ABANDONED_CART,
-                    value: `0`,
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
-
-                {
-                    id: 2,
-                    title: AVERAGE_ORDER_VALUE,
-                    value: `0`,
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
                 {
                     id: 3,
                     title: AVERAGE_UNITS_PER_ORDER,
