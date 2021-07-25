@@ -31,23 +31,19 @@ export default {
     computed: {
         ...mapGetters(["hasShopifyStorePA", "shopifyAverageUnitsPerOrder"])
     },
-    methods: {
-        ...mapActions(["getAverageUnitsCount"])
-    },
+
     watch: {
         async hasShopifyStorePA() {
-            if (this.hasShopifyStorePA) {
-                await this.getAverageUnitsCount();
-                this.data.value = `${this.shopifyAverageUnitsPerOrder}`;
-                this.data.loading = false;
-            } else {
+            if (!this.hasShopifyStorePA) {
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
         shopifyAverageUnitsPerOrder(newVal, oldVal) {
-            this.data.value = `${newVal}`;
-            this.data.loading = false;
+            if (this.shopifyAverageUnitsPerOrder !== null) {
+                this.data.value = `${newVal}`;
+                this.data.loading = false;
+            }
         }
     }
 };

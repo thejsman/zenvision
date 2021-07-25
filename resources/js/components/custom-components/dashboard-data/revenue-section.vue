@@ -22,7 +22,7 @@ import OrderRevenue from "../stats-components/revenue-section/order-revenue-comp
 import ShippingRevenue from "../stats-components/revenue-section/shipping-revenue-component.vue";
 import TaxRevenue from "../stats-components/revenue-section/tax-revenue-component.vue";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { displayCurrency } from "../../../utils";
 
 export default {
@@ -32,13 +32,14 @@ export default {
         ShippingRevenue,
         TaxRevenue
     },
-
     computed: {
         ...mapGetters([
+            "hasShopifyStorePA",
             "shopifyRevenue",
             "shopifyShippingRevenue",
             "shopifyTotalTax",
-            "shopifyDiscounts"
+            "shopifyDiscounts",
+            "dateRangeS"
         ]),
         totalRevenue() {
             return displayCurrency(
@@ -47,6 +48,18 @@ export default {
                     this.shopifyTotalTax -
                     this.shopifyDiscounts
             );
+        }
+    },
+    methods: {
+        ...mapActions(["getDataAfterDateChange", "toggleLoadingStatus"])
+    },
+    watch: {
+        async dateRangeS() {
+            if (this.hasShopifyStorePA) {
+                this.toggleLoadingStatus(true);
+                await this.getDataAfterDateChange();
+                this.toggleLoadingStatus(false);
+            }
         }
     }
 };

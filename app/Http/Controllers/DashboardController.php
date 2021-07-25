@@ -151,15 +151,11 @@ class DashboardController extends Controller
         return $store_balance;
     }
 
-    public function getAvgUnitsPerOrder()
+    public function getAvgUnitsPerOrder(Request $request)
     {
-        $user = Auth::user();
-        $enabled_on_dashboard = $user->getEnabledShopifyStores();
-
-        $orders = ShopifyOrder::whereIn('store_id', $enabled_on_dashboard)->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->pluck('order_id');
-        if (count($orders)) {
-            $productsCount = ShopifyOrderProduct::whereIn('order_id', $orders)->sum('quantity');
-            return round($productsCount / count($orders), 2);
+        if (count($request->order_ids)) {
+            $productsCount = ShopifyOrderProduct::whereIn('order_id', $request->order_ids)->sum('quantity');
+            return round($productsCount / count($request->order_ids), 2);
         } else {
             return 0;
         }

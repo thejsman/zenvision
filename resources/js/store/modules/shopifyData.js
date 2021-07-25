@@ -98,7 +98,7 @@ const actions = {
             console.log(err);
         }
     },
-    getShopifyStoreOrders: async ({ commit, rootGetters }) => {
+    getShopifyStoreOrders: async ({ commit, dispatch, rootGetters }) => {
         try {
             const { data } = await axios.get("shopify-orders", {
                 params: {
@@ -108,6 +108,7 @@ const actions = {
             });
 
             commit("SET_SHOPIFY_ORDERS", data);
+            dispatch("getAverageUnitsCount");
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ORDERS", []);
@@ -200,14 +201,27 @@ const actions = {
             commit("SET_ABANDONED_CART_COUNT", 0);
         }
     },
-    getAverageUnitsCount: async ({ commit }) => {
+    getAverageUnitsCount: async ({ commit, state }) => {
         try {
-            const { data } = await axios.get("getavgunitperorder");
-            commit("SET_AVERAGE_UNITS_COUNT", data);
+            const order_ids = state.orders.map(order => order.order_id);
+
+            if (order_ids.length > 0) {
+                const { data } = await axios.get("getavgunitperorder", {
+                    params: {
+                        order_ids
+                    }
+                });
+                commit("SET_AVERAGE_UNITS_COUNT", data);
+            } else {
+                commit("SET_AVERAGE_UNITS_COUNT", 0);
+            }
         } catch (err) {
             console.log({ err });
             commit("SET_AVERAGE_UNITS_COUNT", 0);
         }
+    },
+    getDataAfterDateChange: async ({ commit, dispatch }) => {
+        await dispatch("getShopifyStoreOrders");
     },
     removeItemfromChangedProducts: ({ commit, dispatch }, product) => {
         commit("REMOVE_ITEM_FORM_CHANGED_PRODUCTS", product);
@@ -232,9 +246,7 @@ const mutations = {
         }
     },
     SET_SHOPIFY_ORDERS: (state, payload) => {
-        if (payload.length > 0) {
-            state.orders = payload;
-        }
+        state.orders = payload;
     },
     SET_SHOPIFY_ALL_ORDERS: (state, payload) => {
         if (payload.length > 0) {

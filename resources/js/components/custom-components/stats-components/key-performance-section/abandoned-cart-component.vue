@@ -29,7 +29,11 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["hasShopifyStorePA", "shopifyAbandonedCartCount"])
+        ...mapGetters([
+            "hasShopifyStorePA",
+            "shopifyAbandonedCartCount",
+            "dateRangeS"
+        ])
     },
     methods: {
         ...mapActions(["getAbandonedCartCount"])
@@ -48,6 +52,13 @@ export default {
         shopifyAbandonedCartCount(newVal, oldVal) {
             this.data.loading = false;
             this.data.value = `${newVal}`;
+        },
+        async dateRangeS() {
+            if (this.hasShopifyStorePA) {
+                this.data.loading = true;
+                await this.getAbandonedCartCount();
+                this.data.loading = false;
+            }
         }
     }
 };
