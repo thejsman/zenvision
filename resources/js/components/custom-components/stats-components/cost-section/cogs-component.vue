@@ -61,18 +61,23 @@ export default {
     watch: {
         hasShopifyStorePA() {
             if (!this.hasShopifyStorePA) {
+                console.log("check this", this.hasShopifyStorePA);
                 this.data.loading = false;
                 this.data.value = "-";
             }
         },
         ShopifyCogsTotalPA() {
-            this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
+            if (this.hasShopifyStorePA) {
+                this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
+            }
         },
         async shopifyOrders(newVal, oldVal) {
-            this.data.loading = true;
-            await this.getShopifyCogsTotalPA();
-            this.data.loading = false;
-            this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
+            if (this.hasShopifyStorePA) {
+                this.data.loading = true;
+                await this.getShopifyCogsTotalPA();
+                this.data.loading = false;
+                this.data.value = displayCurrency(this.ShopifyCogsTotalPA);
+            }
         }
     }
 };
