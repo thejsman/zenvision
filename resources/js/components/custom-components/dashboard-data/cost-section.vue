@@ -4,9 +4,14 @@
             <h3>Cost</h3>
             <h3>{{ totalCost }}</h3>
         </div>
-        <CogsComponent />
-        <ShopifyDiscounts />
-        <ShopifyRefunds />
+        <div class="col-12">
+            <div class="row">
+                <CogsComponent />
+                <ShopifyDiscounts />
+                <ShopifyRefunds />
+            </div>
+        </div>
+        <ChargebackComponent />
         <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
             <Stat
                 :title="cost.title"
@@ -43,6 +48,7 @@ import { mapGetters, mapActions } from "vuex";
 import CogsComponent from "../stats-components/cost-section/cogs-component.vue";
 import ShopifyDiscounts from "../stats-components/cost-section/shopify-discounts-component.vue";
 import ShopifyRefunds from "../stats-components/cost-section/shopify-refunds-component.vue";
+import ChargebackComponent from "../stats-components/cost-section/chargeback-component.vue";
 
 import {
     displayCurrency,
@@ -78,7 +84,8 @@ export default {
         CogsModal,
         CogsComponent,
         ShopifyDiscounts,
-        ShopifyRefunds
+        ShopifyRefunds,
+        ChargebackComponent
     },
     data() {
         return {
