@@ -35,6 +35,7 @@ class GoogleAdController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
+        dd($result);
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
@@ -139,15 +140,12 @@ class GoogleAdController extends Controller
                     if (count($stats)) {
                         array_push($google_ads_data, $stats);
                     }
-
                 } else {
                     $stats = $this->fetchAdStats($account->access_token, $account->ad_account_id, $start_date, $end_date);
                     if (count($stats)) {
                         array_push($google_ads_data, $stats);
                     }
-
                 }
-
             }
         }
         return $google_ads_data;
@@ -214,7 +212,6 @@ class GoogleAdController extends Controller
             } else {
                 return [];
             }
-
         } else {
 
             curl_close($ch);
