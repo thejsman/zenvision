@@ -3,7 +3,6 @@ import Vue from "vue";
 import shopifyData from "./modules/shopifyData";
 import dateRange from "./modules/dateRange";
 import channelStatus from "./modules/channelStatus";
-import keyPerformance from "./modules/keyPerformance";
 import StripeAccount from "./modules/stripeAccount";
 import MasterSheet from "./modules/masterSheet";
 import BankAccount from "./modules/bankAccount";
@@ -18,7 +17,6 @@ export default new Vuex.Store({
         shopifyData,
         dateRange,
         channelStatus,
-        keyPerformance,
         StripeAccount,
         MasterSheet,
         BankAccount,

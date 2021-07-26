@@ -13,11 +13,16 @@ const state = {
 const getters = {
     startDateS: state => state.startDateS,
     endDateS: state => state.endDateS,
+    dateRangeS: state => ({
+        startDate: state.startDateS,
+        endDate: state.endDateS
+    }),
     transStartDate: state => state.transStartDate,
     transEndDate: state => state.transEndDate
 };
 const actions = {
     updateDateRange({ commit }, payload) {
+        console.log({ payload });
         commit("updateDateRange", payload);
     },
     setNextDatesForTransactions: ({ commit }) => {

@@ -7,7 +7,7 @@ const state = {
     stripeAccountsBalance: 0,
     stripeTransactionsArray: [],
     stripeChargebackArray: [],
-    stripeChargebackTotal: 0
+    stripeChargebackTotal: null
 };
 const getters = {
     hasStripeAccountCS: state => state.hasStripeAccount,
@@ -23,14 +23,28 @@ const actions = {
         commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", payload);
     },
     getStripeAccounts: async ({ commit, dispatch }) => {
-        const result = await axios.get("getstripeaccounts");
-        if (result.data.length > 0) {
-            commit("SET_STRIPE_ACCOUNT", result.data);
+        const { data } = await axios.get("getstripeaccounts");
+
+        if (data.length > 0) {
+            commit("SET_STRIPE_ACCOUNT", data);
             dispatch("getStripeBalance");
-            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", true, { root: true });
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", true);
         } else {
             commit("SET_STRIPE_ACCOUNT", []);
-            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false, { root: true });
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false);
+        }
+    },
+    getStripeAccountsPA: async ({ commit, dispatch }) => {
+        const { data } = await axios.get("stripe-accounts");
+
+        if (data.length > 0) {
+            commit("SET_STRIPE_ACCOUNT", data);
+            const status = data.map(element => element.enabled_on_dashboard);
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", status.includes(true));
+            dispatch("getStripeChargeBack");
+        } else {
+            commit("SET_STRIPE_ACCOUNT", []);
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false);
         }
     },
     getStripeBalance: async ({ commit }) => {
@@ -73,6 +87,7 @@ const actions = {
                     e_date: `${rootGetters.endDateS} 23:59:59`
                 }
             });
+
             const ChargebackArray = data.filter(
                 sc => sc.status === "charge_refunded" || sc.status === "lost"
             );
@@ -102,9 +117,8 @@ const actions = {
     }
 };
 const mutations = {
-    TOGGGLE_STRIPE_ACCOUNT_STATUS: (state, status) => {
-        state.hasStripeAccount = status;
-        state.stripeFirstLoad = !state;
+    TOGGGLE_STRIPE_ACCOUNT_STATUS: (state, payload) => {
+        state.hasStripeAccount = payload;
     },
     SET_STRIPE_ACCOUNT: (state, payload) => {
         state.stripeAccounts = payload;

@@ -126,7 +126,6 @@ class ShopifyStoreController extends Controller
                 } else {
                     return redirect()->route('home', ['shopifyAddAccount' => 'success']);
                 }
-
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
                     // 'user_id' => Auth::user()->id,
@@ -285,5 +284,19 @@ class ShopifyStoreController extends Controller
         } else {
             return ["disputes" => []];
         }
+    }
+
+    public function getRefundTotal(Request $request)
+    {
+        $user = Auth::user();
+        $enabled_on_dashboard = $user->getEnabledShopifyStores();
+
+        $refund_total = 0;
+        foreach ($enabled_on_dashboard as $store_id) {
+            $store = ShopifyStore::find($store_id);
+
+            $refund_total += $store->getRefundTotal($request->start_date, $request->end_date);
+        }
+        return $refund_total;
     }
 }

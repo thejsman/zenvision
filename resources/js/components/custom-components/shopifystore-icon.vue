@@ -29,7 +29,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "StoreIcon",
     data() {
@@ -37,7 +37,7 @@ export default {
             stores: []
         };
     },
-
+    computed: { ...mapGetters(["currentChannel"]) },
     props: {
         disableFeature: {
             type: Boolean,
@@ -52,7 +52,8 @@ export default {
         ...mapActions([
             "removeShopifyAccount",
             "getShopifyStores",
-            "toggleLoadingStatus"
+            "toggleLoadingStatus",
+            "getShopifyCogsTotalPA"
         ]),
         async getStores() {
             try {
@@ -74,13 +75,16 @@ export default {
         },
         async handleClick(store) {
             try {
-                eventBus.$emit("setLoadingTrue");
+                this.toggleLoadingStatus(true);
                 await axios.patch("shopifystore", store);
+                await this.getShopifyStores(this.currentChannel);
                 eventBus.$emit("toggleShopifyStore");
-                eventBus.$emit("setLoadingFalse");
+
+                this.toggleLoadingStatus(false);
+                // to remove below line
                 this.getStores();
             } catch (error) {
-                eventBus.$emit("setLoadingFalse");
+                this.toggleLoadingStatus(false);
                 console.log(error);
             }
         },
@@ -90,7 +94,7 @@ export default {
                 eventBus.$emit("setLoadingTrue");
                 await axios.patch("shopifystoredelete", store);
                 await this.removeShopifyAccount(store);
-                await this.getShopifyStores("MS");
+                await this.getShopifyStores(this.currentChannel);
                 eventBus.$emit("toggleShopifyStore");
                 eventBus.$emit("setLoadingFalse");
                 this.getStores();

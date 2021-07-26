@@ -19,7 +19,11 @@ class StripeController extends Controller
         $user = Auth::user();
         return $user->getStripeAccounts();
     }
-
+    public function getStripeAccountsForPA()
+    {
+        $user = Auth::user();
+        return $user->getStripeAccounts();
+    }
     public function store(Request $request)
     {
         $params = $request->query();

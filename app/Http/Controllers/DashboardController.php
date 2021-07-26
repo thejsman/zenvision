@@ -29,7 +29,6 @@ class DashboardController extends Controller
             $store = ShopifyStore::find($store_id);
             $numberOfProducts += $store->getOrderedProductCount();
             $orders = array_merge($orders, $store->getOrders($request->start_date, $request->end_date)->toArray());
-            $refundTotal += $store->getRefundTotal();
         }
 
         return [
@@ -44,13 +43,15 @@ class DashboardController extends Controller
 
     public function getShopifyStoreOrders(Request $request)
     {
+
         $user = Auth::user();
         $enabled_on_dashboard = $user->getEnabledShopifyStores();
         $orders = [];
         foreach ($enabled_on_dashboard as $store_id) {
             $store = ShopifyStore::find($store_id);
-            $orders = array_merge($orders, $store->getOrders($request->start_date, $request->end_date)->toArray());
+            $orders = array_merge($orders, $store->getOrders($request->s_date, $request->e_date)->toArray());
         }
+
         return $orders;
     }
     public function getShopifyStoreAllOrders(Request $request)
@@ -149,15 +150,11 @@ class DashboardController extends Controller
         return $store_balance;
     }
 
-    public function getAvgUnitsPerOrder()
+    public function getAvgUnitsPerOrder(Request $request)
     {
-        $user = Auth::user();
-        $enabled_on_dashboard = $user->getEnabledShopifyStores();
-
-        $orders = ShopifyOrder::whereIn('store_id', $enabled_on_dashboard)->where('is_deleted', false)->whereIn('financial_status', ['paid', 'pending', 'partially_paid'])->pluck('order_id');
-        if (count($orders)) {
-            $productsCount = ShopifyOrderProduct::whereIn('order_id', $orders)->sum('quantity');
-            return round($productsCount / count($orders), 2);
+        if (count($request->order_ids)) {
+            $productsCount = ShopifyOrderProduct::whereIn('order_id', $request->order_ids)->sum('quantity');
+            return round($productsCount / count($request->order_ids), 2);
         } else {
             return 0;
         }

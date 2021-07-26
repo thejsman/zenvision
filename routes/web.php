@@ -51,10 +51,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('shopify-orders', 'DashboardController@getShopifyStoreOrders');
     Route::get('shopify-allorders', 'DashboardController@getShopifyStoreAllOrders');
 
+
     Route::patch('shopifystore', 'ShopifyStoreController@toggleStore');
     Route::patch('shopifystoredelete', 'ShopifyStoreController@destroy');
     Route::get('getshopifydisputes', 'ShopifyStoreController@getDisputes');
-
+    Route::get('shopify-refunds', 'ShopifyStoreController@getRefundTotal');
     //Subscription Cost APIs
     Route::get('subscriptioncost', 'SubscriptionCostController@index');
     Route::post('subscriptioncost', 'SubscriptionCostController@store');
@@ -73,6 +74,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Stripe
     Route::get('getstripeaccounts', 'StripeController@index');
+    Route::get('stripe-accounts', 'StripeController@getStripeAccountsForPA');
     Route::get('stripeconnect', 'StripeController@store');
 
     Route::get('stripeconnect-chargeback', 'StripeController@getStripeChargebacks');

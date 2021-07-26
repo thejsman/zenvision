@@ -7,7 +7,7 @@
             :maxDate="maxDate"
             :locale-data="{ firstDay: 1, format: 'mm-dd-yyyy' }"
             v-model="dateRange"
-            @update="selectDate"
+            @update="handleDateChange"
             :dateFormat="dateFormat"
             :ranges="false"
         >
@@ -17,22 +17,19 @@
 <script>
 import DateRangePicker from "vue2-daterange-picker";
 import moment from "moment";
-import { eventBus } from "../../app";
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     components: { DateRangePicker },
-
     data() {
         return {
             opens: "left",
             startDateSelected: moment().subtract(1, "month")
         };
     },
-
     computed: {
-        ...mapGetters(["startDateS", "endDateS"]),
+        ...mapGetters(["startDateS", "endDateS", "dateRangeS"]),
         maxDate() {
             return moment(this.startDateSelected)
                 .add("3", "months")
@@ -40,12 +37,11 @@ export default {
         },
         dateRange: {
             get() {
-                return {
-                    startDate: this.startDateS,
-                    endDate: this.endDateS
-                };
+                return this.dateRangeS;
             },
-            set() {}
+            set(value) {
+                this.updateDateRange(value);
+            }
         }
     },
     methods: {
@@ -59,10 +55,8 @@ export default {
             }
             return classes;
         },
-        selectDate(date) {
-            this.updateDateRange(date);
-
-            eventBus.$emit("changeDateRange", this.dateRange);
+        handleDateChange() {
+            // console.log("we will handle date change here");
         }
     }
 };

@@ -140,7 +140,12 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["startDateS", "endDateS", "stripeChargebackArray"])
+        ...mapGetters([
+            "startDateS",
+            "endDateS",
+            "stripeChargebackArray",
+            "shopifyOrders"
+        ])
     },
     created() {
         //Stripe
@@ -235,7 +240,7 @@ export default {
 
             let dayArray = [];
             dates.map(day => {
-                const sum = _.sumBy(this.chartData, order => {
+                const sum = _.sumBy(this.shopifyOrders, order => {
                     if (
                         moment(order.created_on_shopify).format(
                             "YYYY-MM-DD"
@@ -394,15 +399,10 @@ export default {
         }
     },
     mounted() {},
-    props: {
-        chartData: {
-            type: Array,
-            default: () => []
-        }
-    },
+
     watch: {
-        chartData(value, newValue) {
-            this.assignData(this.chartData);
+        shopifyOrders() {
+            this.assignData();
         },
         stripeChargebackArray(stripeChargeback, oldVal) {
             console.log("we have received chargeback event");
