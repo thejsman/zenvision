@@ -12,6 +12,7 @@
             </div>
         </div>
         <ChargebackComponent />
+        <!-- <MerchantFeeComponent /> -->
         <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
             <Stat
                 :title="cost.title"
@@ -49,6 +50,7 @@ import CogsComponent from "../stats-components/cost-section/cogs-component.vue";
 import ShopifyDiscounts from "../stats-components/cost-section/shopify-discounts-component.vue";
 import ShopifyRefunds from "../stats-components/cost-section/shopify-refunds-component.vue";
 import ChargebackComponent from "../stats-components/cost-section/chargeback-component.vue";
+import MerchantFeeComponent from "../stats-components/cost-section/merchant-fee-component.vue";
 
 import {
     displayCurrency,
@@ -85,7 +87,8 @@ export default {
         CogsComponent,
         ShopifyDiscounts,
         ShopifyRefunds,
-        ChargebackComponent
+        ChargebackComponent,
+        MerchantFeeComponent
     },
     data() {
         return {
@@ -226,19 +229,12 @@ export default {
         }
     },
     props: {
-        costData: {
-            type: Array,
-            default: () => []
-        },
         refundTotal: {
             type: Number,
             default: 0
         }
     },
     watch: {
-        costData(value, newValue) {
-            this.assignData(this.refundTotal, this.costData);
-        },
         firstLoadStripe(value, newValue) {
             if (this.firstLoadStripe === true) {
                 const objIndex = this.data.findIndex(obj => obj.id === 5);
@@ -248,6 +244,7 @@ export default {
                 this.data[objIndexCB].loading = true;
             } else {
                 // this.getStripeTransactions();
+
                 this.stripeMerchantFee();
                 this.getChargebackTotal();
                 // window.location.href = "/";
@@ -269,6 +266,7 @@ export default {
 
             if (this.hasStripeAccountCS && !this.firstLoadStripe) {
                 this.getStripeTransactions();
+
                 this.stripeMerchantFee();
                 this.getChargebackTotal();
             } else {
@@ -286,7 +284,6 @@ export default {
                     eventBus.$emit("stripeChargebackEvent", []);
 
                     if (this.hasStripeAccountCS) {
-                        console.log("this is causing the issue");
                         updateDataMerchantFee(
                             this.data,
                             CHARGEBACKS_TOTAL,
@@ -299,7 +296,6 @@ export default {
             }
         },
         stripeChargebackTotal(newVal, oldVal) {
-            console.log("value changed", newVal);
             updateData(
                 this.data,
                 CHARGEBACKS_TOTAL,
@@ -318,6 +314,10 @@ export default {
     },
     async created() {
         this.getStripeTransactions();
+        this.getSubscriptionData();
+        eventBus.$on("stripeAccountToggleStatus", () => {
+            this.stripeMerchantFee();
+        });
         eventBus.$on("updateSubscription", async () => {
             await this.getSubscriptionData();
         });
@@ -399,31 +399,49 @@ export default {
         });
     },
     methods: {
-        ...mapActions(["getStripeChargeBack"]),
+        ...mapActions([
+            "getStripeChargeBack",
+            "setMerchantFeeTotal",
+            "setSubscriptionTotal"
+        ]),
+
         async stripeMerchantFee() {
-            this.stripeFeeTotal = 0;
+            if (this.hasStripeAccountCS) {
+                this.stripeFeeTotal = 0;
 
-            try {
-                const result = await axios.post("stripeaccount-merchantfee2", {
-                    s_date: moment.utc(this.startDateS).tz("America/New_York"),
-                    e_date: moment.utc(this.endDateS).tz("America/New_York")
-                });
-                const { data } = result;
-
-                if (data === "") {
-                    // run some trigger function
-                    this.checkStripeReportStatus2();
-                } else {
-                    //set Stripe merchant fee
-                    this.stripeFeeTotal = parseFloat(Math.abs(data));
-                    updateDataMerchantFee(
-                        this.data,
-                        MERCHANT_FEE,
-                        displayCurrency(data)
+                try {
+                    const result = await axios.post(
+                        "stripeaccount-merchantfee2",
+                        {
+                            s_date: moment
+                                .utc(this.startDateS)
+                                .tz("America/New_York"),
+                            e_date: moment
+                                .utc(this.endDateS)
+                                .tz("America/New_York")
+                        }
                     );
+                    const { data } = result;
+
+                    if (data === "") {
+                        // run some trigger function
+                        this.checkStripeReportStatus2();
+                    } else {
+                        //set Stripe merchant fee
+                        this.stripeFeeTotal = parseFloat(Math.abs(data));
+                        this.setMerchantFeeTotal(this.stripeFeeTotal);
+                        updateDataMerchantFee(
+                            this.data,
+                            MERCHANT_FEE,
+                            displayCurrency(this.stripeFeeTotal)
+                        );
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
-            } catch (error) {
-                console.log(error);
+            } else {
+                this.setMerchantFeeTotal(0);
+                updateDataMerchantFee(this.data, MERCHANT_FEE, "-");
             }
         },
 
@@ -458,6 +476,7 @@ export default {
                 const { data } = result;
                 if (data !== "") {
                     this.stripeFeeTotal = parseFloat(Math.abs(data.stripe_fee));
+                    this.setMerchantFeeTotal(this.stripeFeeTotal);
                     clearInterval(this.timer);
                 }
             }, 5000);
@@ -536,11 +555,12 @@ export default {
         },
         async getSubscriptionData() {
             try {
-                const result = await axios.get("/subscriptioncost");
-                const { data } = result;
+                const { data } = await axios.get("/subscriptioncost");
+                console.log({ data });
                 if (data.length > 0) {
                     const subTotal2 = this.getSubscriptionTotal(data);
                     this.subscriptionData = subTotal2;
+                    this.setSubscriptionTotal(subTotal2);
                     this.updateSubscriptionData(
                         this.data,
                         SUBSCRIPTION_COST,
@@ -549,6 +569,7 @@ export default {
                     );
                 } else {
                     this.subscriptionData = 0;
+                    this.setSubscriptionTotal(0);
                     this.updateSubscriptionData(
                         this.data,
                         SUBSCRIPTION_COST,
@@ -557,6 +578,7 @@ export default {
                     );
                 }
             } catch (error) {
+                this.setSubscriptionTotal(0);
                 this.updateSubscriptionData(
                     this.data,
                     SUBSCRIPTION_COST,
@@ -729,15 +751,15 @@ export default {
             // if (this.hasStripeAccountCS && !this.firstLoadStripe) {
             //     await this.getStripeTransactions();
             // }
-            setTimeout(() => {
-                updateData(
-                    this.data,
-                    MERCHANT_FEE,
-                    this.anyActiveAccount
-                        ? displayCurrency(this.totalMerchantFees)
-                        : "-"
-                );
-            }, 500);
+            // setTimeout(() => {
+            //     updateData(
+            //         this.data,
+            //         MERCHANT_FEE,
+            //         this.anyActiveAccount
+            //             ? displayCurrency(this.totalMerchantFees)
+            //             : "-"
+            //     );
+            // }, 500);
         },
         async getPaypalTransactionsTotal(s_date, e_date) {
             this.paypalFeeTotal = 0;
@@ -889,7 +911,9 @@ export default {
                 updateDataMerchantFee(
                     this.data,
                     MERCHANT_FEE,
-                    displayCurrency(this.totalMerchantFees)
+                    this.anyActiveAccount
+                        ? displayCurrency(this.totalMerchantFees)
+                        : "-"
                 );
             }
         },
