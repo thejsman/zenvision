@@ -24,11 +24,24 @@ const actions = {
     },
     getStripeAccounts: async ({ commit, dispatch }) => {
         const { data } = await axios.get("getstripeaccounts");
-        console.log({ data });
+
         if (data.length > 0) {
             commit("SET_STRIPE_ACCOUNT", data);
             dispatch("getStripeBalance");
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", true);
+        } else {
+            commit("SET_STRIPE_ACCOUNT", []);
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false);
+        }
+    },
+    getStripeAccountsPA: async ({ commit, dispatch }) => {
+        const { data } = await axios.get("stripe-accounts");
+
+        if (data.length > 0) {
+            commit("SET_STRIPE_ACCOUNT", data);
+            const status = data.map(element => element.enabled_on_dashboard);
+            commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", status.includes(true));
+            dispatch("getStripeChargeBack");
         } else {
             commit("SET_STRIPE_ACCOUNT", []);
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false);
@@ -74,6 +87,7 @@ const actions = {
                     e_date: `${rootGetters.endDateS} 23:59:59`
                 }
             });
+
             const ChargebackArray = data.filter(
                 sc => sc.status === "charge_refunded" || sc.status === "lost"
             );

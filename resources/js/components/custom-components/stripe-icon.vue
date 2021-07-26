@@ -58,12 +58,13 @@ export default {
         this.getStripeTransactions();
     },
     computed: {
-        ...mapGetters(["stripeAccounts"])
+        ...mapGetters(["stripeAccounts", "currentChannel"])
     },
     methods: {
         ...mapActions([
             "removeStripeAccount",
             "getStripeAccounts",
+            "getStripeAccountsPA",
             "toggleLoadingStatus",
             "getStripeTransactions"
         ]),
@@ -89,7 +90,12 @@ export default {
             try {
                 this.toggleLoadingStatus(true);
                 await axios.patch("stripeconnect", account);
-                await this.getStripeAccounts();
+                if (this.currentChannel === "PA") {
+                    this.getStripeAccountsPA();
+                } else {
+                    await this.getStripeAccounts();
+                }
+
                 this.toggleLoadingStatus(false);
             } catch (error) {
                 this.toggleLoadingStatus(false);

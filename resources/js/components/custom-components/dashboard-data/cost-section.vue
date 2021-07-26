@@ -701,7 +701,7 @@ export default {
         },
         async getChargebackTotal() {
             this.totalChargeback = 0;
-            this.getStripeChargeBack();
+            // this.getStripeChargeBack();
             try {
                 //Shopify Chargebacks
                 if (this.hasShopifyStoreCS) {

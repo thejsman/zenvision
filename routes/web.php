@@ -74,6 +74,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Stripe
     Route::get('getstripeaccounts', 'StripeController@index');
+    Route::get('stripe-accounts', 'StripeController@getStripeAccountsForPA');
     Route::get('stripeconnect', 'StripeController@store');
 
     Route::get('stripeconnect-chargeback', 'StripeController@getStripeChargebacks');

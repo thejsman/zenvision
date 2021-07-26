@@ -11,7 +11,7 @@
 
 <script>
 import Stat from "../../../widgets/stat";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { CHARGEBACKS_TOTAL } from "../../../../constants";
 import { displayCurrency } from "../../../../utils";
 export default {
@@ -33,7 +33,8 @@ export default {
             "hasShopifyStorePA",
             "shopifyRefundTotal",
             "hasStripeAccountCS",
-            "stripeChargebackTotal"
+            "stripeChargebackTotal",
+            "dateRangeS"
         ]),
         anyActiveChannel() {
             return this.hasShopifyStorePA || this.hasStripeAccountCS;
@@ -42,18 +43,21 @@ export default {
             return this.stripeChargebackTotal;
         }
     },
+    methods: {
+        ...mapActions(["getStripeChargeBack"])
+    },
     watch: {
-        anyActiveChannel() {
-            console.log(
-                "check this",
-                this.hasShopifyStorePA || this.hasStripeAccountCS
-            );
-            if (this.anyActiveChannel) {
+        anyActiveChannel(newVal, oldVal) {
+            if (!newVal) {
                 this.data.value = "-";
+                this.data.loading = false;
+            } else {
+                this.data.value = displayCurrency(
+                    `${this.stripeChargebackTotal}`
+                );
                 this.data.loading = false;
             }
         },
-
         stripeChargebackTotal() {
             if (this.anyActiveChannel) {
                 if (this.stripeChargebackTotal !== null) {
@@ -66,6 +70,19 @@ export default {
                 this.data.value = "-";
                 this.data.loading = false;
             }
+        },
+        async hasStripeAccountCS() {
+            if (this.hasStripeAccountCS) {
+                await this.getStripeChargeBack();
+            }
+        },
+        async dateRangeS() {
+            this.data.loading = true;
+            if (this.hasStripeAccountCS) {
+                await this.getStripeChargeBack();
+            }
+
+            this.data.loading = false;
         }
     }
 };
