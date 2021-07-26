@@ -79,6 +79,7 @@
                                 name="firstname"
                                 type="text"
                                 placeholder="First name"
+                                autocomplete="off"
                                 required
                             ></b-form-input>
                         </b-form-group>
@@ -89,6 +90,7 @@
                                 name="lastname"
                                 type="text"
                                 placeholder="Last name"
+                                autocomplete="off"
                                 required
                             ></b-form-input>
                         </b-form-group>
@@ -101,6 +103,7 @@
                                 v-model="email"
                                 type="email"
                                 placeholder="Enter email"
+                                autocomplete="off"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
@@ -119,6 +122,7 @@
                                 name="phone"
                                 type="tel"
                                 placeholder="Phone number"
+                                autocomplete="off"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
@@ -138,6 +142,7 @@
                                 name="password"
                                 type="password"
                                 placeholder="Enter password"
+                                autocomplete="off"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
