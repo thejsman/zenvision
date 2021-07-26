@@ -32,15 +32,28 @@ export default {
             "shopifyDiscounts",
             "shopifyShippingRevenue",
             "ShopifyCogsTotalPA",
-            "shopifyRefundTotal"
+            "shopifyRefundTotal",
+            "stripeMerchantFeeTotal",
+            "subscriptionTotal"
         ]),
         totalProfit() {
+            console.log(
+                this.shopifyRevenue,
+                this.shopifyShippingRevenue,
+                this.shopifyDiscounts,
+                this.ShopifyCogsTotalPA,
+                this.shopifyRefundTotal,
+                this.stripeMerchantFeeTotal,
+                this.subscriptionTotal
+            );
             return displayCurrency(
                 this.shopifyRevenue +
                     this.shopifyShippingRevenue -
                     this.shopifyDiscounts -
                     this.ShopifyCogsTotalPA -
-                    this.shopifyRefundTotal
+                    this.shopifyRefundTotal -
+                    this.stripeMerchantFeeTotal -
+                    this.subscriptionTotal
             );
         }
     }

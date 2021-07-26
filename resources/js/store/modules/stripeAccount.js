@@ -7,7 +7,8 @@ const state = {
     stripeAccountsBalance: 0,
     stripeTransactionsArray: [],
     stripeChargebackArray: [],
-    stripeChargebackTotal: null
+    stripeChargebackTotal: null,
+    merchantFeeTotal: null
 };
 const getters = {
     hasStripeAccountCS: state => state.hasStripeAccount,
@@ -16,7 +17,8 @@ const getters = {
     stripeAccountsBalance: state => state.stripeAccountsBalance / 100,
     stripeFirstLoad: state => state.stripeFirstLoad,
     stripeChargebackTotal: state => state.stripeChargebackTotal,
-    stripeChargebackArray: state => state.stripeChargebackArray
+    stripeChargebackArray: state => state.stripeChargebackArray,
+    stripeMerchantFeeTotal: state => state.merchantFeeTotal
 };
 const actions = {
     toggleStripeAccountStatus: ({ commit }, payload) => {
@@ -42,8 +44,11 @@ const actions = {
             const status = data.map(element => element.enabled_on_dashboard);
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", status.includes(true));
             dispatch("getStripeChargeBack");
+            dispatch("getStripeTransactions");
         } else {
             commit("SET_STRIPE_ACCOUNT", []);
+            commit("SET_STRIPE_CHARGEBACK_TOTAL", 0);
+            commit("SET_STRIPE_TRANSACTIONS", []);
             commit("TOGGGLE_STRIPE_ACCOUNT_STATUS", false);
         }
     },
@@ -76,6 +81,8 @@ const actions = {
         );
         if (stripeTransactions.length > 0) {
             commit("SET_STRIPE_TRANSACTIONS", stripeTransactions);
+        } else {
+            commit("SET_STRIPE_TRANSACTIONS", []);
         }
     },
     getStripeChargeBack: async ({ commit, rootGetters }) => {
@@ -106,6 +113,9 @@ const actions = {
             console.log({ err });
         }
     },
+    setMerchantFeeTotal: async ({ commit }, payload) => {
+        commit("SET_MERCHANT_FEE_TOTAL", payload);
+    },
     removeStripeAccount: async ({ commit, dispatch }, account) => {
         try {
             await axios.patch("stripeconnectdelete", account);
@@ -133,6 +143,9 @@ const mutations = {
 
     SET_STRIPE_CHARGEBACK_TOTAL: (state, payload) =>
         (state.stripeChargebackTotal = payload),
+    SET_MERCHANT_FEE_TOTAL: (state, payload) => {
+        state.merchantFeeTotal = payload;
+    },
     REMOVE_STRIPE_ACCOUNT: (state, payload) => {
         const filteredAccounts = state.stripeAccounts.filter(
             account => account.stripe_user_id !== payload.stripe_user_id

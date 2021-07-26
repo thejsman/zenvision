@@ -91,7 +91,8 @@ export default {
                 this.toggleLoadingStatus(true);
                 await axios.patch("stripeconnect", account);
                 if (this.currentChannel === "PA") {
-                    this.getStripeAccountsPA();
+                    await this.getStripeAccountsPA();
+                    eventBus.$emit("stripeAccountToggleStatus");
                 } else {
                     await this.getStripeAccounts();
                 }

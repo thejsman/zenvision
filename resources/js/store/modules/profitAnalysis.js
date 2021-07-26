@@ -1,5 +1,9 @@
-const state = {};
-const getters = {};
+const state = {
+    subscriptionTotal: null
+};
+const getters = {
+    subscriptionTotal: state => state.subscriptionTotal
+};
 const actions = {
     loadAllChannelsPA: async ({ dispatch }) => {
         await Promise.allSettled([
@@ -8,12 +12,19 @@ const actions = {
         ]);
 
         dispatch("toggleLoadingStatus", false, { root: true });
+    },
+    setSubscriptionTotal: async ({ commit }, payload) => {
+        commit("SET_SUBSCRIPTION_TOTAL", payload);
     }
 };
-const mutations = {};
+const mutations = {
+    SET_SUBSCRIPTION_TOTAL: (state, payload) => {
+        state.subscriptionTotal = payload;
+    }
+};
 
 export default {
-    namespaced: true,
+    // namespaced: true,
     state,
     getters,
     actions,

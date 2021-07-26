@@ -177,7 +177,7 @@ export default {
     },
     methods: {
         // ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
-        ...mapActions("ProfitAnalysis", ["loadAllChannelsPA"]),
+        ...mapActions(["loadAllChannelsPA"]),
 
         showModal(modalId) {
             this.$bvModal.show(modalId);
