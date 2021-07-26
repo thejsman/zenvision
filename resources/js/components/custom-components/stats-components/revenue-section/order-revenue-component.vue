@@ -42,8 +42,10 @@ export default {
             }
         },
         shopifyRevenue(newVal, oldVal) {
-            this.data.loading = false;
-            this.data.value = displayCurrency(`${newVal}`);
+            if (this.hasShopifyStorePA) {
+                this.data.loading = false;
+                this.data.value = displayCurrency(`${newVal}`);
+            }
         }
     }
 };

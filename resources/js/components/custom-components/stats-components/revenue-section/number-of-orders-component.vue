@@ -32,7 +32,7 @@ export default {
         ...mapGetters(["hasShopifyStorePA", "numberOfOrders"])
     },
     watch: {
-        hasShopifyStorePA() {
+        hasShopifyStorePA(newVal, oldVal) {
             if (this.hasShopifyStorePA) {
                 this.data.loading = false;
                 this.data.value = `${this.numberOfOrders}`;
@@ -42,8 +42,10 @@ export default {
             }
         },
         numberOfOrders(newVal, oldVal) {
-            this.data.loading = false;
-            this.data.value = `${newVal}`;
+            if (this.hasShopifyStorePA) {
+                this.data.loading = false;
+                this.data.value = `${newVal}`;
+            }
         }
     }
 };

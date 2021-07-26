@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-4 mt-md-0">
+    <div class="col-md-4 mt-4 mt-md-2">
         <Stat
             :title="data.title"
             :value="data.value"

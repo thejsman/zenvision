@@ -102,14 +102,6 @@ export default {
             firstLoadStripe: false,
             data: [
                 {
-                    id: 4,
-                    title: CHARGEBACKS_TOTAL,
-                    value: `0`,
-                    loading: true,
-                    toolTip:
-                        "Please note that there is a high volume of transaction history that drives this balance.  Accordingly, this information may be delayed by serval minutes"
-                },
-                {
                     id: 5,
                     title: MERCHANT_FEE,
                     value: `0`,

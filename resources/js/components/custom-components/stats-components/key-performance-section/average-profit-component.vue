@@ -65,8 +65,10 @@ export default {
             }
         },
         averageProfitValue(newVal, oldVal) {
-            this.data.loading = false;
-            this.data.value = `${newVal}`;
+            if (this.hasShopifyStorePA) {
+                this.data.loading = false;
+                this.data.value = `${newVal}`;
+            }
         }
     }
 };

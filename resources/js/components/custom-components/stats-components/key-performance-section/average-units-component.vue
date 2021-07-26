@@ -40,9 +40,11 @@ export default {
             }
         },
         shopifyAverageUnitsPerOrder(newVal, oldVal) {
-            if (this.shopifyAverageUnitsPerOrder !== null) {
-                this.data.value = `${newVal}`;
-                this.data.loading = false;
+            if (this.hasShopifyStorePA) {
+                if (this.shopifyAverageUnitsPerOrder !== null) {
+                    this.data.value = `${newVal}`;
+                    this.data.loading = false;
+                }
             }
         }
     }
