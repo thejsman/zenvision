@@ -14,7 +14,12 @@
             emailFocus: false
         };
     },
-
+    methods: {
+        handleEmailBlur() {
+            this.emailFocus = true;
+            this.email = this.email.toLowerCase();
+        }
+    },
     props: {
         submitUrl: { type: String, required: true },
         regError: { type: String, required: false, default: () => null },
@@ -99,7 +104,7 @@
                                 id="email"
                                 name="email"
                                 @focus="emailFocus = false"
-                                @blur="emailFocus = true"
+                                @blur="handleEmailBlur"
                                 v-model="email"
                                 type="email"
                                 placeholder="Enter email"
