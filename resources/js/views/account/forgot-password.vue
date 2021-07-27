@@ -10,6 +10,11 @@ export default {
             isResetError: false
         };
     },
+    methods: {
+        lower(e) {
+            this.email = this.email.toLowerCase();
+        }
+    },
     mounted() {
         this.isResetError = !!this.error;
         this.tryingToReset = !!this.status;
@@ -74,6 +79,7 @@ export default {
                                     id="useremail"
                                     placeholder="Email"
                                     autocomplete="off"
+                                    @blur="lower($event)"
                                     required
                                 />
                             </div>
