@@ -75,6 +75,7 @@ export default {
             "assetsReservesTotal",
             "assetsCashTotal"
         ]),
+        ...mapGetters(["hasShopifyStoreCS"]),
         totalAssets() {
             return displayCurrency(
                 this.assetsInventoryTotal +
@@ -117,7 +118,6 @@ export default {
             );
         },
         assetsInventoryTotal(newVal, oldVal) {
-            console.log("check this", this.assetsInventoryTotal);
             if (this.assetsInventoryTotal === null) {
                 if (this.hasShopifyStoreCS) {
                     setLoadingSingle(this.statData, TOTAL_INVENTORY);
@@ -144,6 +144,25 @@ export default {
                 TOTAL_CASH,
                 displayCurrency(this.assetsCashTotal)
             );
+        },
+        ShopifyCogsTotal() {
+            if (this.hasShopifyStoreCS) {
+                if (this.ShopifyCogsTotal === null) {
+                    setLoadingSingle(this.statData, TOTAL_SUPPLIER_PAYABLE);
+                } else {
+                    updateData(
+                        this.debtsData,
+                        TOTAL_SUPPLIER_PAYABLE,
+                        displayCurrency(this.ShopifyCogsTotal)
+                    );
+                }
+            } else {
+                updateData(
+                    this.debtsData,
+                    TOTAL_SUPPLIER_PAYABLE,
+                    displayCurrency(0)
+                );
+            }
         }
     },
     async created() {
@@ -176,11 +195,11 @@ export default {
                     TOTAL_CREDIT_CARD,
                     displayCurrency(this.debtsCreditCardTotal)
                 );
-                updateData(
-                    this.debtsData,
-                    TOTAL_SUPPLIER_PAYABLE,
-                    displayCurrency(this.ShopifyCogsTotal)
-                );
+                // updateData(
+                //     this.debtsData,
+                //     TOTAL_SUPPLIER_PAYABLE,
+                //     displayCurrency(this.ShopifyCogsTotal)
+                // );
 
                 eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
