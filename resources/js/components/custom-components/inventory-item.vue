@@ -1,5 +1,9 @@
 <template>
-    <div class="changed_inventory" id="inventory_item">
+    <div
+        class="changed_inventory"
+        id="inventory_item"
+        v-if="inventoryChangedProducts.length"
+    >
         <div
             class="text-left border-bottom py-2"
             v-for="cogsItem in inventoryChangedProducts"
