@@ -68,7 +68,11 @@ export default {
                             dismissible
                             >{{ status }}</b-alert
                         >
-                        <form :action="submitUrl" method="POST">
+                        <form
+                            :action="submitUrl"
+                            method="POST"
+                            autocomplete="off"
+                        >
                             <slot />
                             <div class="form-group">
                                 <input

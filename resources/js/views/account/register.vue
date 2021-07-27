@@ -75,7 +75,12 @@
                         dismissible
                         >{{ regError }}</b-alert
                     >
-                    <b-form class="p-2" :action="submitUrl" method="POST">
+                    <b-form
+                        class="p-2"
+                        autocomplete="off"
+                        :action="submitUrl"
+                        method="POST"
+                    >
                         <slot />
                         <b-form-group id="firstname-group">
                             <b-form-input
