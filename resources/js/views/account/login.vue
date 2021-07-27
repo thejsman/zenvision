@@ -67,6 +67,7 @@ export default {
                                 placeholder="Email"
                                 @blur="lower()"
                                 required
+                                autocomplete="off"
                             ></b-form-input>
                         </b-form-group>
 
