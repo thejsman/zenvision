@@ -117,6 +117,7 @@ export default {
             );
         },
         assetsInventoryTotal(newVal, oldVal) {
+            console.log("check this", this.assetsInventoryTotal);
             if (this.assetsInventoryTotal === null) {
                 if (this.hasShopifyStoreCS) {
                     setLoadingSingle(this.statData, TOTAL_INVENTORY);

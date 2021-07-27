@@ -73,6 +73,7 @@ const actions = {
                     dispatch("getShopifyStoreAllOrders");
                     dispatch("getShopifyStoreBalance");
                     dispatch("getShopifyStoreReserves");
+                    dispatch("getShopifyTotalInventory");
                     commit("TOGGGLE_SHOPIFY_STORE_STATUS", true);
                 } else {
                     dispatch("getShopifyStoreOrders");
