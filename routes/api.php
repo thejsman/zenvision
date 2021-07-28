@@ -44,3 +44,9 @@ Route::post('webhooks/product-update', 'ProductsController@update');
 //Inventory Items Webhook
 Route::post('webhooks/inventory-create', 'InventoryController@store');
 Route::post('webhooks/inventory-update', 'InventoryController@update');
+
+
+// GDPR Webhooks
+Route::post('webhooks/customer-data-request', 'GdprWebhook@CustomerDataRequest');
+Route::post('webhooks/customer-redact', 'GdprWebhook@CustomerRedactRequest');
+Route::post('webhooks/shop-redact', 'GdprWebhook@ShopRedactRequest');

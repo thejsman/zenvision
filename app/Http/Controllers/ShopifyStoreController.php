@@ -58,6 +58,21 @@ class ShopifyStoreController extends Controller
                 'address' => env('APP_URL', null) . '/api/webhooks/inventory-update',
                 'format' => 'json',
             ],
+            [
+                'topic' => 'customers/data_request',
+                'address' => env('APP_URL', null) . '/api/webhooks/customer-data-request',
+                'format' => 'json',
+            ],
+            [
+                'topic' => 'customers/redact',
+                'address' => env('APP_URL', null) . '/api/webhooks/customer-redact',
+                'format' => 'json',
+            ],
+            [
+                'topic' => 'shop/redact',
+                'address' => env('APP_URL', null) . '/api/webhooks/shop-redact',
+                'format' => 'json',
+            ],
         ];
     }
 
