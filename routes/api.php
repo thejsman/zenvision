@@ -47,6 +47,6 @@ Route::post('webhooks/inventory-update', 'InventoryController@update');
 
 
 // GDPR Webhooks
-Route::post('webhooks/customer-data-request', 'GdprWebhooks@CustomerDataRequest');
-Route::post('webhooks/customer-redact', 'GdprWebhooks@CustomerRedactRequest');
-Route::post('webhooks/shop-redact', 'GdprWebhooks@ShopRedactRequest');
+Route::post('webhooks/customer-data-request', 'GdprWebhook@CustomerDataRequest');
+Route::post('webhooks/customer-redact', 'GdprWebhook@CustomerRedactRequest');
+Route::post('webhooks/shop-redact', 'GdprWebhook@ShopRedactRequest');

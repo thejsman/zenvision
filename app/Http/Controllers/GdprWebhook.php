@@ -3,8 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\ShopifyStore;
+use App\ShopifyOrder;
 
-class GdprWebhooks extends Controller
+class GdprWebhook extends Controller
 {
-    //
+    public function CustomerDataRequest(Request $request)
+    {
+        $shop_domain = $request->shop_domain;
+        $shop_details = ShopifyStore::where('store_url', $shop_domain)->first();
+        if ($shop_details) {
+            $orders = [];
+            foreach ($request->orders_requested as $req_order) {
+                $order =  ShopifyOrder::where('order_number', $req_order)->where('store_id', $shop_details->id)->get()->toArray();
+                $orders = array_merge($orders, $order);
+            }
+            return response()->json(['status' => 'success', 'data_request' => $request->data_request, 'data' => $orders], 200);
+        } else {
+            return response()->json(['status' => 'success', 'data_request' => $request->data_request, 'message' => 'Data not found', 'data' => []], 200);
+        }
+    }
 }
