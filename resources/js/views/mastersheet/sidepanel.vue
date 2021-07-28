@@ -60,7 +60,8 @@ export default {
                     icon: "bx bx-archive-in",
                     title: TOTAL_SUPPLIER_PAYABLE,
                     value: "$0",
-                    loading: true
+                    loading: true,
+                    showCaret: true
                 }
             ]
         };
@@ -279,6 +280,7 @@ export default {
                         :title="stat.title"
                         :value="stat.value"
                         :loading="stat.loading"
+                        :showCaretDebts="stat.showCaret"
                     />
                 </div>
             </div>

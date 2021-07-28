@@ -1,9 +1,12 @@
 <script>
 import AddInventoryBtn from "../../components/custom-components/add-inventory.vue";
+import AddSupplierPayable from "../../components/custom-components/add-supplier-payable.vue";
+
 export default {
     data() {
         return {
-            showInventorySection: false
+            showInventorySection: false,
+            showSupplierPayableSection: false
         };
     },
     props: {
@@ -92,24 +95,38 @@ export default {
         showCaret: {
             type: Boolean,
             default: false
+        },
+        showCaretDebts: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
         clickHandler() {
             this.showInventorySection = !this.showInventorySection;
+        },
+        clickHandlerSupplierPayable() {
+            this.showSupplierPayableSection = !this.showSupplierPayableSection;
         }
     },
-    components: { AddInventoryBtn }
+    components: { AddInventoryBtn, AddSupplierPayable }
 };
 </script>
 
 <template>
     <div
         class="card mini-stats-wid"
-        :class="{ cogscard: title === 'Inventory' }"
+        :class="{
+            cogscard: title === 'Inventory' || title === 'Supplier Payable'
+        }"
     >
         <div class="card-body" v-on="showCaret ? { click: clickHandler } : {}">
-            <div class="media">
+            <div
+                class="media"
+                v-on="
+                    showCaretDebts ? { click: clickHandlerSupplierPayable } : {}
+                "
+            >
                 <div class="media-body">
                     <div class="d-flex justify-content-between">
                         <p class="text-muted font-weight-medium">{{ title }}</p>
@@ -123,6 +140,15 @@ export default {
                             class="fas"
                             :class="
                                 showInventorySection
+                                    ? 'fa-angle-up'
+                                    : 'fa-angle-down'
+                            "
+                        ></i>
+                        <i
+                            v-if="showCaretDebts"
+                            class="fas"
+                            :class="
+                                showSupplierPayableSection
                                     ? 'fa-angle-up'
                                     : 'fa-angle-down'
                             "
@@ -173,6 +199,13 @@ export default {
             <div v-if="showInventorySection" class="border-top px-3">
                 <div class="text-center">
                     <AddInventoryBtn />
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div v-if="showSupplierPayableSection" class="border-top px-3">
+                <div class="text-center">
+                    <AddSupplierPayable />
                 </div>
             </div>
         </transition>

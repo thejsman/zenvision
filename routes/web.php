@@ -156,6 +156,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('google-connect-test', 'GoogleAdController@store');
     Route::get('google-connect-getaccounts', 'GoogleAdController@getGoogleAdAccounts');
     Route::get('google-adspend', 'GoogleAdController@getAdSpends');
+
+    //supplierPayable
+    Route::get('supplierpayable', 'SupplierPayableController@get');
+    Route::post('supplierpayable', 'SupplierPayableController@store');
 });
 
 //Stripe Webhooks
