@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class GdprWebhook extends Controller
+class GdprWebhooks extends Controller
 {
     //
 }
