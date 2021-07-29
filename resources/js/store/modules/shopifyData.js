@@ -8,7 +8,7 @@ const state = {
     shopifyStores: [],
     orders: [],
     allOrders: [],
-    cogsTotal: 0,
+    cogsTotal: null,
     paCogsTotal: 0,
     inventoryTotal: null,
     storeBalance: 0,
@@ -89,6 +89,7 @@ const actions = {
                 commit("SET_TOTAL_INVENTORY", 0);
                 commit("SET_SHOPIFY_RESERVES", 0);
                 commit("SET_SHOPIFY_ORDERS", []);
+                commit("SET_COGS_ALL_ORDERS", []);
                 commit("SET_SHOPIFY_BALANCE", 0);
                 commit("SET_ABANDONED_CART_COUNT", 0);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
@@ -120,10 +121,9 @@ const actions = {
     },
     getShopifyStoreAllOrders: async ({ commit, rootState }) => {
         try {
-            const response = await axios.get("shopify-allorders");
-
-            commit("SET_SHOPIFY_ALL_ORDERS", response.data);
-            commit("SET_COGS_ALL_ORDERS", response.data);
+            const { data } = await axios.get("shopify-allorders");
+            commit("SET_SHOPIFY_ALL_ORDERS", data);
+            commit("SET_COGS_ALL_ORDERS", data);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ALL_ORDERS", []);
@@ -273,7 +273,7 @@ const mutations = {
         }
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
-        state.cogsTotal = state.orders.reduce((sum, current) => {
+        state.cogsTotal = payload.reduce((sum, current) => {
             return sum + parseFloat(current.total_cost);
         }, 0);
     },

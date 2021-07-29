@@ -60,7 +60,10 @@ export default {
                     icon: "bx bx-archive-in",
                     title: TOTAL_SUPPLIER_PAYABLE,
                     value: "$0",
-                    loading: true
+                    loading: true,
+                    showCaret: true,
+                    tooltip:
+                        "In order to get the most accurate supplier payable you will need to provide the product cost and shipping cost on the Profit Analysis page, COGS section."
                 }
             ]
         };
@@ -75,6 +78,7 @@ export default {
             "assetsReservesTotal",
             "assetsCashTotal"
         ]),
+        ...mapGetters(["hasShopifyStoreCS"]),
         totalAssets() {
             return displayCurrency(
                 this.assetsInventoryTotal +
@@ -117,7 +121,6 @@ export default {
             );
         },
         assetsInventoryTotal(newVal, oldVal) {
-            console.log("check this", this.assetsInventoryTotal);
             if (this.assetsInventoryTotal === null) {
                 if (this.hasShopifyStoreCS) {
                     setLoadingSingle(this.statData, TOTAL_INVENTORY);
@@ -144,6 +147,25 @@ export default {
                 TOTAL_CASH,
                 displayCurrency(this.assetsCashTotal)
             );
+        },
+        ShopifyCogsTotal() {
+            if (this.hasShopifyStoreCS) {
+                if (this.ShopifyCogsTotal === null) {
+                    setLoadingSingle(this.statData, TOTAL_SUPPLIER_PAYABLE);
+                } else {
+                    updateData(
+                        this.debtsData,
+                        TOTAL_SUPPLIER_PAYABLE,
+                        displayCurrency(this.ShopifyCogsTotal)
+                    );
+                }
+            } else {
+                updateData(
+                    this.debtsData,
+                    TOTAL_SUPPLIER_PAYABLE,
+                    displayCurrency(0)
+                );
+            }
         }
     },
     async created() {
@@ -176,11 +198,11 @@ export default {
                     TOTAL_CREDIT_CARD,
                     displayCurrency(this.debtsCreditCardTotal)
                 );
-                updateData(
-                    this.debtsData,
-                    TOTAL_SUPPLIER_PAYABLE,
-                    displayCurrency(this.ShopifyCogsTotal)
-                );
+                // updateData(
+                //     this.debtsData,
+                //     TOTAL_SUPPLIER_PAYABLE,
+                //     displayCurrency(this.ShopifyCogsTotal)
+                // );
 
                 eventBus.$emit("netEquityTotal", this.netEquityTotal);
 
@@ -260,6 +282,8 @@ export default {
                         :title="stat.title"
                         :value="stat.value"
                         :loading="stat.loading"
+                        :showCaretDebts="stat.showCaret"
+                        :tooltip2="stat.tooltip"
                     />
                 </div>
             </div>

@@ -6,8 +6,9 @@ import channelStatus from "./modules/channelStatus";
 import StripeAccount from "./modules/stripeAccount";
 import MasterSheet from "./modules/masterSheet";
 import BankAccount from "./modules/bankAccount";
-
+import SupplierPayable from "./modules/supplierPayable";
 import ProfitAnalysis from "./modules/profitAnalysis";
+
 //Load Vuex
 Vue.use(Vuex);
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
         StripeAccount,
         MasterSheet,
         BankAccount,
-        ProfitAnalysis
+        ProfitAnalysis,
+        SupplierPayable
     }
 });
