@@ -22,4 +22,17 @@ class SupplierPayableController extends Controller
 
         SupplierPayable::create($data);
     }
+    public function edit(Request $request)
+    {
+        if ($request->has('id')) {
+            $supplier_payable = SupplierPayable::find($request->id);
+            $supplier_payable->title = $request->title;
+            $supplier_payable->amount = $request->amount;
+            $supplier_payable->save();
+        }
+    }
+    public function destroy($id)
+    {
+        SupplierPayable::destroy($id);
+    }
 }

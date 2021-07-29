@@ -4,7 +4,7 @@
             <div
                 class="font-weight-bold font-size-24 text-white mt-4 subscription-header"
             >
-                Add supplier payables
+                {{ supplierModalTitle }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -20,24 +20,13 @@
             </div>
         </b-col>
         <b-col cols="12">
-            <div v-if="!hasShopifyStoreCS">
-                <div>
-                    <div class="d-flex justify-content-center mt-5 mb-5">
-                        <b-alert show variant="warning"
-                            >Please connect a Shopify store to manage
-                            inventory</b-alert
-                        >
-                        <!-- <b-spinner type="border" label="Loading..."></b-spinner> -->
-                    </div>
-                </div>
-            </div>
-            <div v-else>
+            <div>
                 <div>
                     <b-form @submit="onSubmit">
                         <b-form-group id="input-group-1" label-for="title">
                             <b-form-input
                                 id="title"
-                                v-model="form.title"
+                                v-model.trim="form.title"
                                 type="text"
                                 placeholder="Title"
                                 class="width-1"
@@ -55,12 +44,22 @@
                             </b-input-group-prepend>
                             <b-form-input
                                 id="amount"
-                                v-model="form.amount"
+                                type="number"
+                                step="0.01"
+                                v-model.trim="form.amount"
                                 placeholder="Amount"
                                 required
                             ></b-form-input>
                         </b-input-group>
-                        <div>
+                        <div v-if="isEditing">
+                            <b-button
+                                variant="success"
+                                class="btn btn-green ml-2 mt-4"
+                                @click="updateSupplierPayable"
+                                >Save</b-button
+                            >
+                        </div>
+                        <div v-else>
                             <b-button
                                 type="submit"
                                 variant="success"
@@ -88,9 +87,9 @@
 </template>
 <script>
 import axios from "axios";
+
 import { mapGetters, mapActions } from "vuex";
 import { eventBus } from "../../../app";
-import _ from "lodash";
 
 export default {
     data() {
@@ -103,13 +102,13 @@ export default {
             show: true,
             showMessage: true,
             updateResult: "",
-            updateVariant: ""
+            updateVariant: "",
+            isEditing: false
         };
     },
     async created() {
-        eventBus.$on("editInventoryText", () => {
-            this.searchText = this.inventorySearchText;
-            this.handleSearch();
+        eventBus.$on("editSupplierpayable", item => {
+            this.handleFormEdit(item);
         });
     },
     computed: {
@@ -117,30 +116,79 @@ export default {
             "shopifyCogsArray",
             "hasShopifyStoreCS",
             "inventorySearchText"
-        ])
+        ]),
+        supplierModalTitle() {
+            return this.isEditing
+                ? "Edit supplier payable"
+                : "Add supplier payables";
+        }
     },
     methods: {
-        ...mapActions([
-            "getShopifyTotalInventory",
-            "toggleLoadingStatus",
-            "addToChangedProducts"
-        ]),
+        ...mapActions(["getSupplierPayable", "toggleLoadingStatus"]),
         async onSubmit(e) {
             e.preventDefault();
+            console.log(this.form);
             try {
+                if (this.form.title === "" || this.form.amount === "") {
+                    this.showAlert("All fields are mandatory", "warning");
+                    return;
+                }
                 await axios.post("supplierpayable", { ...this.form });
                 this.showAlert(
                     "Supplier payable added successfully",
                     "success"
                 );
+                this.getSupplierPayable();
+                this.reset();
             } catch (err) {
+                this.showAlert(
+                    "Something went wrong, please try after sometime.",
+                    "danger"
+                );
                 console.log({ err });
             }
+        },
+        handleFormEdit(item) {
+            this.isEditing = true;
+            this.form = { ...item };
+        },
+        async updateSupplierPayable(e) {
+            try {
+                e.preventDefault();
+                await axios.patch("supplierpayable", { ...this.form });
+                this.showAlert(
+                    "Supplier payable upaded successfully",
+                    "success"
+                );
+                this.getSupplierPayable();
+                this.reset();
+                setTimeout(() => {
+                    this.handleSupplierPayableClose();
+                }, 2000);
+            } catch (err) {
+                console.log({ err });
+                this.showAlert(
+                    "Something went wrong, please try after sometime",
+                    "danger"
+                );
+                this.reset();
+                setTimeout(() => {
+                    this.handleSupplierPayableClose();
+                }, 2000);
+            }
+        },
+
+        handleSupplierPayableClose() {
+            this.$bvModal.hide("supplier-payable-details");
         },
         showAlert(message, variant) {
             this.updateResult = message;
             this.updateVariant = variant;
             this.dismissCountDown = 5;
+        },
+        reset() {
+            this.form.title = "";
+            this.form.amount = "";
         }
     }
 };

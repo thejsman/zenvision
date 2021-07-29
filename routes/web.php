@@ -160,6 +160,8 @@ Route::group(['middleware' => ['auth']], function () {
     //supplierPayable
     Route::get('supplierpayable', 'SupplierPayableController@get');
     Route::post('supplierpayable', 'SupplierPayableController@store');
+    Route::patch('supplierpayable', 'SupplierPayableController@edit');
+    Route::delete('supplierpayable/{id}', 'SupplierPayableController@destroy');
 });
 
 //Stripe Webhooks

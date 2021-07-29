@@ -61,7 +61,9 @@ export default {
                     title: TOTAL_SUPPLIER_PAYABLE,
                     value: "$0",
                     loading: true,
-                    showCaret: true
+                    showCaret: true,
+                    tooltip:
+                        "In order to get the most accurate supplier payable you will need to provide the product cost and shipping cost on the Profit Analysis page, COGS section."
                 }
             ]
         };
@@ -281,6 +283,7 @@ export default {
                         :value="stat.value"
                         :loading="stat.loading"
                         :showCaretDebts="stat.showCaret"
+                        :tooltip2="stat.tooltip"
                     />
                 </div>
             </div>

@@ -33,6 +33,10 @@ export default {
             type: String,
             default: ""
         },
+        tooltip2: {
+            type: String,
+            default: ""
+        },
         chartOptions: {
             type: Object,
             default: () => {
@@ -129,7 +133,17 @@ export default {
             >
                 <div class="media-body">
                     <div class="d-flex justify-content-between">
-                        <p class="text-muted font-weight-medium">{{ title }}</p>
+                        <div class="d-flex align-items-baseline">
+                            <p class="text-muted font-weight-medium">
+                                {{ title }}
+                            </p>
+                            <i
+                                v-if="tooltip2"
+                                v-b-tooltip.hover="tooltip2"
+                                class="fas fas fa-info-circle pl-2"
+                            ></i>
+                        </div>
+
                         <i
                             v-if="tooltip"
                             v-b-tooltip.hover="tooltip"

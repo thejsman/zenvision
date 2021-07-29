@@ -1,38 +1,45 @@
 <template>
-    <div
-        class="changed_inventory"
-        id="inventory_item"
-        v-if="inventoryChangedProducts.length"
-    >
-        <div
-            class="text-left border-bottom py-2"
-            v-for="cogsItem in cogsItems"
-            :key="cogsItem.variant_id"
-        >
-            <b-dropdown variant="link" text="..." class="edit_btn">
-                <b-dropdown-item href="#" @click="editInventory(cogsItem)"
-                    ><i class="fas fa-pencil-alt text-success mr-1" />
-                    Edit
-                </b-dropdown-item>
+    <div id="inventory_item" class="changed_inventory">
+        <div v-if="supplierPayableArray === null" class="mt-4">
+            <b-spinner type="border" label="Loading..."></b-spinner>
+        </div>
+        <div v-else>
+            <div v-if="supplierPayableArray.length">
+                <div
+                    class="text-left border-bottom py-2"
+                    v-for="spItem in supplierPayableArray"
+                    :key="spItem.id"
+                >
+                    <b-dropdown variant="link" text="..." class="edit_btn">
+                        <b-dropdown-item href="#" @click="editInventory(spItem)"
+                            ><i class="fas fa-pencil-alt text-success mr-1" />
+                            Edit
+                        </b-dropdown-item>
 
-                <b-dropdown-item href="#" @click="deleteInventory(cogsItem)"
-                    ><i class="fas fa-trash text-danger mr-1" />
-                    Delete
-                </b-dropdown-item>
-            </b-dropdown>
-            <div class="d-flex justify-content-between align-items-center">
-                <div>{{ cogsItem.title }}</div>
-                <div class="pr-2 text-success font-weight-bold">
-                    {{
-                        new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: "USD"
-                        }).format(cogsItem.amount)
-                    }}
+                        <b-dropdown-item
+                            href="#"
+                            @click="deleteInventory(spItem)"
+                            ><i class="fas fa-trash text-danger mr-1" />
+                            Delete
+                        </b-dropdown-item>
+                    </b-dropdown>
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                        <div>{{ spItem.title }}</div>
+                        <div class="pr-2 text-success font-weight-bold">
+                            {{
+                                new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "USD"
+                                }).format(spItem.amount)
+                            }}
+                        </div>
+                    </div>
+                    <div class="opacity5">
+                        <!-- {{ cogsItem.sku }} -->
+                    </div>
                 </div>
-            </div>
-            <div class="opacity5">
-                {{ cogsItem.sku }}
             </div>
         </div>
     </div>
@@ -44,29 +51,22 @@ import { eventBus } from "../../app";
 import axios from "axios";
 export default {
     computed: {
-        ...mapGetters(["inventoryChangedProducts"])
+        ...mapGetters(["supplierPayableArray"])
     },
-    props: {
-        cogsItems: {
-            type: Array,
-            default: () => []
-        }
-    },
-    methods: {
-        ...mapActions(["removeItemfromChangedProducts", "setSearchText"]),
-        editInventory(item) {
-            this.setSearchText(item.sku);
-            this.$bvModal.show("inventory-details");
 
+    methods: {
+        ...mapActions(["getSupplierPayable"]),
+        editInventory(item) {
+            this.$bvModal.show("supplier-payable-details");
             setTimeout(() => {
-                eventBus.$emit("editInventoryText");
-            }, 100);
+                eventBus.$emit("editSupplierpayable", item);
+            }, 10);
         },
 
         async deleteInventory(item) {
             try {
-                await axios.patch("inventory", item);
-                this.removeItemfromChangedProducts(item);
+                await axios.delete(`supplierpayable/${item.id}`);
+                await this.getSupplierPayable();
             } catch (err) {
                 console.log({ err });
             }

@@ -1,58 +1,48 @@
 <template>
     <div name="fade">
         <div class="">
-            <SupplierPayableItem :cogsItems="cogsItems" />
+            <SupplierPayableItem />
         </div>
         <b-button
             variant="primary"
             class="px-5 mt-4 mb-3"
-            @click="showInventoryModal"
+            @click="showSupplierPayableModal"
             >Add</b-button
         >
         <b-modal
-            id="inventory-details"
+            id="supplier-payable-details"
             size="lg"
             centered
             hide-footer
             hide-header
         >
-            <SupplierPayableModal @handle-close="handleCogsClose" />
+            <SupplierPayableModal @handle-close="handleSupplierPayableClose" />
         </b-modal>
     </div>
 </template>
 
 <script>
 import SupplierPayableModal from "../../components/custom-components/modals/add-supplier-payable-modal.vue";
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import SupplierPayableItem from "./supplier-payable-item.vue";
-import { Axis } from "highcharts";
+
 export default {
-    data() {
-        return {
-            cogsItems: []
-        };
-    },
     created() {
         this.getSupplierPayable();
     },
     components: { SupplierPayableModal, SupplierPayableItem },
     computed: {
-        ...mapGetters(["shopifyCogsArray"])
+        ...mapGetters(["supplierPayableArray"])
     },
     methods: {
-        showInventoryModal() {
-            this.$bvModal.show("inventory-details");
+        ...mapActions(["getSupplierPayable"]),
+
+        showSupplierPayableModal() {
+            this.$bvModal.show("supplier-payable-details");
         },
 
-        handleCogsClose() {
-            this.$bvModal.hide("inventory-details");
-        },
-        async getSupplierPayable() {
-            try {
-                const { data } = await axios.get("supplierpayable");
-                console.log({ data });
-                this.cogsItems = data;
-            } catch (error) {}
+        handleSupplierPayableClose() {
+            this.$bvModal.hide("supplier-payable-details");
         }
     }
 };
