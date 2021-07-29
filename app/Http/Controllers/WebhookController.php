@@ -8,6 +8,7 @@ use App\ShopifyStore;
 use App\ShopifyOrder;
 use App\ShopifyOrderProduct;
 use App\ShopifyProductVariant;
+use App\SupplierPayable;
 
 
 class WebhookController extends Controller
@@ -115,8 +116,8 @@ class WebhookController extends Controller
     {
 
         foreach ($line_items as $line_item) {
+            $cogs = $this->getTotalCost($line_item['variant_id']) * $line_item['fulfillable_quantity'];
 
-            // TODO: line item processing here
             $new_line_item = array(
                 'user_id' =>  $user_id,
                 'store_id' => $store_id,
@@ -131,7 +132,7 @@ class WebhookController extends Controller
                 'fulfillment_service' => $line_item['fulfillment_service'],
                 'product_id' => $line_item['product_id'],
                 'price' => $line_item['price'],
-                'total_cost' => $this->getTotalCost($line_item['variant_id']) * $line_item['fulfillable_quantity'],
+                'total_cost' => $cogs,
                 'total_discount' => $line_item['total_discount'],
                 'fulfillment_status' => $line_item['fulfillment_status'],
                 'duties' => $line_item['duties'],
@@ -139,6 +140,7 @@ class WebhookController extends Controller
             );
 
             $this->updateInventory($line_item['variant_id'], $line_item['fulfillable_quantity'], $webhook_type, $order_id);
+            $this->addSupplierPayable($user_id, $line_item['title'], $order_number, $cogs);
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
         }
     }
@@ -171,6 +173,19 @@ class WebhookController extends Controller
                     }
                 }
             }
+        }
+    }
+    public function addSupplierPayable($user_id, $product_title, $order_number, $cogs)
+    {
+
+        if ($cogs !== null) {
+            $data = array(
+                'user_id' => $user_id,
+                'title' => $product_title,
+                'amount' => $cogs,
+                'shopify_order_number' => $order_number
+            );
+            SupplierPayable::create($data);
         }
     }
 }

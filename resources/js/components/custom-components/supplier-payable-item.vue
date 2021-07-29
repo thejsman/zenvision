@@ -37,7 +37,9 @@
                         </div>
                     </div>
                     <div class="opacity5">
-                        <!-- {{ cogsItem.sku }} -->
+                        <div v-if="spItem.shopify_order_number">
+                            Shopify Order: {{ spItem.shopify_order_number }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,7 +57,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(["getSupplierPayable"]),
+        ...mapActions(["getSupplierPayableTotal"]),
         editInventory(item) {
             this.$bvModal.show("supplier-payable-details");
             setTimeout(() => {
@@ -66,7 +68,7 @@ export default {
         async deleteInventory(item) {
             try {
                 await axios.delete(`supplierpayable/${item.id}`);
-                await this.getSupplierPayable();
+                await this.getSupplierPayableTotal();
             } catch (err) {
                 console.log({ err });
             }
