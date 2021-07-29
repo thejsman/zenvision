@@ -18,6 +18,7 @@ class CreateSupplierPayablesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('title');
             $table->decimal('amount');
+            $table->integer('shopify_order_number')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

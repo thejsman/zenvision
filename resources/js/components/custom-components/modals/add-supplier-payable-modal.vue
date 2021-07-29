@@ -124,7 +124,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["getSupplierPayable", "toggleLoadingStatus"]),
+        ...mapActions(["getSupplierPayableTotal", "toggleLoadingStatus"]),
         async onSubmit(e) {
             e.preventDefault();
             console.log(this.form);
@@ -138,7 +138,8 @@ export default {
                     "Supplier payable added successfully",
                     "success"
                 );
-                this.getSupplierPayable();
+                this.getSupplierPayableTotal();
+
                 this.reset();
             } catch (err) {
                 this.showAlert(
@@ -160,7 +161,7 @@ export default {
                     "Supplier payable upaded successfully",
                     "success"
                 );
-                this.getSupplierPayable();
+                this.getSupplierPayableTotal();
                 this.reset();
                 setTimeout(() => {
                     this.handleSupplierPayableClose();

@@ -18,11 +18,8 @@ const state = {
     searchText: "",
     shopifyAbandonedCart: null,
     shopifyAverageUnitsPerOrder: null,
-    shopifyRefundTotal: null
-    // shopifyRevenue: null,
-    // shopifyShippingRevenue: null,
-    // shopifyTotalTax: null,
-    // shopifyDiscounts: null
+    shopifyRefundTotal: null,
+    supplierPayableArray: null
 };
 const getters = {
     hasShopifyStoreCS: state => state.hasShopifyStore,
@@ -52,7 +49,8 @@ const getters = {
         _.sumBy(state.orders, order => parseFloat(order.total_discounts)),
     shopifyAbandonedCartCount: state => state.shopifyAbandonedCart,
     shopifyAverageUnitsPerOrder: state => state.shopifyAverageUnitsPerOrder,
-    shopifyRefundTotal: state => state.shopifyRefundTotal
+    shopifyRefundTotal: state => state.shopifyRefundTotal,
+    supplierPayableArray: state => state.supplierPayableArray
 };
 const actions = {
     toggleShopifyStoreStatus: ({ commit }, payload) => {
@@ -119,15 +117,29 @@ const actions = {
             commit("SET_SHOPIFY_ORDERS", []);
         }
     },
-    getShopifyStoreAllOrders: async ({ commit, rootState }) => {
+    getShopifyStoreAllOrders: async ({ commit, dispatch }) => {
         try {
             const { data } = await axios.get("shopify-allorders");
             commit("SET_SHOPIFY_ALL_ORDERS", data);
-            commit("SET_COGS_ALL_ORDERS", data);
+            dispatch("getSupplierPayableTotal");
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ALL_ORDERS", []);
-            commit("SET_COGS_ALL_ORDERS", []);
+        }
+    },
+    getSupplierPayableTotal: async ({ state, commit }) => {
+        try {
+            const supplierPayableResult = await axios.get("supplierpayable");
+            const supplierPayableData = supplierPayableResult.data;
+            commit("SET_SUPPLIER_PAYABLE", supplierPayableData);
+            commit("SET_COGS_ALL_ORDERS", {
+                data: state.allOrders,
+                supplierPayableData
+            });
+        } catch (err) {
+            commit("SET_SUPPLIER_PAYABLE", []);
+            commit("SET_COGS_ALL_ORDERS", 0);
+            console.log(err);
         }
     },
 
@@ -273,9 +285,34 @@ const mutations = {
         }
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
-        state.cogsTotal = payload.reduce((sum, current) => {
-            return sum + parseFloat(current.total_cost);
+        const { data, supplierPayableData } = payload;
+        const spOrderNumbers = _.map(
+            supplierPayableData,
+            "shopify_order_number"
+        ).filter(e => e);
+
+        const ordersCogsTotal = data.reduce((sum, current) => {
+            if (!spOrderNumbers.includes(current.order_number)) {
+                console.log(
+                    "check ",
+                    current.order_number,
+                    current.total_cost,
+                    spOrderNumbers
+                );
+            }
+            return !spOrderNumbers.includes(current.order_number)
+                ? sum + current.total_cost
+                : sum + 0;
         }, 0);
+
+        const supplierPayableTotal = supplierPayableData.reduce(
+            (sum, current) => {
+                return sum + parseFloat(current.amount);
+            },
+            0
+        );
+        console.log(supplierPayableTotal, ordersCogsTotal);
+        state.cogsTotal = supplierPayableTotal + ordersCogsTotal;
     },
     SET_COGS_ORDERS_PA: (state, payload) => {
         state.paCogsTotal = payload;
@@ -315,6 +352,8 @@ const mutations = {
     SET_SHOPIFY_REFUND_TOTAL: (state, payload) => {
         state.shopifyRefundTotal = payload;
     },
+    SET_SUPPLIER_PAYABLE: (state, payload) =>
+        (state.supplierPayableArray = payload),
     REMOVE_ITEM_FORM_CHANGED_PRODUCTS: (state, payload) => {
         state.inventoryChangedProducts = state.inventoryChangedProducts.filter(
             product => product.id !== payload.id

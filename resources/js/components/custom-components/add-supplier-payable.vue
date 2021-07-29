@@ -28,7 +28,7 @@ import SupplierPayableItem from "./supplier-payable-item.vue";
 
 export default {
     created() {
-        this.getSupplierPayable();
+        // this.getSupplierPayableTotal();
     },
     components: { SupplierPayableModal, SupplierPayableItem },
     computed: {
