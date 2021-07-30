@@ -129,6 +129,7 @@ export default {
             e.preventDefault();
             console.log(this.form);
             try {
+                this.form.type = "manual";
                 if (this.form.title === "" || this.form.amount === "") {
                     this.showAlert("All fields are mandatory", "warning");
                     return;
@@ -141,6 +142,9 @@ export default {
                 this.getSupplierPayableTotal();
 
                 this.reset();
+                setTimeout(() => {
+                    this.handleSupplierPayableClose();
+                }, 2000);
             } catch (err) {
                 this.showAlert(
                     "Something went wrong, please try after sometime.",

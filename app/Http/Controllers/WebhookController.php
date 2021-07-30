@@ -177,13 +177,13 @@ class WebhookController extends Controller
     }
     public function addSupplierPayable($user_id, $product_title, $order_number, $cogs)
     {
-
         if ($cogs !== null) {
             $data = array(
                 'user_id' => $user_id,
                 'title' => $product_title,
                 'amount' => $cogs,
-                'shopify_order_number' => $order_number
+                'type' => 'shopify',
+                'reference_number' => $order_number
             );
             SupplierPayable::create($data);
         }
