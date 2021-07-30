@@ -132,10 +132,12 @@ const actions = {
             const supplierPayableResult = await axios.get("supplierpayable");
             const supplierPayableData = supplierPayableResult.data;
             commit("SET_SUPPLIER_PAYABLE", supplierPayableData);
-            commit("SET_COGS_ALL_ORDERS", {
-                data: state.allOrders,
-                supplierPayableData
-            });
+            setTimeout(() => {
+                commit("SET_COGS_ALL_ORDERS", {
+                    data: state.allOrders,
+                    supplierPayableData
+                });
+            }, 3000);
         } catch (err) {
             commit("SET_SUPPLIER_PAYABLE", []);
             commit("SET_COGS_ALL_ORDERS", 0);
