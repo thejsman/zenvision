@@ -288,7 +288,7 @@ const mutations = {
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
         const { data, supplierPayableData } = payload;
-
+        console.log({ data, supplierPayableData });
         const spOrderNumbers = _.map(supplierPayableData, sp =>
             sp.type === "shopify" ? sp.reference_number : null
         ).filter(e => e);
