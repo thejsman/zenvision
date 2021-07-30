@@ -121,7 +121,9 @@ const actions = {
         try {
             const { data } = await axios.get("shopify-allorders");
             commit("SET_SHOPIFY_ALL_ORDERS", data);
-            dispatch("getSupplierPayableTotal");
+            setTimeout(() => {
+                dispatch("getSupplierPayableTotal");
+            }, 3000);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ALL_ORDERS", []);
@@ -133,12 +135,11 @@ const actions = {
             const supplierPayableData = supplierPayableResult.data;
             commit("SET_SUPPLIER_PAYABLE", supplierPayableData);
             console.log({ Orders: state.allOrders, supplierPayableData });
-            setTimeout(() => {
-                commit("SET_COGS_ALL_ORDERS", {
-                    data: state.allOrders,
-                    supplierPayableData
-                });
-            }, 3000);
+
+            commit("SET_COGS_ALL_ORDERS", {
+                data: state.allOrders,
+                supplierPayableData
+            });
         } catch (err) {
             commit("SET_SUPPLIER_PAYABLE", []);
             commit("SET_COGS_ALL_ORDERS", 0);
