@@ -18,6 +18,7 @@ class SupplierPayableController extends Controller
         $data = [];
         $data['user_id'] = Auth::user()->id;
         $data['title'] = $request->title;
+        $data['type'] = $request->type;
         $data['amount'] = $request->amount;
 
         SupplierPayable::create($data);

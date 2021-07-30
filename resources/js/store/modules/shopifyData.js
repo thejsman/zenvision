@@ -286,20 +286,12 @@ const mutations = {
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
         const { data, supplierPayableData } = payload;
-        const spOrderNumbers = _.map(
-            supplierPayableData,
-            "shopify_order_number"
+
+        const spOrderNumbers = _.map(supplierPayableData, sp =>
+            sp.type === "shopify" ? sp.reference_number : null
         ).filter(e => e);
 
         const ordersCogsTotal = data.reduce((sum, current) => {
-            if (!spOrderNumbers.includes(current.order_number)) {
-                console.log(
-                    "check ",
-                    current.order_number,
-                    current.total_cost,
-                    spOrderNumbers
-                );
-            }
             return !spOrderNumbers.includes(current.order_number)
                 ? sum + current.total_cost
                 : sum + 0;
