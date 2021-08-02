@@ -20,7 +20,7 @@ class SupplierPayableController extends Controller
         $data['title'] = $request->title;
         $data['type'] = $request->type;
         $data['amount'] = $request->amount;
-
+        $data['reference_number'] = $request->reference_number;
         SupplierPayable::create($data);
     }
     public function edit(Request $request)
@@ -35,5 +35,9 @@ class SupplierPayableController extends Controller
     public function destroy($id)
     {
         SupplierPayable::destroy($id);
+    }
+    public function destroyByTransactionId($id)
+    {
+        SupplierPayable::where('reference_number', $id)->delete();
     }
 }

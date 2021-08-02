@@ -37,8 +37,11 @@
                         </div>
                     </div>
                     <div class="opacity5">
-                        <div v-if="spItem.shopify_order_number">
-                            Shopify Order: {{ spItem.shopify_order_number }}
+                        <div v-if="spItem.type === 'shopify'">
+                            {{ spItem.type }}# {{ spItem.reference_number }}
+                        </div>
+                        <div v-if="spItem.type === 'bank'">
+                            {{ spItem.type }}# {{ spItem.reference_number }}
                         </div>
                     </div>
                 </div>
