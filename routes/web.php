@@ -162,6 +162,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('supplierpayable', 'SupplierPayableController@store');
     Route::patch('supplierpayable', 'SupplierPayableController@edit');
     Route::delete('supplierpayable/{id}', 'SupplierPayableController@destroy');
+    Route::delete('supplierpayable-txn/{id}', 'SupplierPayableController@destroyByTransactionId');
 });
 
 //Stripe Webhooks

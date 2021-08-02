@@ -36,4 +36,8 @@ class SupplierPayableController extends Controller
     {
         SupplierPayable::destroy($id);
     }
+    public function destroyByTransactionId($id)
+    {
+        SupplierPayable::where('reference_number', $id)->delete();
+    }
 }

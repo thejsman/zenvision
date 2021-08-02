@@ -108,6 +108,7 @@
                                 >
                             </div>
                         </div>
+
                         <div
                             v-else
                             v-for="(i, index) in itemsList"
@@ -119,66 +120,55 @@
                                 :key="item.id"
                             >
                                 <div
-                                    class="d-flex flex-row justify-content-start mb-1"
+                                    class="d-flex justify-content-between align-items-center pb-2"
                                 >
-                                    <img
-                                        v-if="item.type === 'paypal'"
-                                        src="/images/icons/paypal-transactions.svg"
-                                        alt
-                                        height="30"
-                                        width="30"
-                                        class="channel-icons ml-3"
-                                    />
-                                    <img
-                                        v-if="item.type === 'stripe'"
-                                        src="/images/icons/stripe-icon.svg"
-                                        alt
-                                        height="30"
-                                        width="30"
-                                        class="channel-icons ml-3"
-                                    />
-                                    <img
-                                        v-if="item.type === 'bank'"
-                                        :src="
-                                            `/images/bank-icons/${item.logo}.png`
-                                        "
-                                        alt
-                                        height="30"
-                                        width="30"
-                                        class="channel-icons ml-3 bg-white rounded"
-                                    />
+                                    <div>
+                                        <img
+                                            v-if="item.type === 'paypal'"
+                                            src="/images/icons/paypal-transactions.svg"
+                                            alt
+                                            height="30"
+                                            width="30"
+                                            class="channel-icons"
+                                        />
+                                        <img
+                                            v-if="item.type === 'stripe'"
+                                            src="/images/icons/stripe-icon.svg"
+                                            alt
+                                            height="30"
+                                            width="30"
+                                            class="channel-icons"
+                                        />
+                                        <img
+                                            v-if="item.type === 'bank'"
+                                            :src="
+                                                `/images/bank-icons/${item.logo}.png`
+                                            "
+                                            alt
+                                            height="30"
+                                            width="30"
+                                            class="channel-icons bg-white rounded"
+                                        />
 
-                                    <div
-                                        class="d-flex justify-content-between flex-fill align-items-center"
-                                    >
-                                        <p class="pl-3">
-                                            {{ item.description }}
-                                        </p>
-                                        <div
-                                            class="d-flex justify-content-between align-items-center"
+                                        {{ item.description }}
+                                    </div>
+                                    <div class="d-flex">
+                                        <select
+                                            class="form-control label_class"
+                                            @change="onChange($event, item)"
                                         >
-                                            <div>
-                                                <div class="float-end">
-                                                    <b-form-select
-                                                        @change="
-                                                            onChange(
-                                                                $event,
-                                                                item
-                                                            )
-                                                        "
-                                                    >
-                                                        <b-form-select-option
-                                                            value="supplier_payable"
-                                                            >Supplier
-                                                            Payable</b-form-select-option
-                                                        >
-                                                    </b-form-select>
-                                                </div>
-                                            </div>
-                                            <p class="pr-3">
-                                                {{ item.amount }}
-                                            </p>
-                                        </div>
+                                            <option value="null">Label</option>
+                                            <option
+                                                value="supplier_payable"
+                                                :selected="
+                                                    transactionArray.includes(
+                                                        item.id
+                                                    )
+                                                "
+                                                >Supplier Payable</option
+                                            >
+                                        </select>
+                                        <p class="pt-3">{{ item.amount }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -318,8 +308,18 @@ export default {
             "hasBankAccountCS",
             "stripeTransactions",
             "transStartDate",
-            "transEndDate"
+            "transEndDate",
+            "supplierPayableArray"
         ]),
+        transactionArray() {
+            if (this.supplierPayableArray) {
+                return this.supplierPayableArray
+                    .map(sp => sp.reference_number)
+                    .filter(e => e);
+            } else {
+                return [];
+            }
+        },
         noAccount() {
             return this.hasStripeAccountCS || this.hasBankAccountCS;
         },
@@ -335,7 +335,15 @@ export default {
         return {
             loading: true,
             message: "loading",
-
+            selected: null,
+            options: [
+                {
+                    value: null,
+                    text: "Label",
+                    disabled: true
+                },
+                { value: "supplier_payable", text: "Supplier Payable" }
+            ],
             items: [],
             allTransactions: [],
             groupedTransactions: [],
@@ -375,25 +383,31 @@ export default {
     },
     methods: {
         ...mapActions("BankAccount", ["getBankTransactions"]),
+
         ...mapActions([
             "getStripeTransactions",
             "setNextDatesForTransactions",
             "getSupplierPayableTotal"
         ]),
         async onChange(e, item) {
-            console.log({ item });
             try {
-                const form = {};
-                form.title = item.description;
-                form.type = item.type;
-                form.amount = -parseFloat(
-                    item.amount.replace(/[^0-9.-]+/g, "")
-                );
-                form.reference_number = item.id;
+                if (e.target.value === "null") {
+                    console.log({ item });
+                    await axios.delete(`supplierpayable-txn/${item.id}`);
+                    await this.getSupplierPayableTotal();
+                } else {
+                    const form = {};
+                    form.title = item.description;
+                    form.type = item.type;
+                    form.amount = -parseFloat(
+                        item.amount.replace(/[^0-9.-]+/g, "")
+                    );
+                    form.reference_number = item.id;
 
-                await axios.post("supplierpayable", { ...form });
+                    await axios.post("supplierpayable", { ...form });
 
-                this.getSupplierPayableTotal();
+                    this.getSupplierPayableTotal();
+                }
             } catch (err) {
                 console.log({ err });
             }
@@ -565,52 +579,8 @@ export default {
     overflow: auto;
     height: 562px;
 }
-// Chip
-// .app-search .form-control {
-//     background: #32384c;
-// }
-// .app-search span {
-//     line-height: 48px;
-// }
-// .chip-container {
-//     width: 450px;
-//     min-height: 34px;
-//     display: flex;
-//     flex-wrap: wrap;
-//     align-content: space-between;
-//     align-items: center;
-
-//     .chip {
-//         margin: 7px;
-//         background: #ffaa61;
-//         padding: 10px 15px;
-//         font-weight: bold;
-//         color: white;
-//         border-radius: 5px;
-//         display: flex;
-//         align-items: center;
-//         i {
-//             cursor: pointer;
-//             opacity: 0.56;
-//             margin-left: 8px;
-//         }
-//     }
-// }
-// .chip-input {
-//     width: 120px;
-//     //   height: 40px;
-//     margin-top: 15px !important;
-//     border: 2px dashed #989ba5;
-//     padding: 4px;
-//     border-radius: 10px;
-//     background-color: transparent;
-// }
-// .list-group {
-//     overflow: auto;
-//     height: 400px;
-//     // width: 1100px;
-// }
-// .list-group p {
-//     font-size: 16px;
-// }
+.label_class {
+    width: 100px;
+    margin-right: 44px;
+}
 </style>
