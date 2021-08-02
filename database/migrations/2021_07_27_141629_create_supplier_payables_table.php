@@ -19,7 +19,7 @@ class CreateSupplierPayablesTable extends Migration
             $table->string('title');
             $table->decimal('amount');
             $table->string('type');
-            $table->integer('reference_number')->nullable();
+            $table->string('reference_number')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
