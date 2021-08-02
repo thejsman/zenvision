@@ -23,8 +23,7 @@ export default {
             "stripeAccounts",
             "hasStripeAccountCS",
             "shopifyAllOrders",
-            "loadingStatus",
-            "ShopifyCogsTotal"
+            "loadingStatus"
         ])
     },
     components: {
