@@ -28,6 +28,8 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     /*register route*/
     Route::post('register', 'Auth\RegisterController@register');
+
+    Route::get('shopifyinstall', 'ShopifyStoreController@shopifyInstall');
 });
 
 //Order webHooks

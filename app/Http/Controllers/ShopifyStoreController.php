@@ -7,8 +7,11 @@ use App\Jobs\ProcessShopifyGetAllOrders;
 use App\Jobs\ProcessShopifyGetAllProducts;
 use App\ShopifyOrder;
 use App\ShopifyStore;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class ShopifyStoreController extends Controller
 {
@@ -83,6 +86,23 @@ class ShopifyStoreController extends Controller
         $shop_domain = $request->input('shop');
         // generating token
         $state = $request->input('state');
+        if ($state == 'shopifyinstall') {
+            $user = new User();
+            $user->password = Hash::make('the-password-of-choice');
+            $user->email = 'the-email@example.com';
+            $user->firstname = 'My Name';
+            $user->lastname = 'My Last Name';
+            $user->phone = "123456498746";
+            // $user->save();
+            // dd('register a user here');
+            $data = array(
+                'title' => 'My App',
+                'Description' => 'This is New Application',
+                'author' => 'foo'
+            );
+
+            return redirect('/shopify-register')->with($data);
+        }
 
         $access_token = $this->getAccessToken($shop_domain, $response_code);
 
@@ -298,5 +318,30 @@ class ShopifyStoreController extends Controller
             $refund_total += $store->getRefundTotal($request->start_date, $request->end_date);
         }
         return $refund_total;
+    }
+
+    public function shopifyInstall(Request $request)
+    {
+        $ar = [];
+        $hmac = $_GET['hmac'];
+        unset($_GET['hmac']);
+        foreach ($_GET as $key => $value) {
+            $key = str_replace("%", "%25", $key);
+            $key = str_replace("&", "%26", $key);
+            $key = str_replace("=", "%3D", $key);
+            $value = str_replace("%", "%25", $value);
+            $value = str_replace("&", "%26", $value);
+
+            $ar[] = $key . "=" . $value;
+        }
+        $str = join('&', $ar);
+        $ver_hmac =  hash_hmac('sha256', $str, env('SHOPIFY_API_SECRET'), false);
+        if ($ver_hmac == $hmac) {
+            $shop = $_GET['shop'];
+            $url = 'https://' . $shop . '/' . env('MIX_SHOPIFY_AUTH_URL') . '&state=shopifyinstall';
+            return new RedirectResponse($url);
+        } else {
+            return redirect('/');
+        }
     }
 }
