@@ -160,11 +160,15 @@ export default {
                     );
                 }
             } else {
-                updateData(
-                    this.debtsData,
-                    TOTAL_SUPPLIER_PAYABLE,
-                    displayCurrency(0)
-                );
+                if (this.ShopifyCogsTotal === null) {
+                    setLoadingSingle(this.statData, TOTAL_SUPPLIER_PAYABLE);
+                } else {
+                    updateData(
+                        this.debtsData,
+                        TOTAL_SUPPLIER_PAYABLE,
+                        displayCurrency(this.ShopifyCogsTotal)
+                    );
+                }
             }
         }
     },

@@ -87,17 +87,23 @@ const actions = {
                 commit("SET_TOTAL_INVENTORY", 0);
                 commit("SET_SHOPIFY_RESERVES", 0);
                 commit("SET_SHOPIFY_ORDERS", []);
-                commit("SET_COGS_ALL_ORDERS", []);
+                commit("SET_COGS_ALL_ORDERS", {
+                    data: state.allOrders,
+                    supplierPayableData: []
+                });
                 commit("SET_SHOPIFY_BALANCE", 0);
                 commit("SET_ABANDONED_CART_COUNT", 0);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
                 commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
+                if (section === "MS") {
+                    dispatch("getSupplierPayableTotal");
+                }
             }
         } catch (err) {
             commit("SET_SHOPIFY_STORES", []);
             commit("TOGGGLE_SHOPIFY_STORE_STATUS", false);
             commit("TOGGGLE_SHOPIFY_STORE_STATUS_PA", false);
-            console.log(err);
+            console.log({ err });
         }
     },
     getShopifyStoreOrders: async ({ commit, dispatch, rootGetters }) => {
@@ -123,7 +129,7 @@ const actions = {
             commit("SET_SHOPIFY_ALL_ORDERS", data);
             setTimeout(() => {
                 dispatch("getSupplierPayableTotal");
-            }, 3000);
+            }, 1000);
         } catch (err) {
             console.log(err);
             commit("SET_SHOPIFY_ALL_ORDERS", []);
@@ -133,6 +139,7 @@ const actions = {
         try {
             const supplierPayableResult = await axios.get("supplierpayable");
             const supplierPayableData = supplierPayableResult.data;
+            console.log("Check this", supplierPayableData);
             commit("SET_SUPPLIER_PAYABLE", supplierPayableData);
             console.log({ Orders: state.allOrders, supplierPayableData });
 
@@ -142,7 +149,10 @@ const actions = {
             });
         } catch (err) {
             commit("SET_SUPPLIER_PAYABLE", []);
-            commit("SET_COGS_ALL_ORDERS", 0);
+            commit("SET_COGS_ALL_ORDERS", {
+                data: state.allOrders,
+                supplierPayableData: []
+            });
             console.log(err);
         }
     },
@@ -295,6 +305,8 @@ const mutations = {
             sp.type === "shopify" ? sp.reference_number : null
         ).filter(e => e);
 
+        console.log({ spOrderNumbers });
+
         const ordersCogsTotal = data.reduce((sum, current) => {
             return !spOrderNumbers.includes(current.order_number)
                 ? sum + current.total_cost
@@ -308,6 +320,8 @@ const mutations = {
             0
         );
         console.log(supplierPayableTotal, ordersCogsTotal);
+        console.log("setting it up", supplierPayableTotal + ordersCogsTotal);
+
         state.cogsTotal = supplierPayableTotal + ordersCogsTotal;
     },
     SET_COGS_ORDERS_PA: (state, payload) => {
