@@ -154,9 +154,31 @@
                                         <p class="pl-3">
                                             {{ item.description }}
                                         </p>
-                                        <p class="pr-3">
-                                            {{ item.amount }}
-                                        </p>
+                                        <div
+                                            class="d-flex justify-content-between align-items-center"
+                                        >
+                                            <div>
+                                                <div class="float-end">
+                                                    <b-form-select
+                                                        @change="
+                                                            onChange(
+                                                                $event,
+                                                                item
+                                                            )
+                                                        "
+                                                    >
+                                                        <b-form-select-option
+                                                            value="supplier_payable"
+                                                            >Supplier
+                                                            Payable</b-form-select-option
+                                                        >
+                                                    </b-form-select>
+                                                </div>
+                                            </div>
+                                            <p class="pr-3">
+                                                {{ item.amount }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -353,7 +375,29 @@ export default {
     },
     methods: {
         ...mapActions("BankAccount", ["getBankTransactions"]),
-        ...mapActions(["getStripeTransactions", "setNextDatesForTransactions"]),
+        ...mapActions([
+            "getStripeTransactions",
+            "setNextDatesForTransactions",
+            "getSupplierPayableTotal"
+        ]),
+        async onChange(e, item) {
+            console.log({ item });
+            try {
+                const form = {};
+                form.title = item.description;
+                form.type = item.type;
+                form.amount = -parseFloat(
+                    item.amount.replace(/[^0-9.-]+/g, "")
+                );
+                form.reference_number = item.id;
+
+                await axios.post("supplierpayable", { ...form });
+
+                this.getSupplierPayableTotal();
+            } catch (err) {
+                console.log({ err });
+            }
+        },
         saveChip(e) {
             e.preventDefault();
             const { chips, currentInput, set } = this;

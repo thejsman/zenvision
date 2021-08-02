@@ -20,7 +20,7 @@ class SupplierPayableController extends Controller
         $data['title'] = $request->title;
         $data['type'] = $request->type;
         $data['amount'] = $request->amount;
-
+        $data['reference_number'] = $request->reference_number;
         SupplierPayable::create($data);
     }
     public function edit(Request $request)
