@@ -87,22 +87,24 @@ class ShopifyStoreController extends Controller
         // generating token
         $state = $request->input('state');
         if ($state == 'shopifyinstall') {
-            $user = new User();
-            $user->password = Hash::make('the-password-of-choice');
-            $user->email = 'the-email@example.com';
-            $user->firstname = 'My Name';
-            $user->lastname = 'My Last Name';
-            $user->phone = "123456498746";
-            // $user->save();
-            // dd('register a user here');
-            $data = array(
-                'title' => 'My App',
-                'Description' => 'This is New Application',
-                'author' => 'foo'
-            );
+            $access_token = $this->getAccessToken($shop_domain, $response_code);
+            $store = $this->getShopifyStoreInfo($shop_domain, $access_token);
 
-            return redirect('/shopify-register')->with($data);
+            $name_array =  explode(" ", $store['shop_owner']);
+
+            session([
+                'shopify_access_token' => $access_token,
+                'shopify_shop_domain' => $shop_domain,
+                'shopify_email' => $store['customer_email'],
+                'shopify_firstname' => $name_array[0],
+                'shopify_lastname' => $name_array[1],
+                'shopify_phone' => $store['phone'],
+            ]);
+
+            return redirect('/shopify-register');
         }
+
+
 
         $access_token = $this->getAccessToken($shop_domain, $response_code);
 
@@ -184,6 +186,98 @@ class ShopifyStoreController extends Controller
             }
         }
     }
+
+    public function ShopifyInstallCreateUser(Request $request)
+    {
+        $user = new User();
+        $user->password = Hash::make($request->password);
+        $user->email = $request->session()->get('shopify_email');
+        $user->firstname = $request->session()->get('shopify_firstname');
+        $user->lastname = $request->session()->get('shopify_lastname');
+        $user->phone = $request->session()->get('shopify_phone');
+        $user->save();
+
+        $access_token = $request->session()->get('shopify_access_token');
+        $shop_domain = $request->session()->get('shopify_shop_domain');
+
+        if ($access_token != "") {
+            $shop_exists = ShopifyStore::where('store_url', $shop_domain)->where('isDeleted', true)->first();
+
+            if ($shop_exists) {
+                $shop_exists->api_token = $access_token;
+                $shop_exists->isDeleted = false;
+
+                $created_at_min = 0;
+                $latest_order = ShopifyOrder::where('store_id', $shop_exists->id)->latest('created_on_shopify')->first();
+
+                if ($latest_order) {
+                    $created_at_min = $latest_order;
+                }
+
+                $this->registerWebhook($shop_domain, $access_token);
+                // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $shop_exists->id, $created_at_min);
+                // $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $shop_exists->id);
+                $shop_exists->save();
+                $param = [];
+                $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
+                $param['limit'] = 250;
+                $param['since_id'] = 0;
+                $param['access_token'] = $access_token;
+
+                // Params for Product variant
+                $param_products = [];
+                $param_products['fields'] = 'id, title, variants, options';
+                $param_products['limit'] = 50;
+                $param_products['since_id'] = 0;
+                $param_products['access_token'] = $access_token;
+
+                // Dispatch the tasks to Queues
+                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $shop_exists->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $shop_exists->id);
+
+                return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+            } else {
+                $store_id = ShopifyStore::updateOrCreate([
+                    // 'user_id' => Auth::user()->id,
+                    'user_id' => Auth::user()->id,
+                    'store_name' => $shop_domain,
+                    'store_url' => $shop_domain,
+                    'api_token' => $access_token,
+                    'isDeleted' => false,
+                    'enabled_on_dashboard' => true,
+                ]);
+                $this->registerWebhook($shop_domain, $access_token);
+
+                // Params for Orders and Ordered products
+                $param = [];
+                $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
+                $param['limit'] = 250;
+                $param['since_id'] = 0;
+                $param['access_token'] = $access_token;
+
+                // Params for Product variant
+                $param_products = [];
+                $param_products['fields'] = 'id, title, variants, options';
+                $param_products['limit'] = 50;
+                $param_products['since_id'] = 0;
+                $param_products['access_token'] = $access_token;
+
+                // Dispatch the tasks to Queues
+                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
+
+                if (strpos($state, 'mastersheet') !== false) {
+                    return redirect()->route('mastersheet', ['shopifyAddAccount' => 'success']);
+                } else {
+                    return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+                }
+            }
+        }
+    }
+    public function registerAndSave()
+    {
+    }
+
     public function getAccessToken($shop_domain = '', $code = '')
     {
         $query = array(
@@ -262,6 +356,20 @@ class ShopifyStoreController extends Controller
         }
         return $store_balance;
     }
+
+    public static function getShopifyStoreInfo($shop_domain = "zenvision-local.myshopify.com", $access_token = "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")
+    {
+
+        $url = "https://" . $shop_domain . "/admin/api/2021-07/shop.json";
+        $response = CustomRequests::getRequest($url, [], $access_token);
+        if (!isset($response['errors'])) {
+            return $response['shop'];
+        } else {
+            return [];
+        }
+    }
+
+
     public static function getShopifyStoreReserves($user = null)
     {
         $user = Auth::user();

@@ -1,9 +1,9 @@
 <template>
     <Layout>
         <div class="row">
-            <b-button v-b-modal.modal-prevent-closing>Open Modal</b-button>
+            <b-button v-b-modal.shopify-register-modal>Open Modal</b-button>
             <b-modal
-                id="modal-prevent-closing"
+                id="shopify-register-modal"
                 ref="modal"
                 centered
                 no-close-on-esc
@@ -15,7 +15,7 @@
                 <div>
                     <h3 class="my-4">You are almost set!</h3>
                     <p>
-                        Please create a login to finish setting up your account
+                        Please create a log in to finish setting up your account
                     </p>
                     <b-card bg-variant="light" text-variant="white">
                         <b-form
@@ -155,7 +155,19 @@ export default {
         }
     },
     created() {
+        this.loadingStatus = true;
         this.toggleCurrentChannel("shopify-register");
+        setTimeout(() => {
+            this.$bvModal.show("shopify-register-modal");
+            this.loadingStatus = false;
+            console.log("Check this: ", this.dataarray);
+        }, 2000);
+    },
+    props: {
+        dataarray: {
+            type: Array,
+            default: () => {}
+        }
     },
     methods: {
         ...mapActions(["toggleCurrentChannel"]),
@@ -194,7 +206,7 @@ export default {
                     this.formPassword.password ===
                     this.formPassword.repeatPassword
                 ) {
-                    await axios.patch("changepassword", this.formPassword);
+                    await axios.post("shopify-register", this.formPassword);
                     this.messageVariant = "success";
                     this.updateResult = "Password updated successfully";
                     this.showMessage = true;
