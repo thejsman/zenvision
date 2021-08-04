@@ -83,7 +83,7 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
                             'tax_lines' => json_encode($order['tax_lines']),
                             'refunds' => json_encode($order['refunds']),
                             'total_tip_received' => $order['total_tip_received'],
-                            'shipping_country' =>  $order['shipping_address']['country'] ? $order['shipping_address']['country'] : null,
+                            'shipping_country' => array_key_exists('shipping_address', $order) ? $order['shipping_address']['country'] : null,
                             'shipping_lines' => json_encode($order['shipping_lines']),
                         );
 
