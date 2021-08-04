@@ -15,7 +15,7 @@
                 <div>
                     <h3 class="my-4">You are almost set!</h3>
                     <p>
-                        Please create a log in to finish setting up your account
+                        Please create a password to finish setting up your account
                     </p>
                     <b-card bg-variant="light" text-variant="white">
                         <b-form @submit="changePassword" v-if="show">
