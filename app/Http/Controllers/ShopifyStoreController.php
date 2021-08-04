@@ -94,7 +94,7 @@ class ShopifyStoreController extends Controller
 
     public function getResponse(Request $request)
     {
-        dd($request);
+
         // response code from shopify
         $response_code = $request->input('code');
         // shopify store domain
@@ -208,7 +208,9 @@ class ShopifyStoreController extends Controller
         $user_exists = User::where('email',  $store['customer_email'])->first();
 
         if ($user_exists) {
-            return redirect('/shopify-register?status=account_exists');
+            Auth::login($user_exists, true);
+            // return redirect('/shopify-register?status=account_exists');
+            return redirect('/');
         }
 
         $user = new User();

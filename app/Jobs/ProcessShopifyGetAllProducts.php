@@ -86,7 +86,7 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
                             $product_variant = array(
                                 'variant_id' => $variant['id'],
                                 'variant_title' => $variant['title'],
-                                'sku' => $variant['sku'] ? $variant['sku'] : 'no_sku',
+                                'sku' => isset($variant['sku']) ? $variant['sku'] : 'no_sku',
                                 'sales_price' => $variant['price'],
                                 'inventory_item_id' => $variant['inventory_item_id'],
                                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
