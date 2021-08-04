@@ -194,6 +194,7 @@ class ShopifyStoreController extends Controller
 
     public function ShopifyInstallCreateUser($access_token, $store)
     {
+        $account_exist = false;
 
         $name_array =  explode(" ", $store['shop_owner']);
 
@@ -207,21 +208,25 @@ class ShopifyStoreController extends Controller
         ]);
         $user_exists = User::where('email',  $store['customer_email'])->first();
 
+
         if ($user_exists) {
+            $account_exist = true;
             Auth::login($user_exists, true);
             // return redirect('/shopify-register?status=account_exists');
-            return redirect('/');
+
+        } else {
+            $user = new User();
+            $user->password = Hash::make('123456');
+            $user->email = $store['customer_email'];
+            $user->firstname = $name_array[0];
+            $user->lastname = $name_array[1];
+            $user->phone = $store['phone'];
+            $user->save();
+
+            Auth::login($user, true);
         }
 
-        $user = new User();
-        $user->password = Hash::make('123456');
-        $user->email = $store['customer_email'];
-        $user->firstname = $name_array[0];
-        $user->lastname = $name_array[1];
-        $user->phone = $store['phone'];
-        $user->save();
 
-        Auth::login($user, true);
 
         if ($access_token != "") {
             $shop_exists = ShopifyStore::where('store_url', $store['domain'])->where('isDeleted', true)->first();
@@ -257,8 +262,11 @@ class ShopifyStoreController extends Controller
                 // Dispatch the tasks to Queues
                 ProcessShopifyGetAllOrders::dispatch($store['domain'], $param, $shop_exists->id, Auth::user()->id);
                 ProcessShopifyGetAllProducts::dispatch($store['domain'], $param_products, $shop_exists->id);
-
-                return redirect('/shopify-register');
+                if ($account_exist) {
+                    return redirect('/');
+                } else {
+                    return redirect('/shopify-register');
+                }
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
                     'user_id' => Auth::user()->id,
@@ -288,7 +296,11 @@ class ShopifyStoreController extends Controller
                 ProcessShopifyGetAllOrders::dispatch($store['domain'], $param, $store_id->id, Auth::user()->id);
                 ProcessShopifyGetAllProducts::dispatch($store['domain'], $param_products, $store_id->id);
 
-                return redirect('/shopify-register');
+                if ($account_exist) {
+                    return redirect('/');
+                } else {
+                    return redirect('/shopify-register');
+                }
             }
         }
     }
