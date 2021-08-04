@@ -49,7 +49,7 @@ class DashboardController extends Controller
         $orders = [];
         foreach ($enabled_on_dashboard as $store_id) {
             $store = ShopifyStore::find($store_id);
-            $orders = array_merge($orders, $store->getOrders($request->s_date, $request->e_date)->toArray());
+            $orders = array_merge($orders, $store->getOrders($request->s_date, $request->e_date. ' ' . '23:59:59')->toArray());
         }
 
         return $orders;
