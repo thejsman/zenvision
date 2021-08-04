@@ -26,6 +26,9 @@ class StripeController extends Controller
     }
     public function store(Request $request)
     {
+        if ($request->has('error')) {
+            return redirect('/');
+        }
         $params = $request->query();
         $code = $params['code'];
         $state = $params['state'];
