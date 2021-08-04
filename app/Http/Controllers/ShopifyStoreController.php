@@ -260,7 +260,7 @@ class ShopifyStoreController extends Controller
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
                     'user_id' => Auth::user()->id,
-                    'store_name' => $store['name'],
+                    'store_name' => $store['domain'],
                     'store_url' => $store['domain'],
                     'api_token' => $access_token,
                     'isDeleted' => false,
