@@ -40,7 +40,7 @@ export default {
                 return (
                     parseFloat(usOrdersCountObj.true / this.numberOfOrders) *
                     100
-                );
+                ).toFixed(2);
             } else {
                 return "0";
             }
