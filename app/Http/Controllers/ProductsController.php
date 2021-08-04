@@ -42,7 +42,7 @@ class ProductsController extends Controller
             $product_variant = array(
                 'variant_id' => $variant['id'],
                 'variant_title' => isset($variant['title']) ? $variant['title'] : "",
-                'sku' => isset($variant['sku']) ? $variant['sku'] : null,
+                'sku' => isset($variant['sku']) ? $variant['sku'] : 'no_sku',
                 'sales_price' => $variant['price'],
                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
                 "size" => isset($sizeOption) ? $variant['option' . $sizeOption] : null,
@@ -92,7 +92,7 @@ class ProductsController extends Controller
             $product_variant = array(
                 'variant_id' => $variant['id'],
                 'variant_title' => isset($variant['title']) ? $variant['title'] : "",
-                'sku' => isset($variant['sku']) ? $variant['sku'] : null,
+                'sku' => isset($variant['sku']) ? $variant['sku'] : 'no_sku',
                 'sales_price' => $variant['price'],
                 'color' => isset($colorOption) ? $variant['option' . $colorOption] : null,
                 "size" => isset($sizeOption) ? $variant['option' . $sizeOption] : null,
