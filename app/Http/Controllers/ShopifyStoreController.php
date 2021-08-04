@@ -433,22 +433,26 @@ class ShopifyStoreController extends Controller
     {
         $ar = [];
         $hmac = $_GET['hmac'];
-        unset($_GET['hmac']);
-        foreach ($_GET as $key => $value) {
-            $key = str_replace("%", "%25", $key);
-            $key = str_replace("&", "%26", $key);
-            $key = str_replace("=", "%3D", $key);
-            $value = str_replace("%", "%25", $value);
-            $value = str_replace("&", "%26", $value);
+        if ($hmac) {
+            unset($_GET['hmac']);
+            foreach ($_GET as $key => $value) {
+                $key = str_replace("%", "%25", $key);
+                $key = str_replace("&", "%26", $key);
+                $key = str_replace("=", "%3D", $key);
+                $value = str_replace("%", "%25", $value);
+                $value = str_replace("&", "%26", $value);
 
-            $ar[] = $key . "=" . $value;
-        }
-        $str = join('&', $ar);
-        $ver_hmac =  hash_hmac('sha256', $str, env('SHOPIFY_API_SECRET'), false);
-        if ($ver_hmac == $hmac) {
-            $shop = $_GET['shop'];
-            $url = 'https://' . $shop . '/' . env('MIX_SHOPIFY_AUTH_URL') . '&state=shopifyinstall';
-            return new RedirectResponse($url);
+                $ar[] = $key . "=" . $value;
+            }
+            $str = join('&', $ar);
+            $ver_hmac =  hash_hmac('sha256', $str, env('SHOPIFY_API_SECRET'), false);
+            if ($ver_hmac == $hmac) {
+                $shop = $_GET['shop'];
+                $url = 'https://' . $shop . '/' . env('MIX_SHOPIFY_AUTH_URL') . '&state=shopifyinstall';
+                return new RedirectResponse($url);
+            } else {
+                return redirect('/');
+            }
         } else {
             return redirect('/');
         }
