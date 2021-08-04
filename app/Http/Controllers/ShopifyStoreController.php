@@ -431,9 +431,11 @@ class ShopifyStoreController extends Controller
 
     public function shopifyInstall(Request $request)
     {
-        $ar = [];
-        $hmac = $_GET['hmac'];
-        if ($hmac) {
+
+        if ($request->has('hmac')) {
+
+            $ar = [];
+            $hmac = $_GET['hmac'];
             unset($_GET['hmac']);
             foreach ($_GET as $key => $value) {
                 $key = str_replace("%", "%25", $key);
