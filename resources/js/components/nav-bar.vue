@@ -73,14 +73,14 @@ export default {
                     aria-label="Profit Analysis"
                     >Profit Analysis</a
                 >
-                <a
+                <!-- <a
                     class="btn btn-link text-white"
                     href="/mastersheet"
                     :class="{ inactive: currentChannel !== 'MS' }"
                     @click="toggleCurrentChannel('MS')"
                     aria-label="Mastersheet"
                     >Mastersheet</a
-                >
+                > -->
             </div>
             <div class="d-flex">
                 <b-dropdown right variant="black" toggle-class="header-item">

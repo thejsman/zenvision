@@ -7,68 +7,6 @@
                 </span>
                 <span class="d-none d-sm-inline-block">Other Expenses</span>
             </template>
-            <!-- <div class="row align-items-center">
-                <div class="col-sm-12 col-md-10">
-                    <form class="app-search d-none d-lg-block">
-                        <div class="position-relative">
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Filter transactions"
-                            />
-                            <span class="bx bx-search-alt"></span>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-sm-12 col-md-2">
-                    <b-dropdown
-                        variant="primary"
-                        class="m-2"
-                        right
-                        text="Right align"
-                    >
-                        <template v-slot:button-content>
-                            Tags ({{ tagsLenght }})
-                            <i class="fas fa-angle-down pl-1"></i>
-                        </template>
-                        <b-dropdown-form>
-                            <div class="chip-container align-items-center">
-                                <b-form-group @submit.stop.prevent>
-                                    <b-form-input
-                                        id="dropdown-form-email"
-                                        class="text-center text-white chip-input mr-1"
-                                        v-model="currentInput"
-                                        size="sm"
-                                        placeholder="Add tags"
-                                        @keypress.enter="saveChip"
-                                        @keydown.delete="backspaceDelete"
-                                    ></b-form-input>
-                                </b-form-group>
-                                <div
-                                    class="chip"
-                                    v-for="(chip, i) of chips"
-                                    :key="chip.label"
-                                >
-                                    {{ chip }}
-                                    <i
-                                        class="fas fa-times"
-                                        @click="deleteChip(i)"
-                                    />
-                                </div>
-                            </div>
-
-                            <b-dropdown-text class="mt-4"
-                                ><span
-                                    v-b-tooltip.hover="
-                                        'Zenvision automatically tags transactions that we believe are Other Expenses.   Please note that while this may not be 100% accurate for you and your business, we recommend that you leave the default settings as is unless you are certain that these transactions are not Other Expenses'
-                                    "
-                                    >What are tags?</span
-                                >
-                            </b-dropdown-text>
-                        </b-dropdown-form>
-                    </b-dropdown>
-                </div>
-            </div> -->
         </b-tab>
 
         <div class="row">
@@ -119,58 +57,7 @@
                                 v-for="item in groupedTransactions[i]"
                                 :key="item.id"
                             >
-                                <div
-                                    class="d-flex justify-content-between align-items-center pb-2"
-                                >
-                                    <div>
-                                        <img
-                                            v-if="item.type === 'paypal'"
-                                            src="/images/icons/paypal-transactions.svg"
-                                            alt
-                                            height="30"
-                                            width="30"
-                                            class="channel-icons"
-                                        />
-                                        <img
-                                            v-if="item.type === 'stripe'"
-                                            src="/images/icons/stripe-icon.svg"
-                                            alt
-                                            height="30"
-                                            width="30"
-                                            class="channel-icons"
-                                        />
-                                        <img
-                                            v-if="item.type === 'bank'"
-                                            :src="
-                                                `/images/bank-icons/${item.logo}.png`
-                                            "
-                                            alt
-                                            height="30"
-                                            width="30"
-                                            class="channel-icons bg-white rounded"
-                                        />
-
-                                        {{ item.description }}
-                                    </div>
-                                    <div class="d-flex">
-                                        <select
-                                            class="form-control label_class"
-                                            @change="onChange($event, item)"
-                                        >
-                                            <option value="null">Label</option>
-                                            <option
-                                                value="supplier_payable"
-                                                :selected="
-                                                    transactionArray.includes(
-                                                        item.id
-                                                    )
-                                                "
-                                                >Supplier Payable</option
-                                            >
-                                        </select>
-                                        <p class="pt-3">{{ item.amount }}</p>
-                                    </div>
-                                </div>
+                                <TransactionItem :item="item" />
                             </div>
                         </div>
                         <div
@@ -204,8 +91,9 @@ import { displayCurrency } from "../../utils";
 import moment from "moment";
 import { eventBus } from "../../app";
 import { mapGetters, mapActions } from "vuex";
-
+import TransactionItem from "./transactions-item.vue";
 export default {
+    components: { TransactionItem },
     props: {
         set: {
             type: Boolean,
@@ -384,34 +272,8 @@ export default {
     methods: {
         ...mapActions("BankAccount", ["getBankTransactions"]),
 
-        ...mapActions([
-            "getStripeTransactions",
-            "setNextDatesForTransactions",
-            "getSupplierPayableTotal"
-        ]),
-        async onChange(e, item) {
-            try {
-                if (e.target.value === "null") {
-                    console.log({ item });
-                    await axios.delete(`supplierpayable-txn/${item.id}`);
-                    await this.getSupplierPayableTotal();
-                } else {
-                    const form = {};
-                    form.title = item.description;
-                    form.type = item.type;
-                    form.amount = -parseFloat(
-                        item.amount.replace(/[^0-9.-]+/g, "")
-                    );
-                    form.reference_number = item.id;
+        ...mapActions(["getStripeTransactions", "setNextDatesForTransactions"]),
 
-                    await axios.post("supplierpayable", { ...form });
-
-                    this.getSupplierPayableTotal();
-                }
-            } catch (err) {
-                console.log({ err });
-            }
-        },
         saveChip(e) {
             e.preventDefault();
             const { chips, currentInput, set } = this;
