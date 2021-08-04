@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <div class="row">
-            <b-button v-b-modal.shopify-register-modal>Open Modal</b-button>
+            <!-- <b-button v-b-modal.shopify-register-modal>Open Modal</b-button> -->
             <b-modal
                 id="shopify-register-modal"
                 ref="modal"
@@ -18,11 +18,7 @@
                         Please create a log in to finish setting up your account
                     </p>
                     <b-card bg-variant="light" text-variant="white">
-                        <b-form
-                            @submit="changePassword"
-                            @reset="onReset"
-                            v-if="show"
-                        >
+                        <b-form @submit="changePassword" v-if="show">
                             <div class="row">
                                 <div class="col-12">
                                     <b-form-group
@@ -106,6 +102,20 @@
                 :background-color="'#191e2c'"
                 :opacity="0.8"
             ></loading>
+            <b-modal
+                id="shopify-account-exists"
+                title="Shopify Account"
+                centered
+                no-close-on-esc
+                no-close-on-backdrop
+                hide-header-close
+                :hide-footer="true"
+            >
+                <p class="my-2">
+                    You already have an account with us, please
+                    <a href="/login">log in.</a>
+                </p>
+            </b-modal>
         </div>
     </Layout>
 </template>
@@ -120,24 +130,13 @@ export default {
     data() {
         return {
             hideSection: true,
-            formProfile: {
-                id: null,
-                email: "",
-                firstName: "",
-                lastName: "",
-                phoneNumber: ""
-            },
+
             formPassword: {
                 password: "",
                 repeatPassword: ""
             },
             show: true,
-            showMessage: false,
-            messageVariant: "success",
-            updateResult: "",
             loadingStatus: false,
-            phoneFocus: false,
-            emailFocus: false,
             passwordFocus: false,
             repeatPasswordFocus: false
         };
@@ -147,7 +146,6 @@ export default {
         passwordState() {
             return this.formPassword.password.length > 5 ? true : false;
         },
-
         repeatPasswordState() {
             return (
                 this.formPassword.password === this.formPassword.repeatPassword
@@ -155,13 +153,22 @@ export default {
         }
     },
     created() {
+        if (new URL(location.href).searchParams.get("status")) {
+            const status = new URL(location.href).searchParams.get("status");
+            if (status === "account_exists") {
+                setTimeout(() => {
+                    this.$bvModal.show("shopify-account-exists");
+                    this.loadingStatus = false;
+                }, 1000);
+            }
+        } else {
+            setTimeout(() => {
+                this.$bvModal.show("shopify-register-modal");
+                this.loadingStatus = false;
+            }, 1000);
+        }
         this.loadingStatus = true;
         this.toggleCurrentChannel("shopify-register");
-        setTimeout(() => {
-            this.$bvModal.show("shopify-register-modal");
-            this.loadingStatus = false;
-            console.log("Check this: ", this.dataarray);
-        }, 2000);
     },
     props: {
         dataarray: {
@@ -171,33 +178,7 @@ export default {
     },
     methods: {
         ...mapActions(["toggleCurrentChannel"]),
-        async updateUserProfile(event) {
-            event.preventDefault();
-            try {
-                this.loadingStatus = true;
-                await axios.patch("/user", this.formProfile);
 
-                this.messageVariant = "success";
-                this.updateResult = "Profile updated successfully";
-                this.showMessage = true;
-                this.loadingStatus = false;
-            } catch (err) {
-                if (Object.keys(err.response.data.errors).length > 0) {
-                    Object.entries(err.response.data.errors).forEach(
-                        ([k, v]) => {
-                            this.updateResult = v[0];
-                        }
-                    );
-                } else {
-                    this.updateResult =
-                        "Something went wrong, please try later";
-                }
-                this.messageVariant = "danger";
-
-                this.showMessage = true;
-                this.loadingStatus = false;
-            }
-        },
         async changePassword(event) {
             event.preventDefault();
             try {
@@ -206,69 +187,19 @@ export default {
                     this.formPassword.password ===
                     this.formPassword.repeatPassword
                 ) {
-                    await axios.post("shopify-register", this.formPassword);
-                    this.messageVariant = "success";
-                    this.updateResult = "Password updated successfully";
-                    this.showMessage = true;
+                    await axios.patch("changepassword", this.formPassword);
                     this.loadingStatus = false;
                 }
+                window.location.href = "/";
             } catch (err) {
-                if (Object.keys(err.response.data.errors).length > 0) {
-                    Object.entries(err.response.data.errors).forEach(
-                        ([k, v]) => {
-                            this.updateResult = v[0];
-                        }
-                    );
-                } else {
-                    this.updateResult =
-                        "Something went wrong, please try later";
-                }
-                this.messageVariant = "danger";
-
-                this.showMessage = true;
+                console.log({ err });
                 this.loadingStatus = false;
             }
         },
-        onSubmit(event) {
-            event.preventDefault();
-            // alert(JSON.stringify(this.form));
-        },
-        onReset(event) {
-            event.preventDefault();
-            // Reset our form values
-            this.form.email = "";
-            this.form.name = "";
-            this.form.food = null;
-            this.form.checked = [];
-            // Trick to reset/clear native browser form validation state
-            this.show = false;
-            this.$nextTick(() => {
-                this.show = true;
-            });
-        },
+
         showAccountModal() {
-            this.$bvModal.show("deactivate-modal");
-        },
-        async deactivateAccount() {
-            try {
-                await axios.delete("/user");
-                window.location.href = "/logout";
-            } catch (error) {
-                window.location.href = "/logout";
-            }
+            this.$bvModal.show("account-exist");
         }
     }
 };
 </script>
-<style>
-.zv-danger {
-    color: #e75555;
-}
-.deactivate-account {
-    cursor: pointer;
-    transition: 0.3s;
-}
-.deactivate-account:hover {
-    opacity: 0.5;
-}
-</style>

@@ -87,21 +87,11 @@ class ShopifyStoreController extends Controller
         // generating token
         $state = $request->input('state');
         if ($state == 'shopifyinstall') {
+
             $access_token = $this->getAccessToken($shop_domain, $response_code);
             $store = $this->getShopifyStoreInfo($shop_domain, $access_token);
 
-            $name_array =  explode(" ", $store['shop_owner']);
-
-            session([
-                'shopify_access_token' => $access_token,
-                'shopify_shop_domain' => $shop_domain,
-                'shopify_email' => $store['customer_email'],
-                'shopify_firstname' => $name_array[0],
-                'shopify_lastname' => $name_array[1],
-                'shopify_phone' => $store['phone'],
-            ]);
-
-            return redirect('/shopify-register');
+            return  $this->ShopifyInstallCreateUser($access_token, $store);
         }
 
 
@@ -187,21 +177,37 @@ class ShopifyStoreController extends Controller
         }
     }
 
-    public function ShopifyInstallCreateUser(Request $request)
+    public function ShopifyInstallCreateUser($access_token, $store)
     {
+
+        $name_array =  explode(" ", $store['shop_owner']);
+
+        session([
+            'shopify_access_token' => $access_token,
+            'shopify_shop_domain' => $store['domain'],
+            'shopify_email' => $store['customer_email'],
+            'shopify_firstname' => $name_array[0],
+            'shopify_lastname' => $name_array[1],
+            'shopify_phone' => $store['phone'],
+        ]);
+        $user_exists = User::where('email',  $store['customer_email'])->first();
+
+        if ($user_exists) {
+            return redirect('/shopify-register?status=account_exists');
+        }
+
         $user = new User();
-        $user->password = Hash::make($request->password);
-        $user->email = $request->session()->get('shopify_email');
-        $user->firstname = $request->session()->get('shopify_firstname');
-        $user->lastname = $request->session()->get('shopify_lastname');
-        $user->phone = $request->session()->get('shopify_phone');
+        $user->password = Hash::make('123456');
+        $user->email = $store['customer_email'];
+        $user->firstname = $name_array[0];
+        $user->lastname = $name_array[1];
+        $user->phone = $store['phone'];
         $user->save();
 
-        $access_token = $request->session()->get('shopify_access_token');
-        $shop_domain = $request->session()->get('shopify_shop_domain');
+        Auth::login($user, true);
 
         if ($access_token != "") {
-            $shop_exists = ShopifyStore::where('store_url', $shop_domain)->where('isDeleted', true)->first();
+            $shop_exists = ShopifyStore::where('store_url', $store['domain'])->where('isDeleted', true)->first();
 
             if ($shop_exists) {
                 $shop_exists->api_token = $access_token;
@@ -214,9 +220,9 @@ class ShopifyStoreController extends Controller
                     $created_at_min = $latest_order;
                 }
 
-                $this->registerWebhook($shop_domain, $access_token);
-                // $orders = (new GetAllOrders)->getAllOrders($shop_domain, $access_token, $shop_exists->id, $created_at_min);
-                // $products = (new GetAllProducts)->getAllProducts($shop_domain, $access_token, $shop_exists->id);
+                $this->registerWebhook($store['domain'], $access_token);
+                // $orders = (new GetAllOrders)->getAllOrders($store['domain'], $access_token, $shop_exists->id, $created_at_min);
+                // $products = (new GetAllProducts)->getAllProducts($store['domain'], $access_token, $shop_exists->id);
                 $shop_exists->save();
                 $param = [];
                 $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
@@ -232,21 +238,20 @@ class ShopifyStoreController extends Controller
                 $param_products['access_token'] = $access_token;
 
                 // Dispatch the tasks to Queues
-                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $shop_exists->id, Auth::user()->id);
-                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $shop_exists->id);
+                ProcessShopifyGetAllOrders::dispatch($store['domain'], $param, $shop_exists->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($store['domain'], $param_products, $shop_exists->id);
 
-                return redirect()->route('home', ['shopifyAddAccount' => 'success']);
+                return redirect('/shopify-register');
             } else {
                 $store_id = ShopifyStore::updateOrCreate([
-                    // 'user_id' => Auth::user()->id,
                     'user_id' => Auth::user()->id,
-                    'store_name' => $shop_domain,
-                    'store_url' => $shop_domain,
+                    'store_name' => $store['name'],
+                    'store_url' => $store['domain'],
                     'api_token' => $access_token,
                     'isDeleted' => false,
                     'enabled_on_dashboard' => true,
                 ]);
-                $this->registerWebhook($shop_domain, $access_token);
+                $this->registerWebhook($store['domain'], $access_token);
 
                 // Params for Orders and Ordered products
                 $param = [];
@@ -263,14 +268,10 @@ class ShopifyStoreController extends Controller
                 $param_products['access_token'] = $access_token;
 
                 // Dispatch the tasks to Queues
-                ProcessShopifyGetAllOrders::dispatch($shop_domain, $param, $store_id->id, Auth::user()->id);
-                ProcessShopifyGetAllProducts::dispatch($shop_domain, $param_products, $store_id->id);
+                ProcessShopifyGetAllOrders::dispatch($store['domain'], $param, $store_id->id, Auth::user()->id);
+                ProcessShopifyGetAllProducts::dispatch($store['domain'], $param_products, $store_id->id);
 
-                if (strpos($state, 'mastersheet') !== false) {
-                    return redirect()->route('mastersheet', ['shopifyAddAccount' => 'success']);
-                } else {
-                    return redirect()->route('home', ['shopifyAddAccount' => 'success']);
-                }
+                return redirect('/shopify-register');
             }
         }
     }
@@ -290,7 +291,7 @@ class ShopifyStoreController extends Controller
 
         //send curl request
         $result = CustomRequests::postRequest($access_token_url, $query);
-
+        // dd($result['access_token']);
         // Store the access token
         $access_token = $result['access_token'];
 
