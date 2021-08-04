@@ -165,6 +165,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('supplierpayable-txn/{id}', 'SupplierPayableController@destroyByTransactionId');
 });
 
+Route::get('/shopify-register', 'ShopifyRegisterController@index')->name('shopify-register');
+Route::post('/shopify-register', 'ShopifyStoreController@ShopifyInstallCreateUser');
+Route::get('/shopify-register-temp', 'ShopifyStoreController@getShopifyStoreInfo');
+
+
 //Stripe Webhooks
 Route::post('stripe/webhook/report', 'StripeController@reportWebhookHandler');
 

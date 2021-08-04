@@ -5,6 +5,8 @@ import Vue from "vue";
 
 Vue.component("home", require("./home").default);
 Vue.component("mastersheet", require("./mastersheet").default);
+Vue.component("shopify-register", require("./shopify-register").default);
+
 Vue.component("profile", require("./profile-page").default);
 Vue.component("pages-404", require("./utility/404").default);
 
