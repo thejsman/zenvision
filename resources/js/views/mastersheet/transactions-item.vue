@@ -120,7 +120,6 @@ export default {
         async onChange(e, item) {
             try {
                 if (e.target.value === "null") {
-                    console.log({ item });
                     await axios.delete(`supplierpayable-txn/${item.id}`);
                     await this.getSupplierPayableTotal();
                 } else {

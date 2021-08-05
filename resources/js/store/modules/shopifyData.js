@@ -139,9 +139,8 @@ const actions = {
         try {
             const supplierPayableResult = await axios.get("supplierpayable");
             const supplierPayableData = supplierPayableResult.data;
-            console.log("Check this", supplierPayableData);
+
             commit("SET_SUPPLIER_PAYABLE", supplierPayableData);
-            console.log({ Orders: state.allOrders, supplierPayableData });
 
             commit("SET_COGS_ALL_ORDERS", {
                 data: state.allOrders,
@@ -300,12 +299,10 @@ const mutations = {
     },
     SET_COGS_ALL_ORDERS: (state, payload) => {
         const { data, supplierPayableData } = payload;
-        console.log({ data, supplierPayableData });
+
         const spOrderNumbers = _.map(supplierPayableData, sp =>
             sp.type === "shopify" ? sp.reference_number : null
         ).filter(e => e);
-
-        console.log({ spOrderNumbers });
 
         const ordersCogsTotal = data.reduce((sum, current) => {
             return !spOrderNumbers.includes(current.order_number)
@@ -319,8 +316,8 @@ const mutations = {
             },
             0
         );
-        console.log(supplierPayableTotal, ordersCogsTotal);
-        console.log("setting it up", supplierPayableTotal + ordersCogsTotal);
+        // console.log(supplierPayableTotal, ordersCogsTotal);
+        // console.log("setting it up", supplierPayableTotal + ordersCogsTotal);
 
         state.cogsTotal = supplierPayableTotal + ordersCogsTotal;
     },

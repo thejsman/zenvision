@@ -306,7 +306,7 @@ export default {
                         : 0
                 );
             });
-            console.log("chart series: ", this.chartSeries);
+
             this.updateSeries();
         },
         renderFacebookData() {
@@ -405,7 +405,6 @@ export default {
             this.assignData();
         },
         stripeChargebackArray(stripeChargeback, oldVal) {
-            console.log("we have received chargeback event");
             if (stripeChargeback.length > 0) {
                 this.stripeChargebackStatus = true;
                 this.stripeChargebackArray2 = stripeChargeback;
