@@ -44,7 +44,6 @@ export default {
         await this.loadAllChannels();
 
         eventBus.$on("toggleShopifyStore", async () => {
-            console.log("toggleShopifyStore triggered");
             await this.loadAllChannels();
         });
 

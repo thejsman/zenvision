@@ -49,7 +49,8 @@ export default {
     methods: {
         ...mapActions(["removeItemfromChangedProducts", "setSearchText"]),
         editInventory(item) {
-            this.setSearchText(item.sku);
+            console.log(item);
+            this.setSearchText(item);
             this.$bvModal.show("inventory-details");
 
             setTimeout(() => {

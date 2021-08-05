@@ -221,7 +221,15 @@ export default {
     },
     async created() {
         eventBus.$on("editInventoryText", () => {
-            this.searchText = this.inventorySearchText;
+            if (
+                this.inventorySearchText.sku === null ||
+                this.inventorySearchText.sku === ""
+            ) {
+                this.searchText = this.inventorySearchText.product_title;
+            } else {
+                this.searchText = this.inventorySearchText.sku;
+            }
+
             this.handleSearch();
         });
         await this.getCogsData();
