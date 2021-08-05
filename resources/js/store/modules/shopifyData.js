@@ -300,15 +300,19 @@ const mutations = {
     SET_COGS_ALL_ORDERS: (state, payload) => {
         const { data, supplierPayableData } = payload;
 
-        const spOrderNumbers = _.map(supplierPayableData, sp =>
-            sp.type === "shopify" ? sp.reference_number : null
-        ).filter(e => e);
+        // const spOrderNumbers = _.map(supplierPayableData, sp =>
+        //     sp.type === "shopify" ? sp.reference_number : null
+        // ).filter(e => e);
 
-        const ordersCogsTotal = data.reduce((sum, current) => {
-            return !spOrderNumbers.includes(current.order_number)
-                ? sum + current.total_cost
-                : sum + 0;
-        }, 0);
+        // const ordersCogsTotal = data.reduce((sum, current) => {
+        //     return !spOrderNumbers.includes(current.order_number)
+        //         ? sum + current.total_cost
+        //         : sum + 0;
+        // }, 0);
+
+        //Removing Orders COGS from Supplier payable, for the orders we do not have an entry
+        // in the supplier_payable table
+        const ordersCogsTotal = 0;
 
         const supplierPayableTotal = supplierPayableData.reduce(
             (sum, current) => {

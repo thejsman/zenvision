@@ -1,7 +1,9 @@
 <template>
     <div name="fade">
         <div class="">
-            <SupplierPayableItem />
+            <div v-if="supplierPayableArray.length">
+                <SupplierPayableItem />
+            </div>
         </div>
         <b-button
             variant="primary"
