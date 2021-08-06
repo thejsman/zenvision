@@ -67,7 +67,7 @@ export default {
                                 placeholder="Email"
                                 @blur="lower()"
                                 required
-                                autocomplete="off"
+                                autocomplete="username"
                             ></b-form-input>
                         </b-form-group>
 
@@ -78,6 +78,7 @@ export default {
                                 name="password"
                                 type="password"
                                 placeholder="Password"
+                                autocomplete="current-password"
                                 required
                             ></b-form-input>
                         </b-form-group>
