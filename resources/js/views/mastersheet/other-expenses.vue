@@ -52,7 +52,7 @@
                             v-for="(i, index) in itemsList"
                             :key="index"
                         >
-                            <p class="p-2 bg-light sticky">{{ i }}</p>
+                            <p class="p-2 bg-light sticky mb-0">{{ i }}</p>
                             <div
                                 v-for="item in groupedTransactions[i]"
                                 :key="item.id"
