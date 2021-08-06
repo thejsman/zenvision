@@ -33,16 +33,18 @@
             <div class="d-flex justify-content-end align-items-center">
                 <div class="transaction_select">
                     <b-dropdown
-                        :text="
-                            transactionArray.includes(item.id)
-                                ? 'Supplier Payable'
-                                : 'Lable'
-                        "
                         variant="outline-light"
-                        :class="{
-                            opacity5: !transactionArray.includes(item.id)
-                        }"
+                        class="align-items-left"
                     >
+                        <template #button-content>
+                            {{
+                                transactionArray.includes(item.id)
+                                    ? "Supplier Payable"
+                                    : "Label"
+                            }}
+                            <i class="fas fa-angle-down pl-2"></i>
+                        </template>
+
                         <b-dropdown-item
                             @click="onChange($event, item)"
                             v-if="!transactionArray.includes(item.id)"
@@ -51,20 +53,9 @@
                         <b-dropdown-item
                             @click="onChange($event, item, true)"
                             v-if="transactionArray.includes(item.id)"
-                            >Lable</b-dropdown-item
+                            >Label</b-dropdown-item
                         >
                     </b-dropdown>
-                    <!-- <select
-                        class="form-control"
-                        @change="onChange($event, item)"
-                    >
-                        <option value="null">Label</option>
-                        <option
-                            value="supplier_payable"
-                            :selected="transactionArray.includes(item.id)"
-                            >Supplier Payable</option
-                        >
-                    </select> -->
                 </div>
 
                 <div class="transaction_amount">{{ item.amount }}</div>
@@ -142,6 +133,6 @@ export default {
     padding-right: 30px;
 }
 .transaction_select {
-    min-width: 130px;
+    min-width: 160px;
 }
 </style>
