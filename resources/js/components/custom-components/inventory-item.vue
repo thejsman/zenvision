@@ -54,7 +54,7 @@ export default {
             this.$bvModal.show("inventory-details");
 
             setTimeout(() => {
-                eventBus.$emit("editInventoryText");
+                eventBus.$emit("editInventoryText", item.id);
             }, 100);
         },
 
