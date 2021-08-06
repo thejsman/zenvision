@@ -77,7 +77,7 @@
                     >
                     <b-form
                         class="p-2"
-                        autocomplete="off"
+                        autocomplete="false"
                         :action="submitUrl"
                         method="POST"
                     >
@@ -89,7 +89,7 @@
                                 name="firstname"
                                 type="text"
                                 placeholder="First name"
-                                autocomplete="off"
+                                autocomplete="false"
                                 required
                             ></b-form-input>
                         </b-form-group>
@@ -100,7 +100,7 @@
                                 name="lastname"
                                 type="text"
                                 placeholder="Last name"
-                                autocomplete="off"
+                                autocomplete="false"
                                 required
                             ></b-form-input>
                         </b-form-group>

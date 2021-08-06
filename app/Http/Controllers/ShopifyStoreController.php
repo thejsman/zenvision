@@ -212,6 +212,7 @@ class ShopifyStoreController extends Controller
         if ($user_exists) {
             $account_exist = true;
             Auth::login($user_exists, true);
+
             // return redirect('/shopify-register?status=account_exists');
 
         } else {
@@ -467,7 +468,7 @@ class ShopifyStoreController extends Controller
 
     public function shopifyInstall(Request $request)
     {
-
+        dd($request);
         if ($request->has('hmac')) {
 
             $ar = [];
