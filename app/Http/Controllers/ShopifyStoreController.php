@@ -229,7 +229,7 @@ class ShopifyStoreController extends Controller
 
 
         if ($access_token != "") {
-            $shop_exists = ShopifyStore::where('store_url', $store['domain'])->where('isDeleted', true)->first();
+            $shop_exists = ShopifyStore::where('store_url', $store['domain'])->first();
 
             if ($shop_exists) {
                 $shop_exists->api_token = $access_token;
@@ -246,6 +246,13 @@ class ShopifyStoreController extends Controller
                 // $orders = (new GetAllOrders)->getAllOrders($store['domain'], $access_token, $shop_exists->id, $created_at_min);
                 // $products = (new GetAllProducts)->getAllProducts($store['domain'], $access_token, $shop_exists->id);
                 $shop_exists->save();
+
+
+                if ($account_exist) {
+                    return redirect('/');
+                } else {
+                    return redirect('/shopify-register');
+                }
                 $param = [];
                 $param['fields'] = 'id, order_number, name, line_items, created_at,  total_price, total_tax, currency, financial_status, total_discounts, referring_site, landing_site, cancelled_at, total_price_usd, discount_applications, fulfillment_status, tax_lines, refunds, total_tip_received, original_total_duties_set, current_total_duties_set, shipping_address, shipping_lines';
                 $param['limit'] = 250;
