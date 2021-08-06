@@ -1,7 +1,7 @@
 <template>
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center my-1">
         <div class="bgred">
-            <div class="d-flex align-items-center px-3 py-1">
+            <div class="d-flex align-items-center px-3 py-2">
                 <img
                     v-if="item.type === 'paypal'"
                     src="/images/icons/paypal-transactions.svg"
@@ -30,10 +30,32 @@
             {{ item.description }}
         </div>
         <div class="bggreen">
-            <div class="row">
-                <div class="col-6">
-                    <select
-                        class="form-control label_class"
+            <div class="d-flex justify-content-end align-items-center">
+                <div class="transaction_select">
+                    <b-dropdown
+                        :text="
+                            transactionArray.includes(item.id)
+                                ? 'Supplier Payable'
+                                : 'Lable'
+                        "
+                        variant="outline-light"
+                        :class="{
+                            opacity5: !transactionArray.includes(item.id)
+                        }"
+                    >
+                        <b-dropdown-item
+                            @click="onChange($event, item)"
+                            v-if="!transactionArray.includes(item.id)"
+                            >Supplier Payable</b-dropdown-item
+                        >
+                        <b-dropdown-item
+                            @click="onChange($event, item, true)"
+                            v-if="transactionArray.includes(item.id)"
+                            >Lable</b-dropdown-item
+                        >
+                    </b-dropdown>
+                    <!-- <select
+                        class="form-control"
                         @change="onChange($event, item)"
                     >
                         <option value="null">Label</option>
@@ -42,56 +64,13 @@
                             :selected="transactionArray.includes(item.id)"
                             >Supplier Payable</option
                         >
-                    </select>
+                    </select> -->
                 </div>
-                <div class="col-6">{{ item.amount }}</div>
+
+                <div class="transaction_amount">{{ item.amount }}</div>
             </div>
         </div>
     </div>
-    <!-- <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <img
-                v-if="item.type === 'paypal'"
-                src="/images/icons/paypal-transactions.svg"
-                alt
-                height="30"
-                width="30"
-                class="channel-icons"
-            />
-            <img
-                v-if="item.type === 'stripe'"
-                src="/images/icons/stripe-icon.svg"
-                alt
-                height="30"
-                width="30"
-                class="channel-icons"
-            />
-            <img
-                v-if="item.type === 'bank'"
-                :src="`/images/bank-icons/${item.logo}.png`"
-                alt
-                height="30"
-                width="30"
-                class="channel-icons bg-white rounded"
-            />
-
-            {{ item.description }}
-        </div>
-        <div class="d-flex">
-            <select
-                class="form-control label_class"
-                @change="onChange($event, item)"
-            >
-                <option value="null">Label</option>
-                <option
-                    value="supplier_payable"
-                    :selected="transactionArray.includes(item.id)"
-                    >Supplier Payable</option
-                >
-            </select>
-            <p class="pt-3">{{ item.amount }}</p>
-        </div>
-    </div> -->
 </template>
 
 <script>
@@ -117,9 +96,9 @@ export default {
     },
     methods: {
         ...mapActions(["getSupplierPayableTotal"]),
-        async onChange(e, item) {
+        async onChange(e, item, removeItem) {
             try {
-                if (e.target.value === "null") {
+                if (removeItem === true) {
                     await axios.delete(`supplierpayable-txn/${item.id}`);
                     await this.getSupplierPayableTotal();
                 } else {
@@ -155,5 +134,14 @@ export default {
     align-items: center;
     justify-content: flex-end;
     flex-grow: 1;
+}
+
+.transaction_amount {
+    min-width: 100px;
+    text-align: right;
+    padding-right: 30px;
+}
+.transaction_select {
+    min-width: 130px;
 }
 </style>
