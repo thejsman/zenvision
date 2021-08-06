@@ -75,12 +75,7 @@
                         dismissible
                         >{{ regError }}</b-alert
                     >
-                    <b-form
-                        class="p-2"
-                        autocomplete="false"
-                        :action="submitUrl"
-                        method="POST"
-                    >
+                    <b-form class="p-2" :action="submitUrl" method="POST">
                         <slot />
                         <b-form-group id="firstname-group">
                             <b-form-input
@@ -89,7 +84,6 @@
                                 name="firstname"
                                 type="text"
                                 placeholder="First name"
-                                autocomplete="false"
                                 required
                             ></b-form-input>
                         </b-form-group>
@@ -100,7 +94,6 @@
                                 name="lastname"
                                 type="text"
                                 placeholder="Last name"
-                                autocomplete="false"
                                 required
                             ></b-form-input>
                         </b-form-group>
@@ -113,7 +106,7 @@
                                 v-model="email"
                                 type="email"
                                 placeholder="Enter email"
-                                autocomplete="off"
+                                autocomplete="username"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
@@ -132,7 +125,6 @@
                                 name="phone"
                                 type="tel"
                                 placeholder="Phone number"
-                                autocomplete="off"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
@@ -152,7 +144,7 @@
                                 name="password"
                                 type="password"
                                 placeholder="Enter password"
-                                autocomplete="off"
+                                autocomplete="new-password"
                                 required
                             ></b-form-input>
                             <b-form-invalid-feedback
