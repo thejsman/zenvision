@@ -220,26 +220,13 @@ export default {
         };
     },
     async created() {
-        eventBus.$on("editInventoryText", () => {
-            if (
-                this.inventorySearchText.sku === null ||
-                this.inventorySearchText.sku === ""
-            ) {
-                this.searchText = this.inventorySearchText.product_title;
-            } else {
-                this.searchText = this.inventorySearchText.sku;
-            }
-
-            this.handleSearch();
+        eventBus.$on("editInventoryText", id => {
+            this.handleSearchById(id);
         });
         await this.getCogsData();
     },
     computed: {
-        ...mapGetters([
-            "shopifyCogsArray",
-            "hasShopifyStoreCS",
-            "inventorySearchText"
-        ])
+        ...mapGetters(["shopifyCogsArray", "hasShopifyStoreCS"])
     },
     methods: {
         ...mapActions([
@@ -257,6 +244,9 @@ export default {
                         .toLowerCase()
                         .includes(this.searchText.toLowerCase())
             );
+        },
+        handleSearchById(id) {
+            this.items = this.preItems.filter(item => item.id === id);
         },
         handleUnitsChange(item) {
             this.changedProducts.push(item);
@@ -314,14 +304,14 @@ export default {
         },
         async getCogsData() {
             try {
-                // const { data } = await axios.get("cogs");
-
                 this.items = this.shopifyCogsArray;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
             } catch (error) {
                 console.log({ error });
-                this.products = [];
+                this.items = [];
+                this.is_loading = false;
+                this.preItems = [];
             }
         }
     }
