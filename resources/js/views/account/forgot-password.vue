@@ -78,7 +78,7 @@ export default {
                                     class="form-control"
                                     id="useremail"
                                     placeholder="Email"
-                                    autocomplete="off"
+                                    :autocomplete="false"
                                     @blur="lower($event)"
                                     required
                                 />
