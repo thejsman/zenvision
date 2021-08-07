@@ -35,7 +35,11 @@
                     <div v-if="spItem.type === 'shopify'">
                         {{ spItem.type }}# {{ spItem.reference_number }}
                     </div>
-                    <div v-if="spItem.type === 'bank'">
+                    <div
+                        v-if="
+                            spItem.type === 'bank' || spItem.type === 'credit'
+                        "
+                    >
                         {{ spItem.type }}# {{ spItem.reference_number }}
                     </div>
                 </div>

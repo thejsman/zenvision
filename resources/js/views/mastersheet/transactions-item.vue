@@ -19,7 +19,7 @@
                     class="channel-icons"
                 />
                 <img
-                    v-if="item.type === 'bank'"
+                    v-if="item.type === 'bank' || item.type === 'credit'"
                     :src="`/images/bank-icons/${item.logo}.png`"
                     alt
                     height="30"
