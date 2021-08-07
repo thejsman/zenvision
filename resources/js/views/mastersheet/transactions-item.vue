@@ -135,4 +135,13 @@ export default {
 .transaction_select {
     min-width: 160px;
 }
+@media (max-width: 600px) {
+    .transaction_select {
+        min-width: 0px;
+    }
+    .transaction_amount {
+        min-width: 0px;
+        padding: 0px 5px;
+    }
+}
 </style>
