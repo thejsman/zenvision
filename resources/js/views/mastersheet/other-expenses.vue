@@ -342,9 +342,11 @@ export default {
 
                 if (this.bankTransactions.length > 0) {
                     this.noTransactions = false;
-                    this.bankTransactions.forEach(bt =>
+                    this.bankTransactions.forEach(bt => {
                         this.allTransactions.push({
-                            type: "bank",
+                            type: this.bankAccounts.find(
+                                bank => bank.bank_user_id === bt.account_id
+                            ).bank_type,
                             id: bt.transaction_id,
                             date: moment(bt.date).format("LL"),
                             description: bt.name,
@@ -353,8 +355,8 @@ export default {
                                 o => o.bank_user_id === bt.account_id
                             ).institution_id,
                             account_id: bt.account_id
-                        })
-                    );
+                        });
+                    });
                 }
             }
 
