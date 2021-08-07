@@ -22,7 +22,6 @@ class CreatePaypalTable extends Migration
             $table->boolean('isDeleted')->default(false);
             $table->boolean('enabled_on_dashboard')->default(true);
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

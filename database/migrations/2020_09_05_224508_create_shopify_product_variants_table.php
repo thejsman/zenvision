@@ -21,7 +21,7 @@ class CreateShopifyProductVariantsTable extends Migration
             $table->bigInteger('inventory_item_id')->nullable();
             $table->string('product_title');
             $table->string('variant_title')->nullable();
-            $table->string('sku')->nullable();
+            $table->string('sku')->nullable()->default('no_sku');
             $table->string('color')->nullable();
             $table->string('size')->nullable();
             $table->decimal('sales_price');
