@@ -227,7 +227,7 @@ export default {
 </script>
 
 <template>
-    <div class="sheet-leftbar card">
+    <div class="px-2">
         <div class="mail-list mt-4">
             <div class="row">
                 <div
@@ -296,9 +296,6 @@ export default {
 </template>
 <style lang="scss">
 .sheet-leftbar {
-    float: left;
-    padding: 20px;
-    border-radius: 5px;
     background-color: #191e2c;
     border-radius: 10px;
 }
@@ -308,10 +305,10 @@ export default {
 .netEquity .text-muted {
     color: #556ee7 !important;
 }
-@media (max-width: 767px) {
-    .sheet-leftbar {
-        float: none;
-        width: 100%;
-    }
-}
+// @media (max-width: 767px) {
+//     .sheet-leftbar {
+//         float: none;
+//         width: 100%;
+//     }
+// }
 </style>

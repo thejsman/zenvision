@@ -91,12 +91,6 @@ export default {
                     <BankAccount />
                 </div>
             </div>
-            <div class="col-md-3 mt-4">
-                <Sidepanel />
-            </div>
-            <div class="col-md-9 mt-4">
-                <Mainpanel />
-            </div>
 
             <loading
                 :active.sync="loadingStatus"
@@ -106,7 +100,14 @@ export default {
                 :opacity="0.8"
             ></loading>
         </div>
-
+        <div class="row">
+            <div class="col-md-3 mt-4 sheet-leftbar">
+                <Sidepanel />
+            </div>
+            <div class="col-md-9 mt-4">
+                <Mainpanel />
+            </div>
+        </div>
         <b-modal
             id="shopify-connect"
             size="lg"
