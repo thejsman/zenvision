@@ -23,7 +23,7 @@ class CreateShopifyOrderProductsTable extends Migration
             $table->bigInteger('variant_id');
             $table->string('title');
             $table->integer('quantity');
-            $table->string('sku');
+            $table->string('sku')->nullable()->default('no_sku');
             $table->string('variant_title')->nullable();
             $table->string('fulfillment_service');
             $table->bigInteger('product_id');

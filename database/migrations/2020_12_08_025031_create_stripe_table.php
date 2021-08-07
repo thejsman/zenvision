@@ -22,6 +22,8 @@ class CreateStripeTable extends Migration
             $table->string('refresh_token');
             $table->boolean('isDeleted')->default(false);
             $table->boolean('enabled_on_dashboard')->default(true);
+            $table->boolean('report_status')->default(false);
+            $table->string('time_zone')->default('America/New_York');
             $table->string('stripe_publishable_key')->nullable();
             $table->timestamps();
 
