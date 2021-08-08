@@ -215,9 +215,10 @@ class ShopifyStoreController extends Controller
 
             // $credentials = array('username' => $user_exists->email, 'password' => $user_exists->password);
 
-            if (Auth::loginUsingId($user_exists->id)) {
+            if ($account_exist) {
                 // return 'You have successfully logged in :D';
-                return redirect('/');
+                Auth::loginUsingId($user_exists->id);
+                dd("We have logged in");
             } else {
                 dd('Sorry, but your Credentials seem to be wrong, stupid');
             }
