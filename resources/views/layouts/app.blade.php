@@ -26,7 +26,7 @@
             var getSessionToken = window['app-bridge-utils'].getSessionToken;
             var app = createApp({
                 apiKey: '6475dbe1c3d0b763d819fc4d053d771e',
-                shopOrigin: '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'
+                shopOrigin: 'https://zenvision-local.myshopify.com'
             });
 
             getSessionToken(app).then(session_token => getPageContent(session_token)).catch(err => {
@@ -35,12 +35,11 @@
             });
 
             function getPageContent(session_token) {
-                fetch('https://zenvision-local.myshopify.com/decode-token', {
+                fetch('https://zenvision-local.myshopify.com', {
                     headers: new Headers({
                         'Authorization': 'Bearer ' + session_token
                     })
                 }).then(data => data.json()).then(json => {
-                    console.log("Check this", data)
                     //do stuff
                     console.error(json);
                 });
