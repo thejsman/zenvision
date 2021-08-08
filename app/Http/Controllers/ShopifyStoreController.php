@@ -209,11 +209,11 @@ class ShopifyStoreController extends Controller
         $user_exists = User::where('email',  $store['customer_email'])->first();
 
         var_dump($access_token, $store);
-        dd($user_exists);
+
         if ($user_exists) {
             $account_exist = true;
             Auth::login($user_exists, true);
-
+            dd($user_exists);
             // return redirect('/shopify-register?status=account_exists');
 
         } else {
