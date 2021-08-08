@@ -16,7 +16,7 @@
     <link href="/css/app-dark.css" rel="stylesheet" id="layout-css">
     <link href="/css/custom.css" rel="stylesheet" id="custom-layout-css">
     <script src="https://cdn.teller.io/connect/connect.js"></script>
-    <script src="https://unpkg.com/@shopify/app-bridge@2"></script>
+    <!-- <script src="https://unpkg.com/@shopify/app-bridge@2"></script>
     <script src="https://unpkg.com/@shopify/app-bridge-utils"></script>
 
     <script>
@@ -45,7 +45,7 @@
                 });
             }
         })();
-    </script>
+    </script> -->
     <!-- Facebook Pixel Code -->
     <script>
         ! function(f, b, e, v, n, t, s) {
