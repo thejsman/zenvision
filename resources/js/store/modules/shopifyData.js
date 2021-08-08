@@ -38,7 +38,9 @@ const getters = {
     inventoryChangedProducts: state => state.inventoryChangedProducts,
     inventorySearchText: state => state.searchText,
     shopifyRevenue: state =>
-        _.sumBy(state.orders, order => parseFloat(order.total_price)),
+        _.sumBy(state.orders, order =>
+            parseFloat(order.total_price - order.total_tax)
+        ),
     shopifyShippingRevenue: state =>
         _.sumBy(state.orders, order =>
             _.sumBy(order.shipping_lines, line => parseFloat(line.price))
