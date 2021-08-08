@@ -105,7 +105,7 @@ class ShopifyStoreController extends Controller
 
             $access_token = $this->getAccessToken($shop_domain, $response_code);
             $store = $this->getShopifyStoreInfo($shop_domain, $access_token);
-
+            dd($request);
             return  $this->ShopifyInstallCreateUser($access_token, $store);
         }
 
@@ -468,7 +468,6 @@ class ShopifyStoreController extends Controller
 
     public function shopifyInstall(Request $request)
     {
-
         if ($request->has('hmac')) {
 
             $ar = [];
