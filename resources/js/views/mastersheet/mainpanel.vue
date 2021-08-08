@@ -255,7 +255,7 @@ export default {
 
 <template>
     <div class="sheet-rightbar mx-4">
-        <h4>Master Cash flow reconciliation</h4>
+        <h4>Master Cash Flow Reconciliation</h4>
 
         <div class="row justify-content-md-between align-items-md-center">
             <!-- end col-->
