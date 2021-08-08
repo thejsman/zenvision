@@ -217,7 +217,9 @@ class ShopifyStoreController extends Controller
 
             if ($account_exist) {
                 // return 'You have successfully logged in :D';
-                dd(Auth::loginUsingId($user_exists->id));
+                if (Auth::loginUsingId($user_exists->id)) {
+                    return redirect('/mastersheet');
+                };
             } else {
                 dd('Sorry, but your Credentials seem to be wrong, stupid');
             }
