@@ -213,9 +213,8 @@ class ShopifyStoreController extends Controller
         if ($user_exists) {
             $account_exist = true;
             Auth::login($user_exists, true);
-            dd($user_exists);
-            // return redirect('/shopify-register?status=account_exists');
-
+            echo ("user exists");
+            return redirect('/');
         } else {
             $user = new User();
             $user->password = Hash::make('123456');
