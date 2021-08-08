@@ -468,7 +468,7 @@ class ShopifyStoreController extends Controller
 
     public function shopifyInstall(Request $request)
     {
-        dd($request);
+
         if ($request->has('hmac')) {
 
             $ar = [];
