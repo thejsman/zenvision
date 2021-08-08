@@ -29,6 +29,7 @@ export default {
     computed: {
         ...mapGetters([
             "shopifyRevenue",
+            "shopifyTotalTax",
             "shopifyDiscounts",
             "shopifyShippingRevenue",
             "ShopifyCogsTotalPA",
@@ -37,17 +38,9 @@ export default {
             "subscriptionTotal"
         ]),
         totalProfit() {
-            console.log(
-                this.shopifyRevenue,
-                this.shopifyShippingRevenue,
-                this.shopifyDiscounts,
-                this.ShopifyCogsTotalPA,
-                this.shopifyRefundTotal,
-                this.stripeMerchantFeeTotal,
-                this.subscriptionTotal
-            );
             return displayCurrency(
                 this.shopifyRevenue +
+                    this.shopifyTotalTax +
                     this.shopifyShippingRevenue -
                     this.shopifyDiscounts -
                     this.ShopifyCogsTotalPA -

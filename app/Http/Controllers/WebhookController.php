@@ -139,8 +139,8 @@ class WebhookController extends Controller
                 'tax_lines' => $line_item['tax_lines'],
             );
 
-            $this->updateInventory($line_item['variant_id'], $line_item['fulfillable_quantity'], $webhook_type, $order_id);
-            $this->addSupplierPayable($user_id, $line_item['title'], $order_number, $cogs);
+            $this->updateInventory($line_item['variant_id'], $line_item['fulfillable_quantity'], $webhook_type, $order_id, $user_id, $line_item['title'], $order_number, $cogs);
+
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
         }
     }
@@ -154,7 +154,7 @@ class WebhookController extends Controller
             return $product->cost + $product->shipping_cost;
         }
     }
-    public function updateInventory($variant_id, $qty, $webhook_type, $order_id = null)
+    public function updateInventory($variant_id, $qty, $webhook_type, $order_id = null, $user_id, $product_title, $order_number, $cogs)
     {
         $product = ShopifyProductVariant::where('variant_id', $variant_id)->first();
         if ($product) {
@@ -172,6 +172,8 @@ class WebhookController extends Controller
                         $product->save();
                     }
                 }
+            } else {
+                $this->addSupplierPayable($user_id, $product_title, $order_number, $cogs);
             }
         }
     }
