@@ -219,10 +219,8 @@ class ShopifyStoreController extends Controller
 
                 $user = User::find($user_exists->id);
 
-                Auth::login($user, true);
-                
-                // sleep for 10 seconds
-               dd("Trying to log in");
+                Auth::login($user);                
+               
                 return redirect()->route('home');
                 // // dd(['access_token' => $access_token, 'store' => $store]);
                 // // return 'You have successfully logged in :D';
