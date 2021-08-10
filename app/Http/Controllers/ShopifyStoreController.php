@@ -222,7 +222,7 @@ class ShopifyStoreController extends Controller
                 Auth::login($user, true);
                 
                 // sleep for 10 seconds
-                sleep(10);
+               dd("Trying to log in");
                 return redirect()->route('home');
                 // // dd(['access_token' => $access_token, 'store' => $store]);
                 // // return 'You have successfully logged in :D';
