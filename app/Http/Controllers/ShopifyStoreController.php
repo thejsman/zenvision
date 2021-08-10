@@ -218,7 +218,7 @@ class ShopifyStoreController extends Controller
             if ($account_exist) {
 
                 $user = User::find($user_exists->id);
-                dd($user);
+
                 Auth::login($user, true);
 
                 return redirect()->route('home');
