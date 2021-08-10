@@ -105,7 +105,7 @@ class ShopifyStoreController extends Controller
 
             $access_token = $this->getAccessToken($shop_domain, $response_code);
             $store = $this->getShopifyStoreInfo($shop_domain, $access_token);
-            dd(['access_token' => $access_token, 'store' => $store]);
+
             return  $this->ShopifyInstallCreateUser($access_token, $store);
         }
 
@@ -208,7 +208,7 @@ class ShopifyStoreController extends Controller
         ]);
         $user_exists = User::where('email',  $store['customer_email'])->first();
 
-        var_dump($access_token, $store);
+
 
         if ($user_exists) {
             $account_exist = true;
@@ -216,6 +216,7 @@ class ShopifyStoreController extends Controller
             // $credentials = array('username' => $user_exists->email, 'password' => $user_exists->password);
 
             if ($account_exist) {
+                dd(['access_token' => $access_token, 'store' => $store]);
                 // return 'You have successfully logged in :D';
                 if (Auth::loginUsingId($user_exists->id)) {
                     return redirect('/mastersheet');
