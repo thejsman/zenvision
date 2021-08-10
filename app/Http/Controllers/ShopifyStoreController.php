@@ -221,14 +221,14 @@ class ShopifyStoreController extends Controller
 
                 Auth::login($user);                
                
-                return redirect()->route('home');
+                 return redirect('/');
                 // // dd(['access_token' => $access_token, 'store' => $store]);
                 // // return 'You have successfully logged in :D';
                 // if (Auth::loginUsingId($user_exists->id)) {
 
                 // };
             } else {
-                dd('Sorry, but your Credentials seem to be wrong, stupid');
+                echo('Sorry, but your Credentials seem to be wrong, stupid');
             }
         } else {
             $user = new User();
