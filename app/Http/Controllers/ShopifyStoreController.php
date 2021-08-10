@@ -94,7 +94,7 @@ class ShopifyStoreController extends Controller
 
     public function getResponse(Request $request)
     {
-        dd($request);
+
         // response code from shopify
         $response_code = $request->input('code');
         // shopify store domain
@@ -105,7 +105,7 @@ class ShopifyStoreController extends Controller
 
             $access_token = $this->getAccessToken($shop_domain, $response_code);
             $store = $this->getShopifyStoreInfo($shop_domain, $access_token);
-
+            dd(['access_token' => $access_token, 'store' => $store]);
             return  $this->ShopifyInstallCreateUser($access_token, $store);
         }
 
