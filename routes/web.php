@@ -179,3 +179,5 @@ Route::get('stripe-reportrun', 'StripeController@createReportRun');
 Route::get('stripe-report-content', 'StripeController@getReportContent');
 Route::get('stripe-report-status', 'StripeController@getReportStatus');
 Route::get('stripe-report-status2', 'StripeController@getReportStatus2');
+
+Route::get('shopifyinstall', 'ShopifyStoreController@shopifyInstall');
