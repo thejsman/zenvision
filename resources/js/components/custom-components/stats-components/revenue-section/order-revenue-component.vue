@@ -43,7 +43,6 @@ export default {
         },
         shopifyRevenue(newVal, oldVal) {
             if (this.hasShopifyStorePA) {
-                console.log("Check this: ", this.shopifyRevenue);
                 this.data.loading = false;
                 this.data.value = displayCurrency(`${this.shopifyRevenue}`);
             }
