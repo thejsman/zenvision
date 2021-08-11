@@ -12,6 +12,9 @@ class GoogleAdController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->has('error')) {
+            return redirect()->route('home');
+        }
         $code = $request->code;
         $ch = curl_init();
 
