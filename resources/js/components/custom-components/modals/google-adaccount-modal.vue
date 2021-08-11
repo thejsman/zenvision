@@ -61,7 +61,7 @@
                 <b-button
                     block
                     class="btn btn-cancel text-center"
-                    @click="$emit('handle-close')"
+                    @click="handleCancel"
                     >Cancel</b-button
                 >
             </div>
@@ -135,6 +135,9 @@ export default {
             return this.adAccounts.some(
                 account => account.ad_account_id === id
             );
+        },
+        handleCancel() {
+            window.location.href = "/";
         }
     }
 };

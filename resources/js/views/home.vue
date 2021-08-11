@@ -147,6 +147,20 @@ export default {
             }, 1000);
         }
 
+        if (new URL(location.href).searchParams.get("gogoleAdAccount")) {
+            const result = new URL(location.href).searchParams.get(
+                "gogoleAdAccount"
+            );
+            console.log({ result });
+            setTimeout(() => {
+                if (result === "access_denied") {
+                    this.$bvModal.show("google-account-access-error");
+                } else if (result === "NOT_ADS_USER") {
+                    this.$bvModal.show("google-account-error");
+                }
+            }, 1000);
+        }
+
         if (new URL(location.href).searchParams.get("shopifyAddAccount")) {
             const result = new URL(location.href).searchParams.get(
                 "shopifyAddAccount"
@@ -183,6 +197,9 @@ export default {
             this.$bvModal.show(modalId);
         },
         handleOk() {
+            window.location.href = "/";
+        },
+        handleCancel() {
             window.location.href = "/";
         },
         async getShopifyStoreData() {
@@ -365,6 +382,7 @@ export default {
             <GoogleConnect
                 :googleData="googleAdAccounts"
                 :googleError="googleError"
+                @hide="handleCancel"
                 @handle-close="$bvModal.hide('google-connect')"
             />
         </b-modal>
@@ -438,6 +456,34 @@ export default {
             <p class="my-2">
                 We are importing your Shopify orders and products, this process
                 can take a few minutes, please check back later.
+            </p>
+        </b-modal>
+        <!-- Google access denied -->
+        <b-modal
+            id="google-account-access-error"
+            title="Google Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                We cannot import Google Ads data without
+                <strong>Manage your AdWords campaigns</strong>, please try again
+                and select the Manage your AdWords campaigns permission on the
+                Google connect consent screen.
+            </p>
+        </b-modal>
+        <b-modal
+            id="google-account-error"
+            title="Google Account"
+            ok-only
+            ok-variant="primary"
+            @ok="handleOk"
+            @hide="handleOk"
+        >
+            <p class="my-2">
+                No Ad account found.
             </p>
         </b-modal>
     </Layout>

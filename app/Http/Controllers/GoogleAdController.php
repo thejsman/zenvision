@@ -13,7 +13,9 @@ class GoogleAdController extends Controller
     public function index(Request $request)
     {
         if ($request->has('error')) {
-            return redirect()->route('home');
+            if ($request->error == 'access_denied') {
+                return redirect()->route('home', ['gogoleAdAccount' => 'access_denied']);
+            }
         }
         $code = $request->code;
         $ch = curl_init();
@@ -49,6 +51,7 @@ class GoogleAdController extends Controller
             'google_refresh_token' => $response['refresh_token'],
             'google_expires_at' => date('Y/m/d H:i:s', Time::now()->timestamp + $response['expires_in']),
         ]);
+
         return redirect()->route('home', ['listGoogleAccounts' => $response['access_token']]);
     }
 
@@ -110,6 +113,10 @@ class GoogleAdController extends Controller
         }
         curl_close($ch);
         $response = json_decode($result, true);
+
+        if (isset($response['error'])) {
+            return redirect()->route('home', ['gogoleAdAccount' => 'NOT_ADS_USER']);
+        }
         return $response['resourceNames'];
     }
 

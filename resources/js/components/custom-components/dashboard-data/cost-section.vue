@@ -556,7 +556,7 @@ export default {
         async getSubscriptionData() {
             try {
                 const { data } = await axios.get("/subscriptioncost");
-                console.log({ data });
+
                 if (data.length > 0) {
                     const subTotal2 = this.getSubscriptionTotal(data);
                     this.subscriptionData = subTotal2;
