@@ -10,10 +10,14 @@ use Illuminate\Http\Request;
 class FacebookController extends Controller
 {
     public function facebookConnect(Request $request)
+
     {
 
-        $code = $request->code;
+        if ($request->has('error')) {
+            return redirect()->route('home');
+        }
 
+        $code = $request->code;
         $client_id = env('MIX_FACEBOOK_CLIENT_ID');
         $client_secret = env('FACEBOOK_SECRET_KEY');
         $redirect_uri = env('MIX_FACEBOOK_REDIRECT_URL');
@@ -53,7 +57,6 @@ class FacebookController extends Controller
 
         $access_token = $result['access_token'];
         return redirect()->route('home', ['listFacebookAdAccounts' => $access_token]);
-
     }
 
     public function getAdAccounts()
