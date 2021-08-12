@@ -21,6 +21,7 @@ class CreatePaypalTable extends Migration
             $table->string('refresh_token');
             $table->boolean('isDeleted')->default(false);
             $table->boolean('enabled_on_dashboard')->default(true);
+            $table->timestamp('expires_at');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
