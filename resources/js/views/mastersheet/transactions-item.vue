@@ -27,7 +27,7 @@
                     class="channel-icons bg-white rounded"
                 />
             </div>
-            {{ item.description }}
+       {{ item.type }} {{ item.type.includes(['depository', 'bank', 'credit', 'investment', 'loan', 'other']) }}     {{ item.description }}
         </div>
         <div class="bggreen">
             <div class="d-flex justify-content-end align-items-center">
