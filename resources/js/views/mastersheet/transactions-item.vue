@@ -19,7 +19,7 @@
                     class="channel-icons"
                 />
                 <img
-                    v-if="item.type === 'bank' || item.type === 'credit'"
+                    v-if="item.type.includes(['depository', 'bank', 'credit', 'investment', 'loan', 'other'])"
                     :src="`/images/bank-icons/${item.logo}.png`"
                     alt
                     height="30"
@@ -133,7 +133,7 @@ export default {
     padding-right: 30px;
 }
 .transaction_select {
-    min-width: 160px;
+    min-width: 80px;
 }
 @media (max-width: 600px) {
     .transaction_select {
