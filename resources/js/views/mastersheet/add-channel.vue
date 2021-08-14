@@ -30,7 +30,7 @@
             </b-dropdown-item>
         </PlaidLink>
 
-        <b-dropdown-item :href="paypalUrl">
+        <!-- <b-dropdown-item :href="paypalUrl">
             <img
                 src="/images/icons/paypal-icon.svg"
                 alt
@@ -39,7 +39,7 @@
                 class="channel-icons"
             />
             Paypal
-        </b-dropdown-item>
+        </b-dropdown-item> -->
         <b-dropdown-item :href="stripeUrl">
             <img
                 src="/images/icons/stripe-icon.svg"

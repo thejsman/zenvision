@@ -19,7 +19,16 @@
                     class="channel-icons"
                 />
                 <img
-                    v-if="item.type.includes(['depository', 'bank', 'credit', 'investment', 'loan', 'other'])"
+                    v-if="
+                        [
+                            'depository',
+                            'bank',
+                            'credit',
+                            'investment',
+                            'loan',
+                            'other'
+                        ].includes(item.type)
+                    "
                     :src="`/images/bank-icons/${item.logo}.png`"
                     alt
                     height="30"
@@ -27,7 +36,7 @@
                     class="channel-icons bg-white rounded"
                 />
             </div>
-       {{ item.type }} {{ item.type.includes(['depository', 'bank', 'credit', 'investment', 'loan', 'other']) }}     {{ item.description }}
+            {{ item.description }}
         </div>
         <div class="bggreen">
             <div class="d-flex justify-content-end align-items-center">
@@ -35,6 +44,7 @@
                     <b-dropdown
                         variant="outline-light"
                         class="align-items-left"
+                        right
                     >
                         <template #button-content>
                             {{
@@ -134,6 +144,10 @@ export default {
 }
 .transaction_select {
     min-width: 80px;
+}
+.transaction_select .dropdown-item {
+    padding: 3px 20px;
+    text-align: right;
 }
 @media (max-width: 600px) {
     .transaction_select {
