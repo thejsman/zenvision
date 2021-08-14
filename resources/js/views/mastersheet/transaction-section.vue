@@ -29,7 +29,7 @@ export default {
                         content-class="p-3 text-muted"
                     >
                         <OtherExpenses />
-                        <AllTransactions />
+                        <!-- <AllTransactions /> -->
                     </b-tabs>
                 </b-card>
                 <div class="text-center text-muted mt-2">

@@ -268,7 +268,7 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="mail-list mt-4">
+        <div class="mail-list mt-4 mb-3">
             <div class="row">
                 <div class="col-xl-12">
                     <div class="d-flex justify-content-between">
