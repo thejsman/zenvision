@@ -23,15 +23,21 @@ export default {
 
         <div class="col mt-1 p-0">
             <div>
-                <b-card no-body>
+                <!-- Hiding tabs  -->
+                <!-- <b-card no-body>
                     <b-tabs
                         nav-class="nav-tabs-custom m-2 pt-2"
                         content-class="p-3 text-muted"
                     >
                         <OtherExpenses />
-                        <!-- <AllTransactions /> -->
+                        <AllTransactions />
                     </b-tabs>
+                </b-card> -->
+
+                <b-card no-body>
+                    <OtherExpenses />
                 </b-card>
+
                 <div class="text-center text-muted mt-2">
                     <p class="align-items-center">
                         <i

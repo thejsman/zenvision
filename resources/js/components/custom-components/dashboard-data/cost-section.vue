@@ -10,21 +10,23 @@
                 <ShopifyDiscounts />
                 <ShopifyRefunds />
             </div>
-        </div>
-        <ChargebackComponent />
-        <!-- <MerchantFeeComponent /> -->
-        <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
-            <Stat
-                :title="cost.title"
-                :value="cost.value"
-                :loading="cost.loading"
-                :onClick="cost.onClick"
-                :totalSubscriptionCount="cost.totalSubscriptionCount"
-                :showIcon="cost.showIcon"
-                :iconName="cost.iconName"
-                :channelIcon="cost.channelIcon"
-                :toolTip="cost.toolTip"
-            />
+            <div class="row mt-2 mb-2">
+                <ChargebackComponent />
+                <!-- <MerchantFeeComponent /> -->
+                <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
+                    <Stat
+                        :title="cost.title"
+                        :value="cost.value"
+                        :loading="cost.loading"
+                        :onClick="cost.onClick"
+                        :totalSubscriptionCount="cost.totalSubscriptionCount"
+                        :showIcon="cost.showIcon"
+                        :iconName="cost.iconName"
+                        :channelIcon="cost.channelIcon"
+                        :toolTip="cost.toolTip"
+                    />
+                </div>
+            </div>
         </div>
 
         <b-modal
