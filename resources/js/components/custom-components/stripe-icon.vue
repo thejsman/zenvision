@@ -9,7 +9,11 @@
                 <div
                     class="border rounded p-2 mx-1 dropbtn bg-white"
                     :class="{
-                        'border-primary': stripeAccount.enabled_on_dashboard
+                        'border-primary': stripeAccount.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !stripeAccount.enabled_on_dashboard
+                                : null
                     }"
                     @click="disableFeature ? handleClick(stripeAccount) : null"
                     v-b-tooltip.hover="stripeAccount.name"
@@ -60,6 +64,7 @@ export default {
     computed: {
         ...mapGetters(["stripeAccounts", "currentChannel"])
     },
+
     methods: {
         ...mapActions([
             "removeStripeAccount",

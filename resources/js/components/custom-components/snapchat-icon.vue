@@ -9,7 +9,11 @@
                 <div
                     class="border rounded p-2 mx-1 dropbtn bg-white"
                     :class="{
-                        'border-primary': snapchatAccount.enabled_on_dashboard
+                        'border-primary': snapchatAccount.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !snapchatAccount.enabled_on_dashboard
+                                : null
                     }"
                     @click="
                         disableFeature ? handleClick(snapchatAccount) : null
@@ -46,6 +50,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters } from "vuex";
 
 export default {
     name: "SnapchatAccount",
@@ -60,6 +65,7 @@ export default {
             default: true
         }
     },
+    computed: { ...mapGetters(["currentChannel"]) },
     created() {
         this.getsnapchatAccounts();
     },

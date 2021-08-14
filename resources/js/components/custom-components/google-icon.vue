@@ -9,7 +9,11 @@
                 <div
                     class="border rounded p-2 mx-1 dropbtn bg-white"
                     :class="{
-                        'border-primary': googleAccount.enabled_on_dashboard
+                        'border-primary': googleAccount.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !googleAccount.enabled_on_dashboard
+                                : null
                     }"
                     @click="disableFeature ? handleClick(googleAccount) : null"
                     v-b-tooltip.hover="googleAccount.ad_account_id"
@@ -40,6 +44,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters } from "vuex";
 export default {
     name: "googleAccount",
     data() {
@@ -53,6 +58,7 @@ export default {
             default: true
         }
     },
+    computed: { ...mapGetters(["currentChannel"]) },
     created() {
         this.getgoogleAccounts();
     },
