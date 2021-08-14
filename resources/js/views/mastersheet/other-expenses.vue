@@ -1,13 +1,13 @@
 <template>
     <div>
-        <b-tab active>
+        <!-- <b-tab active>
             <template v-slot:title>
                 <span class="d-inline-block d-sm-none">
                     Other Expenses
                 </span>
                 <span class="d-none d-sm-inline-block">Other Expenses</span>
             </template>
-        </b-tab>
+        </b-tab> -->
 
         <div class="row">
             <div class="col-md-12 mt-3">
@@ -19,31 +19,37 @@
                         </div>
                     </transition>
                     <div class="list-group" id="infinite-list">
-                        <div v-if="!noAccount"></div>
                         <div
                             v-if="!loading && noTransactions && noAccount"
-                            class="d-flex flex-column justify-content-center w-100"
+                            class="d-flex flex-column justify-content-center w-100 mt-5"
                         >
-                            <p class="text-center">
-                                No transactions in between
-                                <span class="font-weight-bold">
-                                    {{ transEndDate }}</span
-                                >
-                                and
-                                <span class="font-weight-bold">{{
-                                    transStartDate
-                                }}</span
-                                >, load next 14 days transactions
-                            </p>
+                            <div v-if="noAccount">
+                                <p class="text-center">
+                                    No bank/credit card account connected.
+                                </p>
+                            </div>
+                            <div v-else>
+                                <p class="text-center">
+                                    No transactions in between
+                                    <span class="font-weight-bold">
+                                        {{ transEndDate }}</span
+                                    >
+                                    and
+                                    <span class="font-weight-bold">{{
+                                        transStartDate
+                                    }}</span
+                                    >, load next 14 days transactions
+                                </p>
 
-                            <div class="text-center">
-                                <b-button
-                                    type="submit"
-                                    variant="primary"
-                                    class="my-2"
-                                    @click="loadMoreTransactions"
-                                    >Load more</b-button
-                                >
+                                <div class="text-center">
+                                    <b-button
+                                        type="submit"
+                                        variant="primary"
+                                        class="my-2"
+                                        @click="loadMoreTransactions"
+                                        >Load more</b-button
+                                    >
+                                </div>
                             </div>
                         </div>
 
@@ -77,8 +83,8 @@
             </div>
             <div class="col mt-3 pt-3">
                 <p class="text-center text-white">
-                    Add a <strong>Bank Account, Credit Card, Stripe</strong> or
-                    <strong>Paypal </strong> to see transactions
+                    Add a <strong>Bank Account, Credit Card, Stripe</strong> to
+                    see transactions
                 </p>
             </div>
         </div>
