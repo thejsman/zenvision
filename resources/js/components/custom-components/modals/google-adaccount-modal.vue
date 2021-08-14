@@ -4,7 +4,9 @@
             <div class="font-weight-bold font-size-14 text-white">
                 Google Ad Accounts
             </div>
-            <p class="mt-2 mb-4 text-white">Please select one Ad account</p>
+            <p class="mt-2 mb-4 text-white" v-if="!noAccount">
+                Please select one Ad account
+            </p>
             <div v-if="googleError" class="d-flex flex-column">
                 <b-alert show variant="danger" class="w-100">
                     Error fetching the details, please try later</b-alert
@@ -12,7 +14,7 @@
             </div>
             <div v-if="!googleError">
                 <div v-if="noAccount">
-                    <b-alert show variant="warning" class="w-100"
+                    <b-alert show variant="warning" class="w-100 mt-5"
                         >No Ad account found!</b-alert
                     >
                 </div>

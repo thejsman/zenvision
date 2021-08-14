@@ -191,7 +191,7 @@ export default {
     },
     methods: {
         // ...mapActions(["getShopifyStoreOrders", "getShopifyStores"]),
-        ...mapActions(["loadAllChannelsPA"]),
+        ...mapActions(["loadAllChannelsPA", "toggleLoadingStatus"]),
 
         showModal(modalId) {
             this.$bvModal.show(modalId);
@@ -291,6 +291,7 @@ export default {
 
         async getGoogleAdAccounts() {
             try {
+                this.toggleLoadingStatus(true);
                 const result = await axios.get("google-connect-listaccounts", {
                     params: {
                         access_token: new URL(location.href).searchParams.get(
@@ -299,7 +300,10 @@ export default {
                     }
                 });
                 this.googleAdAccounts = result.data;
-
+                if (!this.googleAdAccounts) {
+                    this.googleAdAccounts = [];
+                }
+                this.toggleLoadingStatus(false);
                 this.$bvModal.show("google-connect");
             } catch (error) {
                 console.log(error);
