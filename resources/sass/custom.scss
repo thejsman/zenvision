@@ -486,7 +486,12 @@ th[data-v-aab6e828] {
     border: 2px #556ee6 solid !important;
     cursor: pointer;
 }
-
+.inactive {
+    opacity: 0.5;
+}
+.inactive:hover {
+    opacity: 1;
+}
 .apex-charts {
     min-height: 10px;
     cursor: crosshair;
@@ -698,30 +703,30 @@ body::-webkit-scrollbar {
 }
 
 .d-sm-inline-block {
-  padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 .t_line[data-v-610a7636] {
-  padding-left: 10px;
+    padding-left: 10px;
 }
 
 .learn-more {
-  padding: 30px 0px 30px 0px;
+    padding: 30px 0px 30px 0px;
 }
 
 .date-range {
-  padding: 5px 5px 0px 0px;
+    padding: 5px 5px 0px 0px;
 }
 
 .card-body {
-  flex: 1 1 auto;
-  min-height: 1px;
-  padding: 40px;
-  border-radius: 10px;
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 40px;
+    border-radius: 10px;
 }
 
 .button-profile {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .form-control:hover {

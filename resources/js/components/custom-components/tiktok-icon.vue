@@ -9,7 +9,11 @@
                 <div
                     class="border rounded p-2 mx-1 dropbtn bg-white"
                     :class="{
-                        'border-primary': tiktokAccount.enabled_on_dashboard
+                        'border-primary': tiktokAccount.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !tiktokAccount.enabled_on_dashboard
+                                : null
                     }"
                     @click="disableFeature ? handleClick(tiktokAccount) : null"
                     v-b-tooltip.hover="tiktokAccount.advertiser_name"
@@ -40,6 +44,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters } from "vuex";
 export default {
     name: "TiktokAccount",
     data() {
@@ -53,6 +58,7 @@ export default {
             default: true
         }
     },
+    computed: { ...mapGetters(["currentChannel"]) },
     created() {
         this.getTiktokAccounts();
     },

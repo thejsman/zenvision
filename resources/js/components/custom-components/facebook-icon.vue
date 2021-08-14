@@ -9,7 +9,11 @@
                 <div
                     class="border rounded p-2 dropbtn bg-white mx-1"
                     :class="{
-                        'border-primary': facebookAccount.enabled_on_dashboard
+                        'border-primary': facebookAccount.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !facebookAccount.enabled_on_dashboard
+                                : null
                     }"
                     @click="
                         disableFeature ? handleClick(facebookAccount) : null
@@ -46,6 +50,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../app";
+import { mapGetters } from "vuex";
 export default {
     name: "FacebookAccount",
     data() {
@@ -59,6 +64,7 @@ export default {
             default: true
         }
     },
+    computed: { ...mapGetters(["currentChannel"]) },
     created() {
         this.getfacebookAccounts();
     },

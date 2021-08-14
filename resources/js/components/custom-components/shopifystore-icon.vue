@@ -4,7 +4,13 @@
             <div v-for="store in stores" :key="store.id" class="dropdown">
                 <div
                     class="border rounded p-2 dropbtn mx-1 bg-white"
-                    :class="{ 'border-primary': store.enabled_on_dashboard }"
+                    :class="{
+                        'border-primary': store.enabled_on_dashboard,
+                        inactive:
+                            currentChannel === 'PA'
+                                ? !store.enabled_on_dashboard
+                                : null
+                    }"
                     @click="disableFeature ? handleClick(store) : null"
                     v-b-tooltip.hover="store.store_name"
                 >
