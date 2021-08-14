@@ -115,7 +115,7 @@ class GoogleAdController extends Controller
         $response = json_decode($result, true);
 
         if (isset($response['error'])) {
-            return redirect()->route('home', ['gogoleAdAccount' => 'NOT_ADS_USER']);
+            return false;
         }
         return $response['resourceNames'];
     }
