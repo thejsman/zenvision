@@ -17,7 +17,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 mx-1 dropbtn border-primary bg-white"
+                    class="border rounded p-2 mx-1 dropbtn border-primary bg-white channel-icons-grow"
                     v-b-tooltip.hover="bankName(account)"
                 >
                     <img

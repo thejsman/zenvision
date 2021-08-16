@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 dropbtn bg-white mx-1"
+                    class="border rounded p-2 dropbtn bg-white mx-1 channel-icons-grow"
                     :class="{
                         'border-primary': facebookAccount.enabled_on_dashboard,
                         inactive:

@@ -3,7 +3,7 @@
         <div class="d-flex flex-row">
             <div v-for="store in stores" :key="store.id" class="dropdown">
                 <div
-                    class="border rounded p-2 dropbtn mx-1 bg-white"
+                    class="border rounded p-2 dropbtn mx-1 bg-white channel-icons-grow"
                     :class="{
                         'border-primary': store.enabled_on_dashboard,
                         inactive:

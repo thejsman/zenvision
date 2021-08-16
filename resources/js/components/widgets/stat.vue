@@ -91,9 +91,11 @@ export default {
             <div class="media">
                 <div class="media-body">
                     <div
-                        class="d-flex justify-content-between align-items-baseline"
+                        class="d-flex justify-content-between align-items-center mb-3"
                     >
-                        <p class="text-muted font-weight-medium">{{ title }}</p>
+                        <div class="font-weight-medium">
+                            {{ title }}
+                        </div>
 
                         <div class="d-flex justify-content-end">
                             <b-badge
@@ -103,14 +105,6 @@ export default {
                                 >{{ totalSubscriptionCount }}</b-badge
                             >
                             <img
-                                v-if="channelIcon"
-                                :src="`/images/icons/${this.channelIcon}`"
-                                alt
-                                height="19"
-                                class="channel-icons"
-                            />
-
-                            <img
                                 v-if="showWarning"
                                 v-b-tooltip.hover
                                 :title="toolTip"
@@ -118,6 +112,13 @@ export default {
                                 alt
                                 height="19"
                                 class="channel-icons"
+                            />
+                            <img
+                                v-if="channelIcon"
+                                :src="`/images/icons/${this.channelIcon}`"
+                                alt
+                                height="19"
+                                class="channel-icons ml-2"
                             />
 
                             <img

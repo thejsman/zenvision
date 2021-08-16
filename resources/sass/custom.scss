@@ -286,7 +286,7 @@ th[data-v-aab6e828] {
 }
 
 .channel-icons {
-    margin-right: 10px;
+    // margin-right: 10px;
 }
 
 .dropdown-item {
@@ -512,6 +512,16 @@ th[data-v-aab6e828] {
     box-shadow: 0 2px 34px 0 rgba(0, 0, 0, 0.19);
 }
 
+.channel-icons-grow {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.channel-icons-grow:hover {
+    transform: scale(1.11);
+    box-shadow: 0 2px 34px 0 rgba(0, 0, 0, 0.19);
+}
+
 .badge-primary {
     color: #fff;
     background-color: #556ee6;
@@ -721,7 +731,7 @@ body::-webkit-scrollbar {
 .card-body {
     flex: 1 1 auto;
     min-height: 1px;
-    padding: 40px;
+    padding: 40px 25px;
     border-radius: 10px;
 }
 

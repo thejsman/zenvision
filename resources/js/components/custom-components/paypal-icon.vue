@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2  dropbtn mx-1 bg-white"
+                    class="border rounded p-2  dropbtn mx-1 bg-white channel-icons-grow"
                     :class="{ 'border-primary': account.enabled_on_dashboard }"
                     @click="disableFeature ? handleClick(account) : null"
                     v-b-tooltip.hover="account.name"

@@ -7,7 +7,7 @@
                 class="dropdown"
             >
                 <div
-                    class="border rounded p-2 mx-1 dropbtn bg-white"
+                    class="border rounded p-2 mx-1 dropbtn bg-white channel-icons-grow"
                     :class="{
                         'border-primary': stripeAccount.enabled_on_dashboard,
                         inactive:
