@@ -141,6 +141,7 @@ export default {
     min-width: 100px;
     text-align: right;
     padding-right: 30px;
+    margin-left: 5px;
 }
 .transaction_select {
     min-width: 80px;
