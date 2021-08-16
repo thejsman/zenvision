@@ -246,7 +246,11 @@ export default {
                             "YYYY-MM-DD"
                         ) === day
                     ) {
-                        return parseFloat(order.total_price - order.total_cost);
+                        return parseFloat(
+                            order.total_price -
+                                order.total_cost -
+                                order.total_discounts
+                        );
                     } else {
                         return 0;
                     }
