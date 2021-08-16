@@ -91,7 +91,7 @@ export default {
             <div class="media">
                 <div class="media-body">
                     <div
-                        class="d-flex justify-content-between align-items-center mb-3"
+                        class="d-flex justify-content-between align-items-center mb-4"
                     >
                         <div class="font-weight-medium">
                             {{ title }}
