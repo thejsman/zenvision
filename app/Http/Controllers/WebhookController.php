@@ -9,6 +9,7 @@ use App\ShopifyOrder;
 use App\ShopifyOrderProduct;
 use App\ShopifyProductVariant;
 use App\SupplierPayable;
+use App\InventoryManagement;
 
 
 class WebhookController extends Controller
@@ -45,7 +46,7 @@ class WebhookController extends Controller
             'shipping_lines' => $request->shipping_lines,
         );
 
-        ShopifyOrder::create($new_order);
+        ShopifyOrder::firstOrCreate(['order_id' => $request->id], $new_order);
         $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number);
     }
 
@@ -60,7 +61,7 @@ class WebhookController extends Controller
             $shop_domain = $request->header('x-shopify-shop-domain');
             $shop_details = ShopifyStore::where('store_url', $shop_domain)->first();
 
-            $order_exists =  ShopifyOrder::where('order_id', '=', $request->id)->first();
+            $order_exists =  ShopifyOrder::where('order_id',  $request->id)->first();
 
             if ($order_exists) {
 
@@ -86,9 +87,9 @@ class WebhookController extends Controller
                 $order_exists->original_total_duties_set = $request->original_total_duties_set;
                 $order_exists->current_total_duties_set = $request->current_total_duties_set;
                 $order_exists->shipping_lines = $request->shipping_lines;
-                $order_exists->save();
+                // $order_exists->save();
                 // update line items
-                $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
+                // $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
             }
         }
     }
@@ -163,6 +164,7 @@ class WebhookController extends Controller
                     $product->units = $product->units - $qty;
                     $product->total_inventory = $product->total_inventory - $product->cost * $qty;
                     $product->save();
+                    $this->addInventory($product, $user_id, $order_number, $qty);
                 } else {
                     $order = ShopifyOrderProduct::where('order_id', $order_id)->where('variant_id', $variant_id)->first();
                     if ($order) {
@@ -170,11 +172,37 @@ class WebhookController extends Controller
                         $product->units = $product->units - $qty_diff;
                         $product->total_inventory = $product->total_inventory - $product->cost * $qty_diff;
                         $product->save();
+                        $this->addInventory($product, $user_id, $order_number, $qty);
                     }
                 }
             } else {
                 $this->addSupplierPayable($user_id, $product_title, $order_number, $cogs);
             }
+        }
+    }
+
+    public function addInventory($product, $user_id, $order_number, $qty)
+    {
+        if ($product) {
+            $inventory_item = array(
+                'store_id' => $product->store_id,
+                'user_id' => $user_id,
+                'reference_number' => $order_number,
+                'product_id' => $product->product_id,
+                'variant_id' =>  $product->variant_id,
+                'inventory_item_id' => $product->inventory_item_id,
+                'product_title' => $product->product_title,
+                'variant_title' => $product->variant_title,
+                'sku' => $product->sku == null ? 'no_sku-2' : $product->sku,
+                'color' => $product->color,
+                'size' => $product->size,
+                'sales_price' => $product->sales_price,
+                'cost' => $product->cost,
+                'shipping_cost' => $product->shipping_cost,
+                'units' => $qty,
+                'total_inventory' => $product->cost * $qty
+            );
+            InventoryManagement::create($inventory_item);
         }
     }
     public function addSupplierPayable($user_id, $product_title, $order_number, $cogs)

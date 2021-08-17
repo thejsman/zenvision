@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ShopifyStore;
 use App\ShopifyProductVariant;
+use App\InventoryManagement;
+use Auth;
 
 class InventoryController extends Controller
 {
+    public function index()
+    {
+        return  InventoryManagement::where('user_id', Auth::user()->id)->get();
+    }
     //
     public function store(Request $request)
     {

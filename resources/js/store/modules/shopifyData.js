@@ -224,7 +224,9 @@ const actions = {
     getShopifyTotalInventory: async ({ commit }) => {
         try {
             const { data } = await axios.get("cogs");
-            commit("SET_COGS_ARRAY", data.products);
+            const inventoryResult = await axios.get("inventory");
+            const cogsData = [...data.products, ...inventoryResult.data];
+            commit("SET_COGS_ARRAY", cogsData);
             const totalInventory = _.sumBy(
                 data.products,
                 product => parseFloat(product.total_inventory) || 0

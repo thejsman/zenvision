@@ -110,6 +110,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('cogsicon', 'CogsController@showCogsIcon');
 
     //Inventory 
+    Route::get('inventory', 'InventoryController@index');
     Route::patch('inventory', 'InventoryController@deleteInventory');
     //Facebook APIs
     Route::get('getfacebookaccounts', 'FacebookController@getAdAccounts');
