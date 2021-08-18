@@ -337,9 +337,7 @@ export default {
         },
         async getCogsData() {
             try {
-                this.items = this.shopifyCogsArray.filter(
-                    cogs => !cogs.hasOwnProperty("shopify_order_number")
-                );
+                this.items = this.shopifyCogsArray;
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
             } catch (error) {
