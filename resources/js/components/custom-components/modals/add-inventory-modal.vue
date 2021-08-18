@@ -4,7 +4,7 @@
             <div
                 class="font-weight-bold font-size-24 text-white mt-4 subscription-header"
             >
-                Add Inventory
+                {{ editForm ? "Edit" : "Add" }} Inventory
             </div>
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -147,7 +147,7 @@
                             variant="success"
                             class="btn btn-green ml-2"
                             @click="handleClick"
-                            >Add</b-button
+                            >{{ editForm ? "Save" : "Add" }}</b-button
                         >
                     </div>
                 </div>
@@ -166,6 +166,7 @@ export default {
     data() {
         return {
             changedProducts: [],
+            editForm: false,
             fields: [
                 {
                     key: "product_title",
@@ -221,6 +222,7 @@ export default {
     },
     async created() {
         eventBus.$on("editInventoryText", id => {
+            this.editForm = true;
             this.handleSearchById(id);
         });
         await this.getCogsData();
@@ -250,44 +252,65 @@ export default {
         },
         handleUnitsChange(item) {
             this.changedProducts.push(item);
-            item.total_inventory = parseFloat(item.cost * item.units).toFixed(
-                2
-            );
+            if (item.hasOwnProperty("shopify_order_number")) {
+                item.total_inventory = -parseFloat(
+                    item.cost * item.units
+                ).toFixed(2);
+            } else {
+                item.total_inventory = parseFloat(
+                    item.cost * item.units
+                ).toFixed(2);
+            }
         },
         handleInventoryChange(item) {
             this.changedProducts.push(item);
-            item.units = parseInt(item.total_inventory / item.cost);
+            if (item.hasOwnProperty("shopify_order_number")) {
+                item.units = -parseInt(item.total_inventory / item.cost);
+            } else {
+                item.units = parseInt(item.total_inventory / item.cost);
+            }
         },
         handleCostChange(item) {
             this.changedProducts.push(item);
-            item.total_inventory = parseFloat(item.cost * item.units);
+            if (item.hasOwnProperty("shopify_order_number")) {
+                item.total_inventory = -parseFloat(item.cost * item.units);
+            } else {
+                item.total_inventory = parseFloat(item.cost * item.units);
+            }
         },
         async handleClick() {
             try {
                 this.toggleLoadingStatus(true);
                 this.addToChangedProducts(this.changedProducts);
-                const updateTable = this.items.filter(
-                    (item, index) =>
-                        this.preItems[index].shipping_cost !==
-                            item.shipping_cost ||
-                        this.preItems[index].cost !== item.cost ||
-                        this.preItems[index].units !== item.units ||
-                        this.preItems[index].total_inventory !==
-                            item.total_inventory
-                );
 
-                if (updateTable.length < 1) {
-                    this.showAlert("No changes to update", "danger");
+                if (
+                    this.editForm &&
+                    this.items[0].hasOwnProperty("shopify_order_number")
+                ) {
+                    await axios.patch("edit-inventory", this.items[0]);
                 } else {
-                    await axios.post("cogs", updateTable);
-                    this.getShopifyTotalInventory();
-                    this.toggleLoadingStatus(false);
-                    this.showAlert("Inventory updated succesfully", "success");
-
-                    setTimeout(() => {
-                        this.$emit("handle-close");
-                    }, 2000);
+                    const updateTable = this.items.filter(
+                        (item, index) =>
+                            this.preItems[index].shipping_cost !==
+                                item.shipping_cost ||
+                            this.preItems[index].cost !== item.cost ||
+                            this.preItems[index].units !== item.units ||
+                            this.preItems[index].total_inventory !==
+                                item.total_inventory
+                    );
+                    if (updateTable.length < 1) {
+                        this.showAlert("No changes to update", "danger");
+                    } else {
+                        await axios.post("cogs", updateTable);
+                    }
                 }
+                this.getShopifyTotalInventory();
+                this.toggleLoadingStatus(false);
+                this.showAlert("Inventory updated succesfully", "success");
+
+                setTimeout(() => {
+                    this.$emit("handle-close");
+                }, 2000);
             } catch (error) {
                 console.log(error);
                 this.showAlert(
