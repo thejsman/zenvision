@@ -106,6 +106,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // COGS Data
     Route::get('cogs', 'CogsController@index');
+    Route::get('cogs-ms', 'CogsController@indexMS');
     Route::post('cogs', 'CogsController@update');
     Route::get('cogsicon', 'CogsController@showCogsIcon');
 

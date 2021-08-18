@@ -45,6 +45,10 @@ class User extends Authenticatable
     {
         return $this->stores()->where('enabled_on_dashboard', true)->get()->pluck('id');
     }
+    public function getEnabledShopifyStoresMS()
+    {
+        return $this->stores()->get()->pluck('id');
+    }
     public function getAdAccounts()
     {
         return $this->hasMany(FacebookAd::class, 'user_id')->get();

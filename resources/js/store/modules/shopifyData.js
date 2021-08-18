@@ -223,7 +223,7 @@ const actions = {
     },
     getShopifyTotalInventory: async ({ commit }) => {
         try {
-            const { data } = await axios.get("cogs");
+            const { data } = await axios.get("cogs-ms");
             const inventoryResult = await axios.get("inventory");
             const cogsData = [...data.products, ...inventoryResult.data];
             commit("SET_COGS_ARRAY", cogsData);
