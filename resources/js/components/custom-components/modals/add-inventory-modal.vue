@@ -40,115 +40,125 @@
                 </div>
             </div>
             <div v-else>
-                <b-table
-                    ref="inventoryTable"
-                    selectable
-                    sticky-header
-                    :items="items"
-                    :fields="fields"
-                    responsive="sm"
-                    no-border-collapse
-                    head-variant="dark"
-                >
-                    <template v-slot:cell(cost)="row">
-                        <b-input-group
-                            class="cogs_cost_width"
-                            :class="{ emptyInput: row.item.cost === null }"
+                <div v-if="!this.items.length">
+                    <div class="d-flex justify-content-center mt-5 mb-5">
+                        <b-alert show variant="warning"
+                            >You don't have an inventory to manage</b-alert
                         >
-                            <b-input-group-prepend is-text>
-                                <b>$</b>
-                            </b-input-group-prepend>
-                            <b-form-input
-                                width="20px"
-                                type="number"
-                                v-model="row.item.cost"
-                                @input="handleCostChange(row.item)"
-                                placeholder="Price"
-                                min="0"
-                                trim
-                                size="10"
-                            />
-                        </b-input-group>
-                    </template>
-
-                    <template v-slot:cell(shipping_cost)="row">
-                        <b-input-group
-                            class="cogs_cost_width"
-                            :class="{
-                                emptyInput: row.item.shipping_cost === null
-                            }"
-                        >
-                            <b-input-group-prepend is-text>
-                                <b>$</b>
-                            </b-input-group-prepend>
-                            <b-form-input
-                                type="number"
-                                v-model="row.item.shipping_cost"
-                                placeholder="Price"
-                                min="0"
-                                trim
-                            />
-                        </b-input-group>
-                    </template>
-                    <template v-slot:cell(units)="row">
-                        <b-input-group
-                            class="cogs_cost_width"
-                            :class="{
-                                emptyInput: row.item.units === null
-                            }"
-                        >
-                            <b-form-input
-                                type="number"
-                                v-model="row.item.units"
-                                placeholder="Units"
-                                @input="handleUnitsChange(row.item)"
-                                min="0"
-                                trim
-                            />
-                        </b-input-group>
-                    </template>
-                    <template v-slot:cell(total_inventory)="row">
-                        <b-input-group
-                            class="cogs_cost_width"
-                            :class="{
-                                emptyInput: row.item.total_inventory === null
-                            }"
-                        >
-                            <b-input-group-prepend is-text>
-                                <b>$</b>
-                            </b-input-group-prepend>
-                            <b-form-input
-                                type="number"
-                                v-model="row.item.total_inventory"
-                                placeholder="Total Inventory"
-                                @input="handleInventoryChange(row.item)"
-                                min="0"
-                                trim
-                            />
-                        </b-input-group>
-                    </template>
-                </b-table>
-                <div>
-                    <b-alert
-                        :show="dismissCountDown"
-                        :variant="updateVariant"
-                        @dismissed="dismissCountDown = 0"
-                        class="mr-5"
-                        >{{ updateResult }}</b-alert
-                    >
+                    </div>
                 </div>
-                <div
-                    class="d-flex mt-4 text-muted justify-content-between align-items-center"
-                >
-                    <small>*Per unit</small>
+                <div v-else>
+                    <b-table
+                        ref="inventoryTable"
+                        selectable
+                        sticky-header
+                        :items="items"
+                        :fields="fields"
+                        responsive="sm"
+                        no-border-collapse
+                        head-variant="dark"
+                    >
+                        <template v-slot:cell(cost)="row">
+                            <b-input-group
+                                class="cogs_cost_width"
+                                :class="{ emptyInput: row.item.cost === null }"
+                            >
+                                <b-input-group-prepend is-text>
+                                    <b>$</b>
+                                </b-input-group-prepend>
+                                <b-form-input
+                                    width="20px"
+                                    type="number"
+                                    v-model="row.item.cost"
+                                    @input="handleCostChange(row.item)"
+                                    placeholder="Price"
+                                    min="0"
+                                    trim
+                                    size="10"
+                                />
+                            </b-input-group>
+                        </template>
+
+                        <template v-slot:cell(shipping_cost)="row">
+                            <b-input-group
+                                class="cogs_cost_width"
+                                :class="{
+                                    emptyInput: row.item.shipping_cost === null
+                                }"
+                            >
+                                <b-input-group-prepend is-text>
+                                    <b>$</b>
+                                </b-input-group-prepend>
+                                <b-form-input
+                                    type="number"
+                                    v-model="row.item.shipping_cost"
+                                    placeholder="Price"
+                                    min="0"
+                                    trim
+                                />
+                            </b-input-group>
+                        </template>
+                        <template v-slot:cell(units)="row">
+                            <b-input-group
+                                class="cogs_cost_width"
+                                :class="{
+                                    emptyInput: row.item.units === null
+                                }"
+                            >
+                                <b-form-input
+                                    type="number"
+                                    v-model="row.item.units"
+                                    placeholder="Units"
+                                    @input="handleUnitsChange(row.item)"
+                                    min="0"
+                                    trim
+                                />
+                            </b-input-group>
+                        </template>
+                        <template v-slot:cell(total_inventory)="row">
+                            <b-input-group
+                                class="cogs_cost_width"
+                                :class="{
+                                    emptyInput:
+                                        row.item.total_inventory === null
+                                }"
+                            >
+                                <b-input-group-prepend is-text>
+                                    <b>$</b>
+                                </b-input-group-prepend>
+                                <b-form-input
+                                    type="number"
+                                    v-model="row.item.total_inventory"
+                                    placeholder="Total Inventory"
+                                    @input="handleInventoryChange(row.item)"
+                                    min="0"
+                                    trim
+                                />
+                            </b-input-group>
+                        </template>
+                    </b-table>
                     <div>
-                        <b-button
-                            type="submit"
-                            variant="success"
-                            class="btn btn-green ml-2"
-                            @click="handleClick"
-                            >{{ editForm ? "Save" : "Add" }}</b-button
+                        <b-alert
+                            :show="dismissCountDown"
+                            :variant="updateVariant"
+                            @dismissed="dismissCountDown = 0"
+                            class="mr-5"
+                            >{{ updateResult }}</b-alert
                         >
+                    </div>
+                    <div
+                        class="d-flex mt-4 text-muted justify-content-between align-items-center"
+                    >
+                        <small>*Per unit</small>
+                        <div>
+                            <b-button
+                                type="submit"
+                                variant="success"
+                                class="btn btn-green ml-2"
+                                @click="handleClick"
+                                >{{ editForm ? "Save" : "Add" }}</b-button
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -327,7 +337,9 @@ export default {
         },
         async getCogsData() {
             try {
-                this.items = this.shopifyCogsArray;
+                this.items = this.shopifyCogsArray.filter(
+                    cogs => !cogs.hasOwnProperty("shopify_order_number")
+                );
                 this.is_loading = false;
                 this.preItems = JSON.parse(JSON.stringify(this.items));
             } catch (error) {
