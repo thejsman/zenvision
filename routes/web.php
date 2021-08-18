@@ -112,6 +112,9 @@ Route::group(['middleware' => ['auth']], function () {
     //Inventory 
     Route::get('inventory', 'InventoryController@index');
     Route::patch('inventory', 'InventoryController@deleteInventory');
+    Route::patch('edit-inventory', 'InventoryController@editInventory');
+    Route::delete('inventory/{id}', 'InventoryController@destroy');
+
     //Facebook APIs
     Route::get('getfacebookaccounts', 'FacebookController@getAdAccounts');
     Route::get('getfacebookadsdata', 'FacebookController@getFacebookAdsData');

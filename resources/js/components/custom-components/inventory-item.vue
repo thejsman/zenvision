@@ -7,7 +7,7 @@
         <div
             class="text-left border-bottom py-2"
             v-for="cogsItem in inventoryChangedProducts"
-            :key="cogsItem.variant_id"
+            :key="`${cogsItem.variant_id}-${Math.floor(Math.random() * 1000)}`"
         >
             <b-dropdown variant="link" text="..." class="edit_btn">
                 <b-dropdown-item href="#" @click="editInventory(cogsItem)"
@@ -34,6 +34,9 @@
             <div class="opacity5">
                 {{ cogsItem.sku }}
             </div>
+            <div v-if="cogsItem.shopify_order_number" class="opacity5">
+                Shopify# {{ cogsItem.shopify_order_number }}
+            </div>
         </div>
     </div>
 </template>
@@ -49,7 +52,6 @@ export default {
     methods: {
         ...mapActions(["removeItemfromChangedProducts", "setSearchText"]),
         editInventory(item) {
-            console.log(item);
             this.setSearchText(item);
             this.$bvModal.show("inventory-details");
 
@@ -60,7 +62,11 @@ export default {
 
         async deleteInventory(item) {
             try {
-                await axios.patch("inventory", item);
+                if (item.hasOwnProperty("shopify_order_number")) {
+                    await axios.delete(`inventory/${item.id}`);
+                } else {
+                    await axios.patch("inventory", item);
+                }
                 this.removeItemfromChangedProducts(item);
             } catch (err) {
                 console.log({ err });

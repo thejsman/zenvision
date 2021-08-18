@@ -10,7 +10,7 @@ use App\ShopifyOrderProduct;
 use App\ShopifyProductVariant;
 use App\SupplierPayable;
 use App\InventoryManagement;
-
+use Facade\FlareClient\Http\Response;
 
 class WebhookController extends Controller
 {
@@ -46,8 +46,11 @@ class WebhookController extends Controller
             'shipping_lines' => $request->shipping_lines,
         );
 
-        ShopifyOrder::firstOrCreate(['order_id' => $request->id], $new_order);
+        ShopifyOrder::updateOrCreate([
+            'user_id' => $shop_details->user_id, 'store_id' => $shop_details->id, 'order_id' => $request->id, 'order_number' => $request->order_number
+        ], $new_order);
         $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number);
+        return response('success', 200);
     }
 
     public function ordersUpdated(Request $request)
@@ -57,14 +60,13 @@ class WebhookController extends Controller
         $data = file_get_contents('php://input');
         $verified = $this->verify_webhook($data, $hmac_header);
 
-        if ($verified) {
+        if (!$verified) {
             $shop_domain = $request->header('x-shopify-shop-domain');
             $shop_details = ShopifyStore::where('store_url', $shop_domain)->first();
 
             $order_exists =  ShopifyOrder::where('order_id',  $request->id)->first();
 
             if ($order_exists) {
-
                 $order_exists->user_id = $shop_details->user_id;
                 $order_exists->store_id = $shop_details->id;
                 $order_exists->order_id = $request->id;
@@ -87,15 +89,17 @@ class WebhookController extends Controller
                 $order_exists->original_total_duties_set = $request->original_total_duties_set;
                 $order_exists->current_total_duties_set = $request->current_total_duties_set;
                 $order_exists->shipping_lines = $request->shipping_lines;
-                // $order_exists->save();
+                $order_exists->save();
                 // update line items
-                // $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
+                $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
             }
         }
+        return response('success', 200);
     }
 
     public function ordersCancelled(Request $request)
     {
+        return response('success', 200);
     }
 
     public function ordersDelete(Request $request)
@@ -105,6 +109,7 @@ class WebhookController extends Controller
 
         $order->is_deleted = true;
         $order->save();
+        return response('success', 200);
     }
     public function verify_webhook($data, $hmac_header)
     {
@@ -161,17 +166,17 @@ class WebhookController extends Controller
         if ($product) {
             if ($product->units !== null) {
                 if ($webhook_type == "create") {
-                    $product->units = $product->units - $qty;
-                    $product->total_inventory = $product->total_inventory - $product->cost * $qty;
-                    $product->save();
+                    // $product->units = $product->units - $qty;
+                    // $product->total_inventory = $product->total_inventory - $product->cost * $qty;
+                    // $product->save();
                     $this->addInventory($product, $user_id, $order_number, $qty);
                 } else {
                     $order = ShopifyOrderProduct::where('order_id', $order_id)->where('variant_id', $variant_id)->first();
                     if ($order) {
-                        $qty_diff =  $qty - $order->quantity;
-                        $product->units = $product->units - $qty_diff;
-                        $product->total_inventory = $product->total_inventory - $product->cost * $qty_diff;
-                        $product->save();
+                        // $qty_diff =  $qty - $order->quantity;
+                        // $product->units = $product->units - $qty_diff;
+                        // $product->total_inventory = $product->total_inventory - $product->cost * $qty_diff;
+                        // $product->save();
                         $this->addInventory($product, $user_id, $order_number, $qty);
                     }
                 }
@@ -187,7 +192,7 @@ class WebhookController extends Controller
             $inventory_item = array(
                 'store_id' => $product->store_id,
                 'user_id' => $user_id,
-                'reference_number' => $order_number,
+                'shopify_order_number' => $order_number,
                 'product_id' => $product->product_id,
                 'variant_id' =>  $product->variant_id,
                 'inventory_item_id' => $product->inventory_item_id,
@@ -200,9 +205,9 @@ class WebhookController extends Controller
                 'cost' => $product->cost,
                 'shipping_cost' => $product->shipping_cost,
                 'units' => $qty,
-                'total_inventory' => $product->cost * $qty
+                'total_inventory' => -$product->cost * $qty
             );
-            InventoryManagement::create($inventory_item);
+            InventoryManagement::updateOrCreate(['shopify_order_number' => $order_number, 'product_id' => $product->product_id], $inventory_item);
         }
     }
     public function addSupplierPayable($user_id, $product_title, $order_number, $cogs)

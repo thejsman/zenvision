@@ -227,11 +227,18 @@ const actions = {
             const inventoryResult = await axios.get("inventory");
             const cogsData = [...data.products, ...inventoryResult.data];
             commit("SET_COGS_ARRAY", cogsData);
-            const totalInventory = _.sumBy(
+
+            // set inventory total from cogs data
+            let totalInventory = _.sumBy(
                 data.products,
                 product => parseFloat(product.total_inventory) || 0
             );
 
+            // Subtract Shopify order inventory from inventory total
+            totalInventory += _.sumBy(
+                inventoryResult.data,
+                inventory => parseFloat(inventory.total_inventory) || 0
+            );
             commit("SET_TOTAL_INVENTORY", totalInventory);
         } catch (err) {
             commit("SET_TOTAL_INVENTORY", 0);

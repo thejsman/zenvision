@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\ShopifyStore;
 use App\ShopifyProductVariant;
 use App\InventoryManagement;
+
 use Auth;
 
 class InventoryController extends Controller
@@ -88,5 +89,20 @@ class InventoryController extends Controller
         $item->total_inventory = null;
         $item->units = null;
         $item->save();
+    }
+
+    public function editInventory(Request $request)
+    {
+        $item = InventoryManagement::find($request->id);
+        if ($item) {
+            $item->cost = $request->cost;
+            $item->units = $request->units;
+            $item->total_inventory = $request->total_inventory;
+            $item->save();
+        }
+    }
+    public function destroy($id)
+    {
+        InventoryManagement::destroy($id);
     }
 }

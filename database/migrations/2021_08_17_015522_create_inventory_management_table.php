@@ -17,7 +17,7 @@ class CreateInventoryManagementTable extends Migration
             $table->id();
             $table->unsignedBigInteger('store_id');
             $table->unsignedBigInteger('user_id');
-            $table->string('reference_number')->nullable();
+            $table->string('shopify_order_number')->nullable();
             $table->bigInteger('product_id');
             $table->bigInteger('variant_id');
             $table->bigInteger('inventory_item_id')->nullable();
