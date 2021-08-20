@@ -64,7 +64,7 @@ export default {
                     </a>
                 </div>
             </div>
-            <div class="">
+            <div class="d-none d-md-block">
                 <a
                     class="btn btn-link text-white"
                     href="/"
@@ -82,46 +82,91 @@ export default {
                     >Mastersheet</a
                 >
             </div>
-            <div class="d-flex">
-                <b-dropdown right variant="black" toggle-class="header-item">
-                    <template v-slot:button-content>
-                        <div class="dropdown d-inline-block">
-                            <button
-                                type="button"
-                                class="btn header-item noti-icon right-bar-toggle toggle-right"
-                                aria-label="settings"
+            <div class="d-flex align-items-center">
+                <div class="dropdown hamburger d-md-none">
+                    <button
+                        class="btn btn-light dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                    >
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a
+                                class="btn btn-link text-white"
+                                href="/"
+                                :class="{ inactive: currentChannel !== 'PA' }"
+                                @click="toggleCurrentChannel('PA')"
+                                aria-label="Profit Analysis"
+                                >Profit Analysis</a
                             >
-                                <i class="bx bx-cog toggle-right"></i>
-                            </button>
-                        </div>
-                    </template>
-                    <a
-                        class="dropdown-item"
-                        href="/profile"
-                        aria-label="profile"
+                        </li>
+                        <li>
+                            <a
+                                class="btn btn-link text-white"
+                                href="/mastersheet"
+                                :class="{ inactive: currentChannel !== 'MS' }"
+                                @click="toggleCurrentChannel('MS')"
+                                aria-label="Mastersheet"
+                                >Mastersheet</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="d-flex">
+                    <b-dropdown
+                        right
+                        variant="black"
+                        toggle-class="header-item"
                     >
-                        <i
-                            class="bx bx-user font-size-16 align-middle mr-1 text-danger"
-                        ></i>
-                        Profile
-                    </a>
-                    <a
-                        class="dropdown-item"
-                        href="mailto:support@zenvision.io"
-                        aria-label="support"
-                    >
-                        <i
-                            class="bx bx-support font-size-16 align-middle mr-1 text-danger"
-                        ></i>
-                        Support
-                    </a>
-                    <a class="dropdown-item" href="/logout" aria-label="logout">
-                        <i
-                            class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"
-                        ></i>
-                        Logout
-                    </a>
-                </b-dropdown>
+                        <template v-slot:button-content>
+                            <div class="dropdown d-inline-block">
+                                <button
+                                    type="button"
+                                    class="btn header-item noti-icon right-bar-toggle toggle-right"
+                                    aria-label="settings"
+                                >
+                                    <i class="bx bx-cog toggle-right"></i>
+                                </button>
+                            </div>
+                        </template>
+
+                        <a
+                            class="dropdown-item"
+                            href="/profile"
+                            aria-label="profile"
+                        >
+                            <i
+                                class="bx bx-user font-size-16 align-middle mr-1 text-danger"
+                            ></i>
+                            Profile
+                        </a>
+                        <a
+                            class="dropdown-item"
+                            href="mailto:support@zenvision.io"
+                            aria-label="support"
+                        >
+                            <i
+                                class="bx bx-support font-size-16 align-middle mr-1 text-danger"
+                            ></i>
+                            Support
+                        </a>
+                        <a
+                            class="dropdown-item"
+                            href="/logout"
+                            aria-label="logout"
+                        >
+                            <i
+                                class="bx bx-power-off font-size-16 align-middle mr-1 text-danger"
+                            ></i>
+                            Logout
+                        </a>
+                    </b-dropdown>
+                </div>
             </div>
         </div>
     </header>
@@ -132,5 +177,15 @@ export default {
 }
 .inactive:hover {
     opacity: 1;
+}
+.hamburger div {
+    width: 20px;
+    height: 1px;
+    background-color: rgb(255, 255, 255);
+    margin: 5px 0;
+}
+
+.header-item {
+    height: 57px;
 }
 </style>

@@ -1,16 +1,23 @@
 <template>
     <div class="ml-auto d-inline-flex">
-        <p class="mt-2 mr-2 date-range">Date Range:</p>
+        <p class="mt-2 mr-2 date-range d-none d-md-block">Date Range:</p>
         <DateRangePicker
             ref="picker"
             :opens="opens"
             :maxDate="maxDate"
-            :locale-data="{ firstDay: 1, format: 'mm-dd-yyyy' }"
+            :locale-data="{ firstDay: 1, format: 'MM-DD-YYYY' }"
             v-model="dateRange"
             @update="handleDateChange"
             :dateFormat="dateFormat"
             :ranges="false"
         >
+            <div slot="input" class="d-block d-lg-none d-none d-md-block">
+                <i class="bx bx-calendar calendar-icon"></i>
+            </div>
+            <div slot="input" class="d-none d-md-block">
+                {{ startDateS | moment }} -
+                {{ endDateS | moment }}
+            </div>
         </DateRangePicker>
     </div>
 </template>
@@ -42,6 +49,11 @@ export default {
             set(value) {
                 this.updateDateRange(value);
             }
+        }
+    },
+    filters: {
+        moment: function(date) {
+            return moment(date).format("MM-DD-YYYY");
         }
     },
     methods: {
@@ -90,5 +102,9 @@ export default {
     border-radius: 0;
     display: inline-block;
     padding: 3px;
+}
+.calendar-icon {
+    font-size: 18px;
+    padding: 0px;
 }
 </style>
