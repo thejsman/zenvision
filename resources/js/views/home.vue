@@ -328,13 +328,15 @@ export default {
             <div class="col-12">
                 <div class="page-title-box d-flex align-items-center">
                     <ChannelDropdown />
-                    <StoreIcon />
-                    <PaypalAccount />
-                    <StripeAccount />
-                    <FacebookAccount />
-                    <SnapchatAccount />
-                    <TiktokAccount />
-                    <GoogleAccount />
+                    <div class="d-flex channel-icons">
+                        <StoreIcon />
+                        <PaypalAccount />
+                        <StripeAccount />
+                        <FacebookAccount />
+                        <SnapchatAccount />
+                        <TiktokAccount />
+                        <GoogleAccount />
+                    </div>
                     <DateRange @changeDateRange="handleDateChange" />
                 </div>
             </div>
@@ -492,3 +494,14 @@ export default {
         </b-modal>
     </Layout>
 </template>
+<style scoped>
+@media (max-width: 768px) {
+    .channel-icons {
+        max-width: 140px;
+        overflow-x: scroll;
+    }
+}
+/* .channel-icons::-webkit-scrollbar {
+    width: 5px !important;
+} */
+</style>
