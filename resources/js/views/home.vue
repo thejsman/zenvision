@@ -498,7 +498,7 @@ export default {
 @media (max-width: 768px) {
     .channel-icons {
         max-width: 140px;
-        overflow-x: scroll;
+        overflow-x: auto;
     }
 }
 /* .channel-icons::-webkit-scrollbar {
