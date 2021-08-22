@@ -5,7 +5,7 @@
             ref="picker"
             :opens="opens"
             :maxDate="maxDate"
-            :locale-data="{ firstDay: 1, format: 'MM-DD-YYYY' }"
+            :locale-data="{ format: 'mm-dd-yyyy' }"
             v-model="dateRange"
             @update="handleDateChange"
             :dateFormat="dateFormat"

@@ -254,7 +254,7 @@ export default {
 </script>
 
 <template>
-    <div class="sheet-rightbar mx-4">
+    <div class="sheet-rightbar mx-2">
         <h4>Master Cash Flow Reconciliation</h4>
 
         <div class="row justify-content-md-between align-items-md-center">

@@ -494,14 +494,14 @@ export default {
         </b-modal>
     </Layout>
 </template>
-<style scoped>
+<style>
 @media (max-width: 768px) {
     .channel-icons {
-        max-width: 140px;
+        max-width: 146px;
         overflow-x: auto;
     }
 }
-/* .channel-icons::-webkit-scrollbar {
-    width: 5px !important;
-} */
+.channel-icons::-webkit-scrollbar {
+    height: 2px !important;
+}
 </style>
