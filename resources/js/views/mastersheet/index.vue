@@ -85,10 +85,12 @@ export default {
             <div class="col-12 my-2 d-flex justify-content-between">
                 <div class="d-flex justify-content-start align-items-center">
                     <AddChannel />
-                    <ShopifyStoreIcon :disableFeature="false" />
-                    <PaypalAccountIcon :disableFeature="false" />
-                    <StripeAccount :disableFeature="false" />
-                    <BankAccount />
+                    <div class="d-flex channel-icons">
+                        <ShopifyStoreIcon :disableFeature="false" />
+                        <PaypalAccountIcon :disableFeature="false" />
+                        <StripeAccount :disableFeature="false" />
+                        <BankAccount />
+                    </div>
                 </div>
             </div>
 
@@ -104,7 +106,7 @@ export default {
             <div class="col-md-3 mt-4 sheet-leftbar">
                 <Sidepanel />
             </div>
-            <div class="col-md-9 mt-4">
+            <div class="col-md-9 mt-2">
                 <Mainpanel />
             </div>
         </div>

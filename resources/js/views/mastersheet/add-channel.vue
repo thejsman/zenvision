@@ -1,8 +1,10 @@
 <template>
     <b-dropdown variant="primary" class="m-2">
         <template v-slot:button-content>
-            Add Channels
-            <i class="fas fa-plus pl-1"></i>
+            <div class="d-flex align-items-center">
+                <span class="d-none d-md-block pr-2">Add Channels</span
+                ><i class="fas fa-plus"></i>
+            </div>
         </template>
         <PlaidLink
             clientName="Zenvision"

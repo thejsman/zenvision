@@ -2,8 +2,8 @@
     <b-dropdown variant="primary" class="m-2 mr-3">
         <template v-slot:button-content>
             <div class="d-flex align-items-center">
-                <span class="d-none d-md-block pr-1">Add Channels</span>
-                <i class="fas fa-plus pl-1"></i>
+                <span class="d-none d-md-block pr-2">Add Channels</span
+                ><i class="fas fa-plus"></i>
             </div>
         </template>
         <b-dropdown-item href="#" v-b-modal.shopify-connect>

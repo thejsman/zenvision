@@ -9,11 +9,8 @@
                 <CogsComponent />
                 <ShopifyDiscounts />
                 <ShopifyRefunds />
-            </div>
-            <div class="row mt-2 mb-2">
                 <ChargebackComponent />
-                <!-- <MerchantFeeComponent /> -->
-                <div v-for="cost of data" :key="cost.id" class="col-md-4 p-2">
+                <div v-for="cost of data" :key="cost.id" class="col-md-4 mt-4">
                     <Stat
                         :title="cost.title"
                         :value="cost.value"
@@ -26,6 +23,10 @@
                         :toolTip="cost.toolTip"
                     />
                 </div>
+            </div>
+            <div class="mt-2 mb-2"></div>
+            <div class="row mt-2 mb-2">
+                <!-- <MerchantFeeComponent /> -->
             </div>
         </div>
 
