@@ -2,10 +2,10 @@
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-6 mobile-footer">
                     {{ new Date().getFullYear() }} © Zenvision.
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 mobile-footer">
                     <div class="d-flex justify-content-end text-white">
                         <a
                             href="https://www.zenvision.io/terms-and-conditions/"
@@ -34,5 +34,11 @@
 }
 .footer-link:hover {
     opacity: 1;
+}
+@media screen and (max-width: 768px) {
+    .mobile-footer {
+        display: flex;
+        justify-content: center;
+    }
 }
 </style>
