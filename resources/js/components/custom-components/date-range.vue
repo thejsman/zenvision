@@ -73,7 +73,7 @@ export default {
     }
 };
 </script>
-<style>
+<style lang="scss">
 .daterangepicker {
     top: 40px;
     background-color: #262b3c;
@@ -106,5 +106,19 @@ export default {
 .calendar-icon {
     font-size: 18px;
     padding: 0px;
+}
+.daterangepicker .calendars-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.drp-calendar .col .left {
+    flex: 0 0 auto;
+}
+@media screen and (max-width: 768px) {
+    .daterangepicker .drp-selected {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
 }
 </style>
