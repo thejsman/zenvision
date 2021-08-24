@@ -8,8 +8,8 @@ class CreditCardController extends Controller
 {
     public static function getCreditCardliabilities($user = null)
     {
-        if($user == null) {
-          $user =  Auth::user();
+        if ($user == null) {
+            $user =  Auth::user();
         }
         $cc_accounts = $user->getCreditCardAccounts();
 
@@ -18,7 +18,7 @@ class CreditCardController extends Controller
         foreach ($cc_accounts as $account) {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://sandbox.plaid.com/accounts/balance/get',
+                CURLOPT_URL => 'https://plaid.com/accounts/balance/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -46,7 +46,7 @@ class CreditCardController extends Controller
             curl_close($curl);
 
             //Change logic
-            
+
             // if (!isset($response['error_code'])) {
             //     if (!is_null($response['liabilities']['credit'][0]['last_statement_balance'])) {
             //         $liabilities += $response['liabilities']['credit'][0]['last_statement_balance'];
@@ -60,7 +60,6 @@ class CreditCardController extends Controller
                     $balance += $response['accounts'][0]['balances']['current'];
                 }
                 $limit += $response['accounts'][0]['balances']['limit'];
-
             }
         }
         return $limit - $balance;

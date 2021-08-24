@@ -28,7 +28,6 @@ class BankAccountController extends Controller
         // Save Bank Logo
         $blob = $this->getBankLogo($request->institution_id);
         $this->createImageFromBase64($blob, $request->institution_id);
-
     }
     public function getBankAccounts()
     {
@@ -42,25 +41,25 @@ class BankAccountController extends Controller
     }
     public static function getAccountBalance($user = null)
     {
-        if($user == null) {
+        if ($user == null) {
             $user = Auth::user();
         }
         $bank_accounts = $user->getBankAccounts();
         $balance = 0;
         foreach ($bank_accounts as $account) {
-          if($account->bank_type == "depository") {
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://sandbox.plaid.com/accounts/balance/get',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
+            if ($account->bank_type == "depository") {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://plaid.com/accounts/balance/get',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => '{
                 "client_id": "' . env('PLAID_CLIENT_ID') . '",
                 "secret": "' . env('PLAID_SECRET') . '",
                 "access_token": "' . $account->access_token . '",
@@ -68,22 +67,22 @@ class BankAccountController extends Controller
                   "account_ids": ["' . $account->bank_user_id . '"]
                 }
               }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                ),
-            ));
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                    ),
+                ));
 
-            $result = curl_exec($curl);
-            $response = json_decode($result, true);
-            curl_close($curl);
-            if (!isset($response['errors'])) {
-                if (!is_null($response['accounts'][0]['balances']['available'])) {
-                    $balance += $response['accounts'][0]['balances']['available'];
-                } else {
-                    $balance += $response['accounts'][0]['balances']['current'];
+                $result = curl_exec($curl);
+                $response = json_decode($result, true);
+                curl_close($curl);
+                if (!isset($response['errors'])) {
+                    if (!is_null($response['accounts'][0]['balances']['available'])) {
+                        $balance += $response['accounts'][0]['balances']['available'];
+                    } else {
+                        $balance += $response['accounts'][0]['balances']['current'];
+                    }
                 }
             }
-          }          
         }
         return $balance;
     }
@@ -97,7 +96,7 @@ class BankAccountController extends Controller
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://sandbox.plaid.com/transactions/get',
+                CURLOPT_URL => 'https://plaid.com/transactions/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -144,7 +143,7 @@ class BankAccountController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://sandbox.plaid.com/institutions/get_by_id',
+            CURLOPT_URL => 'https://plaid.com/institutions/get_by_id',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -174,7 +173,7 @@ class BankAccountController extends Controller
 
         if (!isset($response['errors'])) {
 
-            return $response['institution']['logo'];
+            return $response['institution']['logenerateLinkTokengo'];
         } else {
             return null;
         }
@@ -186,7 +185,7 @@ class BankAccountController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://sandbox.plaid.com/link/token/create',
+            CURLOPT_URL => 'https://plaid.com/link/token/create',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -220,14 +219,13 @@ class BankAccountController extends Controller
         } else {
             return null;
         }
-
     }
     protected function getAccessToken($public_token)
     {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://sandbox.plaid.com/item/public_token/exchange',
+            CURLOPT_URL => 'https://plaid.com/item/public_token/exchange',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
