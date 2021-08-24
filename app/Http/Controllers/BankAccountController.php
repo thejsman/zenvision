@@ -50,7 +50,7 @@ class BankAccountController extends Controller
             if ($account->bank_type == "depository") {
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://plaid.com/accounts/balance/get',
+                    CURLOPT_URL => 'https://development.plaid.com/accounts/balance/get',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -96,7 +96,7 @@ class BankAccountController extends Controller
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://plaid.com/transactions/get',
+                CURLOPT_URL => 'https://development.plaid.com/transactions/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -143,7 +143,7 @@ class BankAccountController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://plaid.com/institutions/get_by_id',
+            CURLOPT_URL => 'https://development.plaid.com/institutions/get_by_id',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -173,7 +173,7 @@ class BankAccountController extends Controller
 
         if (!isset($response['errors'])) {
 
-            return $response['institution']['logenerateLinkTokengo'];
+            return $response['institution']['logo'];
         } else {
             return null;
         }
@@ -185,7 +185,7 @@ class BankAccountController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://plaid.com/link/token/create',
+            CURLOPT_URL => 'https://development.plaid.com/link/token/create',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -225,7 +225,7 @@ class BankAccountController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://plaid.com/item/public_token/exchange',
+            CURLOPT_URL => 'https://development.plaid.com/item/public_token/exchange',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
