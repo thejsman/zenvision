@@ -8,7 +8,7 @@
         </template>
         <PlaidLink
             clientName="Zenvision"
-            env="sandbox"
+            env="development"
             :link_token="plaidLinkToken"
             :products="['auth', 'transactions']"
             :onLoad="onLoad"
@@ -54,7 +54,7 @@
         </b-dropdown-item>
         <PlaidLink
             clientName="Zenvision"
-            env="sandbox"
+            env="development"
             :link_token="plaidLinkToken"
             :products="['auth', 'transactions']"
             :onLoad="onLoad"
