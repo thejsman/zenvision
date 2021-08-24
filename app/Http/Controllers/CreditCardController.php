@@ -18,7 +18,7 @@ class CreditCardController extends Controller
         foreach ($cc_accounts as $account) {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://plaid.com/accounts/balance/get',
+                CURLOPT_URL => 'https://development.plaid.com/accounts/balance/get',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
