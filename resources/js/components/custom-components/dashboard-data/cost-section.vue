@@ -5,7 +5,7 @@
             <h3>{{ totalCost }}</h3>
         </div>
         <div class="col-12">
-            <div class="row">
+            <div class="row mb-4">
                 <CogsComponent />
                 <ShopifyDiscounts />
                 <ShopifyRefunds />
