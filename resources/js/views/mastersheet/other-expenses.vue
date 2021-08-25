@@ -23,7 +23,7 @@
                             v-if="!loading && noTransactions && noAccount"
                             class="d-flex flex-column justify-content-center w-100 mt-5"
                         >
-                            <div v-if="noAccount">
+                            <div v-if="!noAccount">
                                 <p class="text-center">
                                     No bank/credit card account connected.
                                 </p>
@@ -215,6 +215,7 @@ export default {
             }
         },
         noAccount() {
+            console.log(this.hasStripeAccountCS || this.hasBankAccountCS);
             return this.hasStripeAccountCS || this.hasBankAccountCS;
         },
         tagsLenght() {
