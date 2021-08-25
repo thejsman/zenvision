@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-4 mt-xs-4">
+    <div class="col-md-4 mt-4">
         <Stat
             :title="data.title"
             :value="data.value"
@@ -20,7 +20,7 @@ export default {
         return {
             data: {
                 id: 1,
-                title: MERCHANT_FEE,
+                title: MERCHANT_FEE + "2",
                 value: `0`,
                 loading: true,
                 toolTip:
