@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Cache;
 
 class ShopifyStoreController extends Controller
 {
@@ -81,7 +82,10 @@ class ShopifyStoreController extends Controller
 
     public function getStores()
     {
-        return Auth::user()->stores;
+
+        return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('STORES', env('REDIS_TTL'), function () {
+            return Auth::user()->stores;
+        });
     }
 
     // validate Store url method
@@ -219,16 +223,16 @@ class ShopifyStoreController extends Controller
 
                 $user = User::find($user_exists->id);
 
-                Auth::login($user);                
-               
-                 return redirect('/');
+                Auth::login($user);
+
+                return redirect('/');
                 // // dd(['access_token' => $access_token, 'store' => $store]);
                 // // return 'You have successfully logged in :D';
                 // if (Auth::loginUsingId($user_exists->id)) {
 
                 // };
             } else {
-                echo('Sorry, but your Credentials seem to be wrong, stupid');
+                echo ('Sorry, but your Credentials seem to be wrong, stupid');
             }
         } else {
             $user = new User();
@@ -327,9 +331,7 @@ class ShopifyStoreController extends Controller
             }
         }
     }
-    public function registerAndSave()
-    {
-    }
+
 
     public function getAccessToken($shop_domain = '', $code = '')
     {
@@ -351,12 +353,18 @@ class ShopifyStoreController extends Controller
     }
     public function toggleStore(Request $request)
     {
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . Auth::user()->id])->flush();
+
         $store = ShopifyStore::find($request->id);
         $store->enabled_on_dashboard = !$store->enabled_on_dashboard;
         $store->save();
     }
     public function destroy(Request $request)
     {
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . Auth::user()->id])->flush();
+
         $store = ShopifyStore::find($request->id);
         $access_token = $request->api_token;
         $revoke_url = "https://" . $request->store_url . "/admin/api_permissions/current.json";

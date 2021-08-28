@@ -5,6 +5,8 @@ namespace App;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Cache;
+
 
 class User extends Authenticatable
 {
@@ -43,7 +45,9 @@ class User extends Authenticatable
     }
     public function getEnabledShopifyStores()
     {
-        return $this->stores()->where('enabled_on_dashboard', true)->get()->pluck('id');
+        return Cache::tags(['SHOPIFY:' .  $this->id])->remember('ENABLED_STORE', env('REDIS_TTL'), function () {
+            return $this->stores()->where('enabled_on_dashboard', true)->get()->pluck('id');
+        });
     }
     public function getEnabledShopifyStoresMS()
     {

@@ -8,6 +8,7 @@ use App\ShopifyOrderProduct;
 use App\ShopifyStore;
 use Auth;
 use Illuminate\Http\Request;
+use Cache;
 
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CreditCardController;
@@ -43,16 +44,18 @@ class DashboardController extends Controller
 
     public function getShopifyStoreOrders(Request $request)
     {
-
-        $user = Auth::user();
-        $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        $orders = [];
-        foreach ($enabled_on_dashboard as $store_id) {
-            $store = ShopifyStore::find($store_id);
-            $orders = array_merge($orders, $store->getOrders($request->s_date, $request->e_date . ' ' . '23:59:59')->toArray());
-        }
-
-        return $orders;
+        return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('ORDERS' . '_' . $request->s_date . '_' . $request->e_date, env('REDIS_TTL'), function () use ($request) {
+            $start_data = $request->s_date;
+            $end_date = $request->e_date . ' ' . '23:59:59';
+            $user = Auth::user();
+            $enabled_on_dashboard = $user->getEnabledShopifyStores();
+            $orders = [];
+            foreach ($enabled_on_dashboard as $store_id) {
+                $store = ShopifyStore::find($store_id);
+                $orders = array_merge($orders, $store->getOrders($start_data,  $end_date)->toArray());
+            }
+            return $orders;
+        });
     }
     public function getShopifyStoreAllOrders(Request $request)
     {
