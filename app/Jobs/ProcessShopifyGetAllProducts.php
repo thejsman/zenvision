@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Cache;
+use Auth;
 
 class ProcessShopifyGetAllProducts implements ShouldQueue
 {
@@ -106,6 +108,8 @@ class ProcessShopifyGetAllProducts implements ShouldQueue
             // next page token
             $nextPageToken = $products['next']['page_token'] ?? null;
         } while ($nextPageToken != null);
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . Auth::user()->id])->flush();
     }
 
     private function shopRequest($method = '', $url = '')

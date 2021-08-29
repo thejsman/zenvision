@@ -9,6 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Cache;
+
 
 class ProcessShopifyGetAllOrders implements ShouldQueue
 {
@@ -121,7 +123,8 @@ class ProcessShopifyGetAllOrders implements ShouldQueue
             // next page token
             $nextPageToken = $orders['next']['page_token'] ?? null;
         } while ($nextPageToken != null);
-
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . $this->user_id])->flush();
     }
     private function shopRequest($method = '', $url = '')
     {

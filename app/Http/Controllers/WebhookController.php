@@ -10,7 +10,7 @@ use App\ShopifyOrderProduct;
 use App\ShopifyProductVariant;
 use App\SupplierPayable;
 use App\InventoryManagement;
-use Facade\FlareClient\Http\Response;
+use Cache;
 
 class WebhookController extends Controller
 {
@@ -50,6 +50,10 @@ class WebhookController extends Controller
             'user_id' => $shop_details->user_id, 'store_id' => $shop_details->id, 'order_id' => $request->id, 'order_number' => $request->order_number
         ], $new_order);
         $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number);
+
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . $shop_details->user_id])->flush();
+
         return response('success', 200);
     }
 
@@ -93,7 +97,12 @@ class WebhookController extends Controller
                 // update line items
                 $this->addLineItems($request->line_items, $shop_details->user_id, $shop_details->id, $request->id, $request->order_number, "update");
             }
+            //Cache Clear
+            Cache::tags(['SHOPIFY:' . $shop_details->user_id])->flush();
         }
+
+
+
         return response('success', 200);
     }
 
@@ -148,6 +157,8 @@ class WebhookController extends Controller
             $this->updateInventory($line_item['variant_id'], $line_item['fulfillable_quantity'], $webhook_type, $order_id, $user_id, $line_item['title'], $order_number, $cogs);
 
             ShopifyOrderProduct::updateOrCreate(['order_id' => $order_id, 'variant_id' => $line_item['variant_id'], 'product_id' => $line_item['product_id']], $new_line_item);
+            //Cache Clear
+            Cache::tags(['SHOPIFY:' . $user_id])->flush();
         }
     }
 
@@ -184,6 +195,8 @@ class WebhookController extends Controller
                 $this->addSupplierPayable($user_id, $product_title, $order_number, $cogs);
             }
         }
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . $user_id])->flush();
     }
 
     public function addInventory($product, $user_id, $order_number, $qty)
@@ -209,6 +222,8 @@ class WebhookController extends Controller
             );
             InventoryManagement::updateOrCreate(['shopify_order_number' => $order_number, 'product_id' => $product->product_id], $inventory_item);
         }
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . $user_id])->flush();
     }
     public function addSupplierPayable($user_id, $product_title, $order_number, $cogs)
     {
