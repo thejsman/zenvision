@@ -203,9 +203,14 @@ const actions = {
             });
         }
     },
-    getCogsIconStatus: async ({ commit }) => {
+    getCogsIconStatus: async ({ commit, rootGetters }) => {
         try {
-            const { data } = await axios.get("/cogsicon");
+            const { data } = await axios.get("/cogsicon", {
+                params: {
+                    start_date: rootGetters.startDateS,
+                    end_date: rootGetters.endDateS
+                }
+            });
         } catch (err) {
             console.log({ err });
         }

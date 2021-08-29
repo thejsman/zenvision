@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ShopifyProductVariant;
 use App\ShopifyOrderProduct;
-use App\User;
+use Cache;
 use Auth;
 
 class CogsController extends Controller
@@ -40,6 +40,8 @@ class CogsController extends Controller
             $cogs = $value['cost'] + $value['shipping_cost'];
             $this->updateProductCogs($value['variant_id'], $cogs);
         }
+        //Cache Clear
+        Cache::tags(['SHOPIFY:' . Auth::user()->id])->flush();
     }
 
     private function updateProductCogs($varian_id, $cogs)
@@ -51,13 +53,15 @@ class CogsController extends Controller
             $lineItem->save();
         }
     }
-    public function showCogsIcon()
+    public function showCogsIcon(Request $request)
     {
-        $user = Auth::user();
-        $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        $cost_count =  ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('cost')->count();
-        $shipping_count = ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('shipping_cost')->count();
+        return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('COGS_ICON_' . $request->start_date . '_' . $request->end_date, env('REDIS_TTL'), function () {
+            $user = Auth::user();
+            $enabled_on_dashboard = $user->getEnabledShopifyStores();
+            $cost_count =  ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('cost')->count();
+            $shipping_count = ShopifyProductVariant::whereIn('store_id', $enabled_on_dashboard)->whereNull('shipping_cost')->count();
 
-        return $cost_count + $shipping_count;
+            return $cost_count + $shipping_count;
+        });
     }
 }
