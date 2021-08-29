@@ -251,9 +251,14 @@ const actions = {
     addToChangedProducts: ({ commit }, product) => {
         commit("SET_CHANGED_PRODUCTS", product);
     },
-    getAbandonedCartCount: async ({ commit }) => {
+    getAbandonedCartCount: async ({ commit, rootGetters }) => {
         try {
-            const { data } = await axios.get("abandonedcart");
+            const { data } = await axios.get("abandonedcart", {
+                params: {
+                    start_date: rootGetters.startDateS,
+                    end_date: rootGetters.endDateS
+                }
+            });
             commit("SET_ABANDONED_CART_COUNT", data);
         } catch (err) {
             console.log({ err });

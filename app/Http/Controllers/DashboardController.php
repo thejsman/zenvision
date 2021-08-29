@@ -12,6 +12,7 @@ use Cache;
 
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CreditCardController;
+use Exception;
 
 class DashboardController extends Controller
 {
@@ -72,18 +73,23 @@ class DashboardController extends Controller
     // Funciton to get abandoned cart count
     public function getAbandonedCartCount(Request $request)
     {
-
-        $user = Auth::user();
-        $enabled_on_dashboard = $user->getEnabledShopifyStores();
-        $abandoned_cart_count = 0;
-        foreach ($enabled_on_dashboard as $store_id) {
-            $store = ShopifyStore::find($store_id);
-            $url = "https://" . $store->store_url . "/admin/api/2020-07/checkouts/count.json";
-            $access_token = $store->api_token;
-            $response = CustomRequests::getRequest($url, [], $access_token);
-            $abandoned_cart_count += $response['count'];
-        }
-        return $abandoned_cart_count;
+        return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('ABANDONED_CART_COUNT' . '_' . $request->start_date . '_' . $request->end_date, env('REDIS_TTL'), function () {
+            try {
+                $user = Auth::user();
+                $enabled_on_dashboard = $user->getEnabledShopifyStores();
+                $abandoned_cart_count = 0;
+                foreach ($enabled_on_dashboard as $store_id) {
+                    $store = ShopifyStore::find($store_id);
+                    $url = "https://" . $store->store_url . "/admin/api/2020-07/checkouts/count.json";
+                    $access_token = $store->api_token;
+                    $response = CustomRequests::getRequest($url, [], $access_token);
+                    $abandoned_cart_count += $response['count'];
+                }
+                return $abandoned_cart_count;
+            } catch (Exception $e) {
+                return 0;
+            }
+        });
     }
 
     public static function mastersheet($user = null)
