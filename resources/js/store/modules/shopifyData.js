@@ -260,14 +260,16 @@ const actions = {
             commit("SET_ABANDONED_CART_COUNT", 0);
         }
     },
-    getAverageUnitsCount: async ({ commit, state }) => {
+    getAverageUnitsCount: async ({ commit, state, rootGetters }) => {
         try {
             const order_ids = state.orders.map(order => order.order_id);
 
             if (order_ids.length > 0) {
                 const { data } = await axios.get("getavgunitperorder", {
                     params: {
-                        order_ids
+                        order_ids,
+                        start_date: rootGetters.startDateS,
+                        end_date: rootGetters.endDateS
                     }
                 });
                 commit("SET_AVERAGE_UNITS_COUNT", data);

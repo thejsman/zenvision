@@ -155,12 +155,14 @@ class DashboardController extends Controller
 
     public function getAvgUnitsPerOrder(Request $request)
     {
-        if (count($request->order_ids)) {
-            $productsCount = ShopifyOrderProduct::whereIn('order_id', $request->order_ids)->sum('quantity');
-            return round($productsCount / count($request->order_ids), 2);
-        } else {
-            return 0;
-        }
+        return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('AVERAGE_UNITS' . '_' . $request->start_date . '_' . $request->end_date, env('REDIS_TTL'), function () use ($request) {
+            if (count($request->order_ids)) {
+                $productsCount = ShopifyOrderProduct::whereIn('order_id', $request->order_ids)->sum('quantity');
+                return round($productsCount / count($request->order_ids), 2);
+            } else {
+                return 0;
+            }
+        });
     }
 
 
