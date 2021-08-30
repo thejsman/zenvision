@@ -408,6 +408,7 @@ const mutations = {
             state.orders = [];
             state.allOrders = [];
             state.cogsTotal = 0;
+            state.paCogsTotal = 0;
             state.storeBalance = 0;
             state.storeReserves = 0;
             state.shopifyCogsArray = [];

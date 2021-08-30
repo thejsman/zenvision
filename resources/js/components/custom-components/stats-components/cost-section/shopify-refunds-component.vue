@@ -33,14 +33,19 @@ export default {
     },
     watch: {
         hasShopifyStorePA() {
-            if (!this.hasShopifyStorePA) {
-                this.data.value = "-";
+            if (this.hasShopifyStorePA) {
                 this.data.loading = false;
+                this.data.value = displayCurrency(`${this.shopifyRefundTotal}`);
+            } else {
+                this.data.loading = false;
+                this.data.value = "-";
             }
         },
         shopifyRefundTotal(newVal, oldVal) {
             if (this.hasShopifyStorePA) {
-                this.data.value = displayCurrency(`${newVal}`);
+                this.data.value = this.hasShopifyStorePA
+                    ? displayCurrency(`${newVal}`)
+                    : "-";
                 this.data.loading = false;
             }
         }

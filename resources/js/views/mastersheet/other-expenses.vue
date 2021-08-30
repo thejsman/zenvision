@@ -215,7 +215,6 @@ export default {
             }
         },
         noAccount() {
-            console.log(this.hasStripeAccountCS || this.hasBankAccountCS);
             return this.hasStripeAccountCS || this.hasBankAccountCS;
         },
         tagsLenght() {

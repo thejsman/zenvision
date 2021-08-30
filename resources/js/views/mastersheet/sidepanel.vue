@@ -177,7 +177,6 @@ export default {
     },
     methods: {
         async getMastersheetData() {
-            // console.log("check this", this.assetsInventoryTotal);
             // if (
             //     this.assetsInventoryTotal === null &&
             //     this.hasShopifyStoreCS === true

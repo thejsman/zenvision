@@ -11,6 +11,7 @@ use Auth;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
+use Cache;
 
 class StripeController extends Controller
 {
@@ -142,12 +143,17 @@ class StripeController extends Controller
         $account->enabled_on_dashboard = !$request->enabled_on_dashboard;
 
         $account->save();
+
+        //Cache Clear
+        Cache::tags(['STRIPE:' . Auth::user()->id])->flush();
     }
     public function destroy(Request $request)
     {
         $account = StripeAccount::find($request->id);
         $account->isDeleted = true;
         $account->save();
+        //Cache Clear
+        Cache::tags(['STRIPE:' . Auth::user()->id])->flush();
     }
 
     public function getReportStatus(Request $request)
@@ -460,30 +466,36 @@ class StripeController extends Controller
     public function getStripeChargebacks(Request $request)
     {
 
-        $user = Auth::user();
-        $stripeAccounts = $user->getStripeAccountConnectIds();
-        $stripe_chargebacks = [];
+        // return Cache::tags(['SHOPIFY:' . Auth::user()->id])->remember('STORES', env('REDIS_TTL'), function () {
+        return Cache::tags(['STRIPE' . Auth::user()->id])->remember('STRIPE_CHARGEBACK_' . $request->s_date . '_' . $request->e_date, env('REDIS_TTL'), function () use ($request) {
 
-        if ($stripeAccounts->count()) {
-            foreach ($stripeAccounts as $account) {
-                if ($account->enabled_on_dashboard) {
-                    $stripe = new \Stripe\StripeClient(
-                        $account->access_token
-                    );
-                    $disputes = $stripe->disputes->all([
-                        'limit' => 100,
-                        'created' => array(
-                            'gte' => strtotime($request->s_date),
-                            'lte' => strtotime($request->e_date),
-                        ),
-                    ]);
-                    foreach ($disputes->autoPagingIterator() as $dispute) {
-                        array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
+            $user = Auth::user();
+            $stripeAccounts = $user->getStripeAccountConnectIds();
+            $stripe_chargebacks = [];
+
+            if ($stripeAccounts->count()) {
+                foreach ($stripeAccounts as $account) {
+                    if ($account->enabled_on_dashboard) {
+                        $stripe = new \Stripe\StripeClient(
+                            $account->access_token
+                        );
+                        $disputes = $stripe->disputes->all([
+                            'limit' => 100,
+                            'created' => array(
+                                'gte' => strtotime($request->s_date),
+                                'lte' => strtotime($request->e_date),
+                            ),
+                        ]);
+                        foreach ($disputes->autoPagingIterator() as $dispute) {
+                            array_push($stripe_chargebacks, array('created' => $dispute->created, 'amount' => $dispute->amount, 'status' => $dispute->status, 'currency' => $dispute->currency));
+                        }
                     }
                 }
-            }
 
-            return $stripe_chargebacks;
-        }
+                return $stripe_chargebacks;
+            } else {
+                return 0;
+            }
+        });
     }
 }

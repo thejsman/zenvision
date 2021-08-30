@@ -182,7 +182,7 @@ export default {
             "stripeAccounts",
             "hasStripeAccountCS",
             "stripeFirstLoad",
-            "hasShopifyStoreCS",
+            "hasShopifyStorePA",
             "stripeChargebackTotal",
             "stripeChargebackArray",
 
@@ -207,12 +207,13 @@ export default {
             eventBus.$emit("totalCostValue", totalCost);
             return displayCurrency(totalCost);
         },
-        anyActiveAccount() {
-            return (
-                this.hasPaypalAccount ||
-                this.hasStripeAccountCS ||
-                this.hasShopifyStoreCS
-            );
+        anyActiveAccount: {
+            get() {
+                return this.hasStripeAccountCS || this.hasShopifyStorePA;
+            },
+            set(status) {
+                return status;
+            }
         },
         totalMerchantFees() {
             return this.stripeFeeTotal + this.paypalFeeTotal;
@@ -260,6 +261,9 @@ export default {
             );
         },
         hasStripeAccountCS(newVal, oldVal) {
+            if (newVal) {
+                this.anyActiveAccount = true;
+            }
             this.stripeFeeTotal = 0;
             setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
             setLoadingSingle(this.data, MERCHANT_FEE);
@@ -310,6 +314,23 @@ export default {
                     ? displayCurrency(this.stripeChargebackTotal)
                     : "-"
             );
+        },
+        hasShopifyStorePA(newVal, oldVal) {
+            if (newVal) {
+                updateDataMerchantFee(
+                    this.data,
+                    MERCHANT_FEE,
+                    displayCurrency(this.totalMerchantFees)
+                );
+            } else {
+                updateDataMerchantFee(
+                    this.data,
+                    MERCHANT_FEE,
+                    this.anyActiveAccount
+                        ? displayCurrency(this.totalMerchantFees)
+                        : "-"
+                );
+            }
         }
     },
     async created() {
@@ -500,7 +521,7 @@ export default {
         },
 
         async getCogsData(orders, refundTotal) {
-            if (this.hasShopifyStoreCS) {
+            if (this.hasShopifyStorePA) {
                 setLoadingSingle(this.data, DISCOUNTS_TOTAL);
                 setLoadingSingle(this.data, REFUNDS_TOTAL);
                 const discounts = _.sumBy(orders, order =>
@@ -521,7 +542,12 @@ export default {
                 try {
                     setLoadingSingle(this.data, COGS_TOTAL);
 
-                    const result = await axios.get("/cogsicon");
+                    const result = await axios.get("/cogsicon", {
+                        params: {
+                            startDateS,
+                            endDateS
+                        }
+                    });
                     const showIcon = result.data === 0 ? false : true;
                     const cogs = _.sumBy(orders, order =>
                         parseFloat(order.total_cost)
@@ -531,7 +557,7 @@ export default {
                     this.updateCogsData(
                         this.data,
                         COGS_TOTAL,
-                        this.hasShopifyStoreCS ? displayCurrency(cogs) : "-",
+                        this.hasShopifyStorePA ? displayCurrency(cogs) : "-",
                         showIcon
                     );
                 } catch (err) {
@@ -718,7 +744,7 @@ export default {
             // this.getStripeChargeBack();
             try {
                 //Shopify Chargebacks
-                if (this.hasShopifyStoreCS) {
+                if (this.hasShopifyStorePA) {
                     // setLoadingSingle(this.data, CHARGEBACKS_TOTAL);
                     // this.shopifyChargebackTotal = 0;
                     // const result = await axios.get("getshopifydisputes");
@@ -908,13 +934,15 @@ export default {
                 }
             } else {
                 this.stripeFeeTotal = 0;
-                updateDataMerchantFee(
-                    this.data,
-                    MERCHANT_FEE,
-                    this.anyActiveAccount
-                        ? displayCurrency(this.totalMerchantFees)
-                        : "-"
-                );
+                // setTimeout(() => {
+                //     updateDataMerchantFee(
+                //         this.data,
+                //         MERCHANT_FEE,
+                //         this.anyActiveAccount
+                //             ? displayCurrency(this.totalMerchantFees)
+                //             : this.anyActiveAccount
+                //     );
+                // }, 1500);
             }
         },
 

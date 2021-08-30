@@ -43,7 +43,9 @@ export default {
         },
         shopifyTotalTax(newVal, oldVal) {
             this.data.loading = false;
-            this.data.value = displayCurrency(`${newVal}`);
+            this.data.value = this.hasShopifyStorePA
+                ? displayCurrency(`${newVal}`)
+                : "-";
         }
     }
 };

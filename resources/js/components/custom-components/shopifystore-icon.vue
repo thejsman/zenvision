@@ -97,16 +97,16 @@ export default {
         async removeChannel(store, event) {
             try {
                 this.toggleLoadingStatus(true);
-                eventBus.$emit("setLoadingTrue");
+
                 await axios.patch("shopifystoredelete", store);
                 await this.removeShopifyAccount(store);
                 await this.getShopifyStores(this.currentChannel);
                 eventBus.$emit("toggleShopifyStore");
-                eventBus.$emit("setLoadingFalse");
+
                 this.getStores();
                 this.toggleLoadingStatus(false);
             } catch (error) {
-                eventBus.$emit("setLoadingFalse");
+                this.toggleLoadingStatus(false);
                 console.log(error);
             }
         },
