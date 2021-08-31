@@ -165,6 +165,17 @@ export default {
                 later.
             </p>
         </b-modal>
+        <!-- BankAccount Modal -->
+        <b-modal
+            id="bankaccount-error"
+            title="Bank Account"
+            ok-only
+            ok-variant="primary"
+        >
+            <p class="my-2">
+                Something went wrong, please try again after sometime.
+            </p>
+        </b-modal>
     </Layout>
 </template>
 <style>

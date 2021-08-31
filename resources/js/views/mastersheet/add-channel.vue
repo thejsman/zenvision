@@ -104,6 +104,7 @@ import axios from "axios";
 import PlaidLink from "vue-plaid-link2";
 import { mapMutations } from "vuex";
 import BankConnect from "../../components/custom-components/modals/bank-account-modal.vue";
+
 export default {
     data() {
         return {
@@ -117,7 +118,8 @@ export default {
             plaidLinkToken: "",
             plaidPublicToken: "",
             plaidInstitution: "",
-            plaidClickType: ""
+            plaidClickType: "",
+            showModal: true
         };
     },
     components: { PlaidLink, BankConnect },
@@ -140,19 +142,27 @@ export default {
         },
         async onLoad() {},
         onSuccess(public_token, metadata) {
-            const accounts = metadata.accounts.filter(account =>
-                this.plaidClickType === "depository"
-                    ? account.type === "depository"
-                    : account.type === "credit"
-            );
-            this.plaidAccounts = accounts;
-            this.plaidPublicToken = public_token;
-            this.plaidInstitution = metadata.institution;
+            try {
+                const accounts = metadata.accounts.filter(account =>
+                    this.plaidClickType === "depository"
+                        ? account.type === "depository"
+                        : account.type === "credit"
+                );
+                this.plaidAccounts = accounts;
+                this.plaidPublicToken = public_token;
+                this.plaidInstitution = metadata.institution;
+            } catch (err) {
+                console.log(err);
+            }
         },
         onExit(err, metadata) {},
         onEvent(eventName, metadata) {
+            console.log({ eventName });
             if (eventName === "HANDOFF") {
                 this.$bvModal.show("plaid-connect");
+            }
+            if (eventName === "ERROR") {
+                this.$bvModal.show("bankaccount-error");
             }
         },
         async getPlaidLinkToken() {
